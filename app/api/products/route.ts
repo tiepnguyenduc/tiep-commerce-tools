@@ -6,6 +6,11 @@ export async function GET(request: Request) {
     await searchProducts(
       url.searchParams.get("q") ?? "",
       url.searchParams.get("category") ?? "",
+      {
+        color: url.searchParams.get("color") ?? "",
+        price: url.searchParams.get("price") ?? "",
+        sort: url.searchParams.get("sort") ?? "",
+      },
     ),
   );
 }

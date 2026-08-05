@@ -209,17 +209,72 @@ select {
   letter-spacing: -4px;
   margin: 10px 0;
 }
-.filters {
+.filters,
+.search-strip {
   display: grid;
   grid-template-columns: 1fr 220px auto;
   gap: 12px;
   margin-bottom: 30px;
+}
+.search-strip {
+  grid-template-columns: 1fr auto;
 }
 .field {
   padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: white;
+}
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 36px;
+  align-items: start;
+  padding-bottom: 64px;
+}
+.filter-panel {
+  position: sticky;
+  top: 24px;
+}
+.filter-form {
+  display: grid;
+  gap: 30px;
+}
+.filter-group {
+  border: 0;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+.filter-label {
+  color: var(--ink);
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.check-row {
+  align-items: center;
+  color: #4f5a52;
+  display: flex;
+  gap: 10px;
+}
+.check-row input {
+  accent-color: var(--orange);
+  height: 16px;
+  width: 16px;
+}
+.filter-apply {
+  width: 100%;
+}
+.clear-filters {
+  color: #bd744f;
+  font-weight: 800;
+}
+.empty-state {
+  min-height: 280px;
 }
 .detail {
   display: grid;
@@ -337,8 +392,12 @@ select {
   .detail,
   .cart-layout,
   .checkout-layout,
-  .account-grid {
+  .account-grid,
+  .catalog-layout {
     grid-template-columns: 1fr;
+  }
+  .filter-panel {
+    position: static;
   }
   .hero h1 {
     font-size: 60px;
@@ -348,7 +407,8 @@ select {
   .grid {
     grid-template-columns: 1fr 1fr;
   }
-  .filters {
+  .filters,
+  .search-strip {
     grid-template-columns: 1fr;
   }
   .detail img {

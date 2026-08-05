@@ -3,29 +3,19 @@ import { apiRoot } from "./client";
 import { products } from "../sample-data";
 import type { Product, SearchResult } from "../types";
 import { mapProductResourceToStorefrontProduct } from "./catalog-mappers";
+import {
+  applyCatalogFilters,
+  type CatalogFilterOptions,
+} from "../catalog-filters";
 
-function filter(items: Product[], q = "", category = ""): SearchResult {
-  const query = q.toLowerCase();
-  const selected = items.filter(
-    (p) =>
-      (!query ||
-        `${p.name} ${p.description} ${p.sku}`.toLowerCase().includes(query)) &&
-      (!category || p.category === category),
-  );
-  return {
-    products: selected,
-    total: selected.length,
-    facets: {
-      categories: [...new Set(items.map((p) => p.category))],
-      colors: [...new Set(items.map((p) => p.color))],
-    },
-  };
-}
 export async function searchProducts(
   q = "",
   category = "",
+  options: Omit<CatalogFilterOptions, "q" | "category"> = {},
 ): Promise<SearchResult> {
-  if (!apiRoot) return filter(products, q, category);
+  const filterOptions: CatalogFilterOptions = { ...options, q, category };
+
+  if (!apiRoot) return applyCatalogFilters(products, filterOptions);
   try {
     const { body } = await apiRoot
       .products()
@@ -68,22 +58,21 @@ export async function searchProducts(
         badges: ["Live catalog"],
       };
     });
-    return filter(mapped, q, category);
+    return applyCatalogFilters(mapped, filterOptions);
   } catch {
     try {
       const { body } = await apiRoot
         .products()
         .get({ queryArgs: { limit: 24 } })
         .execute();
-      return filter(
+      return applyCatalogFilters(
         body.results.map((product, index) =>
           mapProductResourceToStorefrontProduct(product, index, "en-US"),
         ),
-        q,
-        category,
+        filterOptions,
       );
     } catch {
-      return filter(products, q, category);
+      return applyCatalogFilters(products, filterOptions);
     }
   }
 }
