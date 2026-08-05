@@ -6,7 +6,7 @@ export default function Page() {
     <main className="shell">
       <header className="page-head">
         <span className="eyebrow">Customer & associate workspace</span>
-        <h1>Good morning, Alex.</h1>
+        <h1>Good morning.</h1>
       </header>
       <div className="account-grid">
         <aside className="panel dark">
