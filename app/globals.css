@@ -34,6 +34,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
   border-bottom: 1px solid var(--line);
 }
 .brand {
@@ -48,6 +49,23 @@ select {
   display: flex;
   align-items: center;
   gap: 24px;
+  min-width: 0;
+}
+.category-nav {
+  display: flex;
+  gap: 16px;
+  max-width: 520px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+.category-nav a {
+  color: #4f5a52;
+  font-size: 14px;
+  font-weight: 800;
 }
 .pill,
 .button {
@@ -276,6 +294,28 @@ select {
 .empty-state {
   min-height: 280px;
 }
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 34px;
+}
+.page-link {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: center;
+  min-width: 42px;
+  padding: 10px 14px;
+}
+.page-link[aria-current="page"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
 .detail {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -456,6 +496,7 @@ select {
   border-top: 1px solid var(--line);
 }
 @media (max-width: 800px) {
+  .category-nav,
   .nav > a:not(.pill) {
     display: none;
   }

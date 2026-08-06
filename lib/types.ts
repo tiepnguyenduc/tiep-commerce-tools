@@ -16,6 +16,11 @@ export type Product = {
   price: Money;
   badges: string[];
 };
+export type HeaderCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
 export type CartLine = {
   id: string;
   productId: string;
@@ -52,4 +57,9 @@ export type SearchResult = {
   products: Product[];
   total: number;
   facets: { categories: string[]; colors: string[] };
+  pagination: {
+    page: number;
+    perPage: number;
+    totalPages: number;
+  };
 };

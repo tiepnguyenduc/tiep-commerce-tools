@@ -7,9 +7,12 @@ export async function GET(request: Request) {
       url.searchParams.get("q") ?? "",
       url.searchParams.get("category") ?? "",
       {
+        categoryId: url.searchParams.get("categoryId") ?? "",
         color: url.searchParams.get("color") ?? "",
         price: url.searchParams.get("price") ?? "",
         sort: url.searchParams.get("sort") ?? "",
+        page: url.searchParams.get("page") ?? "",
+        perPage: Number(url.searchParams.get("perPage") ?? "") || undefined,
       },
     ),
   );

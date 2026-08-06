@@ -3,9 +3,12 @@ import type { Product, SearchResult } from "./types";
 export type CatalogFilterOptions = {
   q?: string;
   category?: string;
+  categoryId?: string;
   color?: string;
   price?: string;
   sort?: string;
+  page?: string | number;
+  perPage?: number;
 };
 
 function normalize(value = "") {
@@ -53,6 +56,12 @@ function sortProducts(items: Product[], sort = "") {
   return selected;
 }
 
+function normalizePositiveInteger(value: string | number | undefined, fallback: number) {
+  const parsed = typeof value === "number" ? value : Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) return fallback;
+  return parsed;
+}
+
 export function applyCatalogFilters(
   items: Product[],
   options: CatalogFilterOptions = {},
@@ -74,11 +83,22 @@ export function applyCatalogFilters(
     );
   });
 
-  const products = sortProducts(selected, options.sort);
+  const sortedProducts = sortProducts(selected, options.sort);
+  const perPage = normalizePositiveInteger(options.perPage, sortedProducts.length || 1);
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / perPage));
+  const requestedPage = normalizePositiveInteger(options.page, 1);
+  const page = Math.min(requestedPage, totalPages);
+  const start = (page - 1) * perPage;
+  const products = sortedProducts.slice(start, start + perPage);
 
   return {
     products,
-    total: products.length,
+    total: sortedProducts.length,
     facets: getFacets(items),
+    pagination: {
+      page,
+      perPage,
+      totalPages,
+    },
   };
 }

@@ -1,5 +1,5 @@
 import { ProductCard } from "@/components/ProductCard";
-import { searchProducts } from "@/lib/ct/catalog";
+import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 
 const priceRanges = [
   { label: "Under $25", value: "-25" },
@@ -9,28 +9,63 @@ const priceRanges = [
   { label: "Over $200", value: "200-" },
 ];
 
+const productsPerPage = 12;
+
+function pageHref(
+  params: {
+    q?: string;
+    category?: string;
+    categoryId?: string;
+    color?: string;
+    price?: string;
+    sort?: string;
+  },
+  page: number,
+) {
+  const search = new URLSearchParams();
+
+  for (const [key, value] of Object.entries({ ...params, page: String(page) })) {
+    if (value) search.set(key, value);
+  }
+
+  return `/products?${search.toString()}`;
+}
+
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{
     q?: string;
     category?: string;
+    categoryId?: string;
     color?: string;
     price?: string;
     sort?: string;
+    page?: string;
   }>;
 }) {
   const p = await searchParams;
-  const result = await searchProducts(p.q, p.category, {
+  const categoryOptions = await listHeaderCategories();
+  const selectedCategoryName =
+    categoryOptions.find((category) => category.id === p.categoryId)?.name ??
+    p.category ??
+    "";
+  const result = await searchProducts(p.q, selectedCategoryName, {
+    categoryId: p.categoryId,
     color: p.color,
     price: p.price,
     sort: p.sort,
+    page: p.page,
+    perPage: productsPerPage,
   });
   return (
     <main className="shell">
       <header className="page-head">
         <h1>All Products</h1>
-        <p className="muted">{result.total} products</p>
+        <p className="muted">
+          {result.total} products · Page {result.pagination.page} of{" "}
+          {result.pagination.totalPages}
+        </p>
       </header>
 
       <div className="catalog-layout">
@@ -41,6 +76,7 @@ export default async function Page({
               name="q"
               value={p.q ?? ""}
             />
+            <input type="hidden" name="category" value={selectedCategoryName} />
 
             <label className="filter-group">
               <span className="filter-label">Sort by</span>
@@ -71,12 +107,14 @@ export default async function Page({
               <span className="filter-label">Category</span>
               <select
                 className="field"
-                name="category"
-                defaultValue={p.category ?? ""}
+                name="categoryId"
+                defaultValue={p.categoryId ?? ""}
               >
                 <option value="">All categories</option>
-                {result.facets.categories.map((x) => (
-                  <option key={x}>{x}</option>
+                {categoryOptions.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
                 ))}
               </select>
             </label>
@@ -108,17 +146,64 @@ export default async function Page({
             />
             <input type="hidden" name="sort" value={p.sort ?? ""} />
             <input type="hidden" name="price" value={p.price ?? ""} />
-            <input type="hidden" name="category" value={p.category ?? ""} />
+            <input type="hidden" name="category" value={selectedCategoryName} />
+            <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
             <input type="hidden" name="color" value={p.color ?? ""} />
             <button className="button">Search</button>
           </form>
 
           {result.products.length ? (
-            <div className="grid">
-              {result.products.map((x) => (
-                <ProductCard key={x.id} product={x} />
-              ))}
-            </div>
+            <>
+              <div className="grid">
+                {result.products.map((x) => (
+                  <ProductCard key={x.id} product={x} />
+                ))}
+              </div>
+
+              {result.pagination.totalPages > 1 ? (
+                <nav className="pagination" aria-label="Product pagination">
+                  {result.pagination.page > 1 ? (
+                    <a
+                      className="page-link"
+                      href={pageHref(
+                        { ...p, category: selectedCategoryName },
+                        result.pagination.page - 1,
+                      )}
+                    >
+                      Previous
+                    </a>
+                  ) : null}
+
+                  {Array.from(
+                    { length: result.pagination.totalPages },
+                    (_, index) => index + 1,
+                  ).map((page) => (
+                    <a
+                      aria-current={
+                        page === result.pagination.page ? "page" : undefined
+                      }
+                      className="page-link"
+                      href={pageHref({ ...p, category: selectedCategoryName }, page)}
+                      key={page}
+                    >
+                      {page}
+                    </a>
+                  ))}
+
+                  {result.pagination.page < result.pagination.totalPages ? (
+                    <a
+                      className="page-link"
+                      href={pageHref(
+                        { ...p, category: selectedCategoryName },
+                        result.pagination.page + 1,
+                      )}
+                    >
+                      Next
+                    </a>
+                  ) : null}
+                </nav>
+              ) : null}
+            </>
           ) : (
             <section className="panel empty-state">
               <h2>No products found</h2>

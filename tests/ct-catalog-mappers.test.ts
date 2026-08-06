@@ -1,7 +1,48 @@
 import { describe, expect, it } from "vitest";
-import { mapProductResourceToStorefrontProduct } from "../lib/ct/catalog-mappers";
+import {
+  mapCategoryResourcesToHeaderCategories,
+  mapProductResourceToStorefrontProduct,
+} from "../lib/ct/catalog-mappers";
 
 describe("commercetools catalog mapping", () => {
+  it("maps root categories to header category links", () => {
+    const categories = mapCategoryResourcesToHeaderCategories(
+      [
+        {
+          id: "root-furniture",
+          key: "furniture",
+          name: { "en-US": "Furniture" },
+          slug: { "en-US": "furniture" },
+          ancestors: [],
+          orderHint: "0.20",
+        },
+        {
+          id: "child-sofas",
+          key: "sofas",
+          name: { "en-US": "Sofas" },
+          slug: { "en-US": "sofas" },
+          ancestors: [{ typeId: "category", id: "root-furniture" }],
+          parent: { typeId: "category", id: "root-furniture" },
+          orderHint: "0.10",
+        },
+        {
+          id: "root-decor",
+          key: "decor",
+          name: { en: "Decor" },
+          slug: { en: "decor" },
+          ancestors: [],
+          orderHint: "0.10",
+        },
+      ] as any,
+      "en-US",
+    );
+
+    expect(categories).toEqual([
+      { id: "root-decor", name: "Decor", slug: "decor" },
+      { id: "root-furniture", name: "Furniture", slug: "furniture" },
+    ]);
+  });
+
   it("maps Product Query API resources to storefront products", () => {
     const product = mapProductResourceToStorefrontProduct(
       {

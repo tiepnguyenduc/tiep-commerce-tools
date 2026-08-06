@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { ModeBar } from "./ModeBar";
 import { ProductCard } from "./ProductCard";
-import { searchProducts } from "@/lib/ct/catalog";
+import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import type { StoreMode } from "@/lib/types";
 export async function Home({ mode }: { mode: StoreMode }) {
-  const { products } = await searchProducts();
+  await connection();
+  const [{ products }, categories] = await Promise.all([
+    searchProducts(),
+    listHeaderCategories(),
+  ]);
   const b2b = mode === "b2b";
   return (
     <>
@@ -47,14 +52,14 @@ export async function Home({ mode }: { mode: StoreMode }) {
             </div>
           </div>
           <div className="categories">
-            {["Workspace", "Seating", "Lighting", "Storage"].map((c, i) => (
+            {categories.slice(0, 4).map((category, i) => (
               <Link
-                href={`/products?category=${c}`}
+                href={`/products?categoryId=${encodeURIComponent(category.id)}&category=${encodeURIComponent(category.name)}`}
                 className="category"
-                key={c}
+                key={category.id}
               >
                 <span>0{i + 1}</span>
-                <h3>{c} →</h3>
+                <h3>{category.name} →</h3>
               </Link>
             ))}
           </div>

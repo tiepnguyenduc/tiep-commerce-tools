@@ -68,4 +68,25 @@ describe("catalog filters", () => {
       ),
     ).toEqual(["Cheap chair", "Desk", "Premium desk"]);
   });
+
+  it("paginates filtered products without changing total", () => {
+    const manyProducts = Array.from({ length: 25 }, (_, index) =>
+      product(`product-${index + 1}`, 1000 + index, "Workspace", "Oak"),
+    );
+
+    const result = applyCatalogFilters(manyProducts, {
+      page: "2",
+      perPage: 12,
+    });
+
+    expect(result.products.map((x) => x.id)).toEqual(
+      Array.from({ length: 12 }, (_, index) => `product-${index + 13}`),
+    );
+    expect(result.total).toBe(25);
+    expect(result.pagination).toEqual({
+      page: 2,
+      perPage: 12,
+      totalPages: 3,
+    });
+  });
 });
