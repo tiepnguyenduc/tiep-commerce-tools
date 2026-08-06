@@ -7,6 +7,10 @@ import type {
   OrderFromCartDraft,
 } from "@commercetools/platform-sdk";
 import { getEnvReadiness } from "../env";
+import {
+  addDiscountCodeAction,
+  removeDiscountCodeAction,
+} from "../cart-discount";
 import type { Cart, StoreMode } from "../types";
 import { apiRoot } from "./client";
 import {
@@ -21,6 +25,8 @@ type CartUpdateTarget = {
   get(): Promise<CtCart>;
   update(version: number, actions: CartUpdateAction[]): Promise<CtCart>;
 };
+
+const discountCodeExpand = "discountCodes[*].discountCode";
 
 type CartUpdateInput = {
   productId: string;
@@ -76,17 +82,35 @@ async function targetForCart(mode: StoreMode, cartId: string): Promise<CartUpdat
     const context = requireB2BContext();
     const builder = b2bChain(context).carts().withId({ ID: cartId });
     return {
-      get: async () => (await builder.get().execute()).body,
+      get: async () =>
+        (await builder.get({ queryArgs: { expand: discountCodeExpand } }).execute())
+          .body,
       update: async (version, actions) =>
-        (await builder.post({ body: { version, actions } }).execute()).body,
+        (
+          await builder
+            .post({
+              queryArgs: { expand: discountCodeExpand },
+              body: { version, actions },
+            })
+            .execute()
+        ).body,
     };
   }
 
   const builder = requireApiRoot().carts().withId({ ID: cartId });
   return {
-    get: async () => (await builder.get().execute()).body,
+    get: async () =>
+      (await builder.get({ queryArgs: { expand: discountCodeExpand } }).execute())
+        .body,
     update: async (version, actions) =>
-      (await builder.post({ body: { version, actions } }).execute()).body,
+      (
+        await builder
+          .post({
+            queryArgs: { expand: discountCodeExpand },
+            body: { version, actions },
+          })
+          .execute()
+      ).body,
   };
 }
 
@@ -182,6 +206,36 @@ export async function updateLiveCart(input: CartUpdateInput): Promise<Cart> {
   const target = await targetForCart(input.mode, cartId);
   const updated = await withRetry(target, updateActions(input));
   return mapCommercetoolsCart(updated, input.mode, requireCommerceConfig().locale);
+}
+
+async function updateLiveCartWithActions(
+  mode: StoreMode,
+  actions: CartUpdateAction[],
+): Promise<Cart> {
+  const cartId = getCartId(mode);
+  if (!cartId) {
+    throw new Error("No active cart. Add an item before applying a discount code.");
+  }
+
+  const target = await targetForCart(mode, cartId);
+  const updated = await withRetry(target, () => actions);
+  return mapCommercetoolsCart(updated, mode, requireCommerceConfig().locale);
+}
+
+export function applyLiveDiscountCode(
+  mode: StoreMode,
+  code: string,
+): Promise<Cart> {
+  return updateLiveCartWithActions(mode, [addDiscountCodeAction(code)]);
+}
+
+export function removeLiveDiscountCode(
+  mode: StoreMode,
+  discountCodeId: string,
+): Promise<Cart> {
+  return updateLiveCartWithActions(mode, [
+    removeDiscountCodeAction(discountCodeId),
+  ]);
 }
 
 export async function createLiveOrder(

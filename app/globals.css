@@ -335,6 +335,77 @@ select {
   border: 1px solid var(--line);
   background: white;
 }
+.discount-row {
+  color: #28724f;
+}
+.cart-total-row {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 18px;
+}
+.discount-box {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.discount-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.discount-form-controls {
+  display: flex;
+  gap: 8px;
+}
+.discount-form-controls input {
+  min-width: 0;
+  flex: 1;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.discount-form-controls button,
+.discount-chip button {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  font-weight: 800;
+}
+.discount-form-controls button:disabled,
+.discount-chip button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.discount-codes {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.discount-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f3f0ea;
+}
+.discount-chip span,
+.discount-chip small {
+  display: block;
+}
+.discount-chip small {
+  margin-top: 2px;
+  color: var(--muted);
+}
+.discount-error {
+  margin: 10px 0 0;
+  color: #a33a2b;
+  font-size: 13px;
+}
 .steps {
   display: flex;
   gap: 8px;

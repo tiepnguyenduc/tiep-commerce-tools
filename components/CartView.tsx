@@ -4,6 +4,12 @@ import Link from "next/link";
 import type { Cart } from "@/lib/types";
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountError, setDiscountError] = useState("");
+  const [applyingDiscount, setApplyingDiscount] = useState(false);
+  const [removingDiscountId, setRemovingDiscountId] = useState<string | null>(
+    null,
+  );
   async function load() {
     const response = await fetch("/api/cart");
     const data = await response.json();
@@ -20,6 +26,53 @@ export function CartView() {
     });
     const data = await r.json();
     if (r.ok) setCart(data);
+  }
+  async function updateDiscount(
+    method: "POST" | "DELETE",
+    body: Record<string, string>,
+  ) {
+    if (!cart) return;
+    const response = await fetch("/api/cart/discount", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...body, mode: cart.mode }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Discount update failed.");
+    }
+    setCart(data);
+  }
+  async function applyDiscount(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const code = discountCode.trim();
+    if (!code || applyingDiscount) return;
+    setApplyingDiscount(true);
+    setDiscountError("");
+    try {
+      await updateDiscount("POST", { code });
+      setDiscountCode("");
+    } catch (error) {
+      setDiscountError(
+        error instanceof Error ? error.message : "Discount update failed.",
+      );
+    } finally {
+      setApplyingDiscount(false);
+    }
+  }
+  async function removeDiscount(discountCodeId: string) {
+    if (removingDiscountId) return;
+    setRemovingDiscountId(discountCodeId);
+    setDiscountError("");
+    try {
+      await updateDiscount("DELETE", { discountCodeId });
+    } catch (error) {
+      setDiscountError(
+        error instanceof Error ? error.message : "Discount update failed.",
+      );
+    } finally {
+      setRemovingDiscountId(null);
+    }
   }
   if (!cart) return <p>Loading training cart…</p>;
   return (
@@ -74,6 +127,68 @@ export function CartView() {
           <span>Subtotal</span>
           <strong>{cart.subtotal.formatted}</strong>
         </div>
+        {cart.discountTotal.centAmount > 0 && (
+          <div className="row discount-row">
+            <span>Discount</span>
+            <strong>−{cart.discountTotal.formatted}</strong>
+          </div>
+        )}
+        <div className="row cart-total-row">
+          <span>Total</span>
+          <strong>{cart.total.formatted}</strong>
+        </div>
+        {cart.itemCount > 0 && (
+          <div className="discount-box">
+            <form className="discount-form" onSubmit={applyDiscount}>
+              <label htmlFor="discount-code">Discount code</label>
+              <div className="discount-form-controls">
+                <input
+                  id="discount-code"
+                  value={discountCode}
+                  onChange={(event) => {
+                    setDiscountCode(event.target.value);
+                    setDiscountError("");
+                  }}
+                  placeholder="Enter code"
+                  autoComplete="off"
+                />
+                <button
+                  type="submit"
+                  disabled={!discountCode.trim() || applyingDiscount}
+                >
+                  {applyingDiscount ? "Applying…" : "Apply"}
+                </button>
+              </div>
+            </form>
+            {cart.discountCodes.length > 0 && (
+              <div className="discount-codes" aria-label="Applied discount codes">
+                {cart.discountCodes.map((discount) => (
+                  <div className="discount-chip" key={discount.id}>
+                    <span>
+                      <strong>{discount.code}</strong>
+                      {discount.state !== "MatchesCart" && (
+                        <small>{discount.state}</small>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeDiscount(discount.id)}
+                      disabled={removingDiscountId !== null}
+                      aria-label={`Remove discount code ${discount.code}`}
+                    >
+                      {removingDiscountId === discount.id ? "Removing…" : "Remove"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {discountError && (
+              <p className="discount-error" role="alert">
+                {discountError}
+              </p>
+            )}
+          </div>
+        )}
         <p className="muted">
           Shipping and tax are calculated during checkout.
         </p>

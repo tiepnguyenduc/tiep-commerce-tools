@@ -26,6 +26,11 @@ export type CartLine = {
   unitPrice: Money;
   total: Money;
 };
+export type AppliedDiscountCode = {
+  id: string;
+  code: string;
+  state: string;
+};
 export type Cart = {
   id: string;
   version: number;
@@ -33,6 +38,9 @@ export type Cart = {
   lines: CartLine[];
   itemCount: number;
   subtotal: Money;
+  discountTotal: Money;
+  total: Money;
+  discountCodes: AppliedDiscountCode[];
 };
 export type CheckoutResult = {
   id: string;

@@ -12,4 +12,10 @@ describe("local cart and checkout training behavior", () => {
   });
   it("keeps the selected checkout mode", () =>
     expect(updateCart(emptyCart("b2b"), "p2", 1).mode).toBe("b2b"));
+  it("initializes cart discount totals without simulating a code", () => {
+    const cart = emptyCart();
+    expect(cart.discountCodes).toEqual([]);
+    expect(cart.discountTotal.centAmount).toBe(0);
+    expect(cart.total).toEqual(cart.subtotal);
+  });
 });

@@ -38,20 +38,54 @@ function localizedName(line: Pick<LineItem, "name">, locale: string) {
 }
 
 export function mapCommercetoolsCart(
-  cart: Pick<CtCart, "id" | "version" | "lineItems" | "totalPrice">,
+  cart: Pick<
+    CtCart,
+    "id" | "version" | "lineItems" | "totalPrice" | "discountCodes"
+  >,
   mode: StoreMode,
   locale = "en-US",
 ): Cart {
-  const lines: CartLine[] = cart.lineItems.map((line) => ({
-    id: line.id,
-    productId: line.productId,
-    sku: line.variant.sku || line.id,
-    name: localizedName(line, locale),
-    image: line.variant.images?.[0]?.url || fallbackImage,
-    quantity: line.quantity,
-    unitPrice: mapMoney(line.price.value, locale),
-    total: mapMoney(line.totalPrice, locale),
-  }));
+  const lines: CartLine[] = cart.lineItems.map((line) => {
+    const selectedPrice = line.price.discounted?.value ?? line.price.value;
+    return {
+      id: line.id,
+      productId: line.productId,
+      sku: line.variant.sku || line.id,
+      name: localizedName(line, locale),
+      image: line.variant.images?.[0]?.url || fallbackImage,
+      quantity: line.quantity,
+      unitPrice: mapMoney(selectedPrice, locale),
+      total: mapMoney(line.totalPrice, locale),
+    };
+  });
+  const subtotalCents = cart.lineItems.reduce((sum, line) => {
+    const selectedPrice = line.price.discounted?.value ?? line.price.value;
+    return sum + selectedPrice.centAmount * line.quantity;
+  }, 0);
+  const subtotal = mapMoney(
+    { ...cart.totalPrice, centAmount: subtotalCents },
+    locale,
+  );
+  const total = mapMoney(cart.totalPrice, locale);
+  const discountTotal = mapMoney(
+    {
+      ...cart.totalPrice,
+      centAmount: Math.max(0, subtotalCents - cart.totalPrice.centAmount),
+    },
+    locale,
+  );
+  const discountCodes = (cart.discountCodes ?? []).flatMap((info) => {
+    const code = info.discountCode.obj?.code;
+    return code
+      ? [
+          {
+            id: info.discountCode.id,
+            code,
+            state: info.state,
+          },
+        ]
+      : [];
+  });
 
   return {
     id: cart.id,
@@ -59,6 +93,9 @@ export function mapCommercetoolsCart(
     mode,
     lines,
     itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
-    subtotal: mapMoney(cart.totalPrice, locale),
+    subtotal,
+    discountTotal,
+    total,
+    discountCodes,
   };
 }

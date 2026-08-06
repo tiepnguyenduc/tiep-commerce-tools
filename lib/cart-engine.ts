@@ -9,13 +9,17 @@ const format = (n: number) => ({
   }).format(n / 100),
 });
 export function emptyCart(mode: StoreMode = "b2c"): Cart {
+  const subtotal = format(0);
   return {
     id: "training-cart",
     version: 1,
     mode,
     lines: [],
     itemCount: 0,
-    subtotal: format(0),
+    subtotal,
+    discountTotal: format(0),
+    total: subtotal,
+    discountCodes: [],
   };
 }
 export function updateCart(
@@ -38,11 +42,15 @@ export function updateCart(
       total: format(p.price.centAmount * quantity),
     });
   const cents = rest.reduce((n, x) => n + x.total.centAmount, 0);
+  const subtotal = format(cents);
   return {
     ...cart,
     version: cart.version + 1,
     lines: rest,
     itemCount: rest.reduce((n, x) => n + x.quantity, 0),
-    subtotal: format(cents),
+    subtotal,
+    discountTotal: format(0),
+    total: subtotal,
+    discountCodes: [],
   };
 }
