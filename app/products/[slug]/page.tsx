@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProduct } from "@/lib/ct/catalog";
 import { AddToCart } from "@/components/AddToCart";
+import { AddToWishlist } from "@/components/AddToWishlist";
 export default async function Page({
   params,
 }: {
@@ -32,7 +33,10 @@ export default async function Page({
           Commercial-grade materials, straightforward care, and a flexible
           specification for home or team spaces.
         </p>
-        <AddToCart productId={p.id} />
+        <div className="product-actions">
+          <AddToCart productId={p.id} />
+          <AddToWishlist productId={p.id} />
+        </div>
       </div>
     </main>
   );

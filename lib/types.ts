@@ -21,6 +21,48 @@ export type HeaderCategory = {
   name: string;
   slug: string;
 };
+export type CustomerAddress = {
+  id?: string;
+  firstName?: string;
+  lastName?: string;
+  streetName?: string;
+  streetNumber?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country: string;
+  phone?: string;
+};
+export type CustomerProfile = {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  addresses: CustomerAddress[];
+};
+export type CustomerOrderSummary = {
+  id: string;
+  orderNumber: string;
+  createdAt: string;
+  orderState: string;
+  lineCount: number;
+  total: Money;
+};
+export type WishlistLine = {
+  id: string;
+  productId: string;
+  variantId?: number;
+  sku: string;
+  name: string;
+  image: string;
+  quantity: number;
+};
+export type Wishlist = {
+  id: string;
+  version: number;
+  name: string;
+  lines: WishlistLine[];
+};
 export type CartLine = {
   id: string;
   productId: string;

@@ -22,7 +22,12 @@ function mapCustomerResult(result: {
   customer: { id: string; email: string; firstName?: string; lastName?: string };
   cart?: { id: string };
 }) {
-  setCustomerSession({ id: result.customer.id, email: result.customer.email });
+  setCustomerSession({
+    id: result.customer.id,
+    email: result.customer.email,
+    firstName: result.customer.firstName,
+    lastName: result.customer.lastName,
+  });
   if (result.cart?.id) setCartId("b2c", result.cart.id);
 
   return {

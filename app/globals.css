@@ -466,6 +466,7 @@ select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+    margin-bottom: 24px;
 }
 .form-grid .wide {
   grid-column: 1/-1;
@@ -486,9 +487,152 @@ select {
   grid-template-columns: 0.7fr 1.3fr;
   gap: 25px;
 }
+.account-auth-panel {
+  max-width: 460px;
+}
+.account-layout {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 280px 1fr;
+}
+.account-sidebar,
+.account-main,
+.account-box {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.account-sidebar {
+  align-self: start;
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+}
+.account-sidebar-head h2,
+.account-main-head h2,
+.account-box h3 {
+  margin: 8px 0;
+}
+.account-menu {
+  border-top: 1px solid var(--line);
+  display: grid;
+}
+.account-menu button {
+  background: white;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 14px 4px;
+  text-align: left;
+}
+.account-menu button[aria-current="page"] {
+  color: var(--orange);
+}
+.account-main {
+  padding: 28px;
+}
+.account-main-head {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+}
+.account-content-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+}
+.account-stack {
+  display: grid;
+  gap: 18px;
+}
+.account-box {
+  padding: 20px;
+}
+.form-grid.compact {
+  margin: 14px 0 18px;
+}
+.text-button,
+.wishlist-button {
+  background: transparent;
+  border: 0;
+  color: var(--orange);
+  cursor: pointer;
+  font-weight: 900;
+  padding: 0;
+}
+.text-button.danger {
+  color: #a33a2b;
+}
+.inline-actions {
+  display: flex;
+  gap: 14px;
+}
+.address-list,
+.wishlist-list {
+  display: grid;
+  gap: 14px;
+}
+.address-card {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.account-table-wrap {
+  overflow-x: auto;
+}
+.account-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.account-table th,
+.account-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 10px;
+  text-align: left;
+}
+.wishlist-row {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 96px 1fr auto;
+  padding-bottom: 14px;
+}
+.wishlist-row img {
+  border-radius: 12px;
+  height: 96px;
+  object-fit: cover;
+  width: 96px;
+}
+.wishlist-button {
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 11px 17px;
+}
+.wishlist-button.compact {
+  border-color: var(--line);
+  font-size: 13px;
+  margin-top: 12px;
+  padding: 9px 13px;
+}
+.wishlist-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+.account-status {
+  margin-top: 18px;
+}
 .metric {
   font-size: 44px;
   font-weight: 900;
+  line-height: 1;
 }
 .footer {
   margin-top: 70px;
@@ -505,8 +649,12 @@ select {
   .cart-layout,
   .checkout-layout,
   .account-grid,
+  .account-layout,
   .catalog-layout {
     grid-template-columns: 1fr;
+  }
+  .account-content-grid {
+    grid-template-columns: 1fr 1fr;
   }
   .filter-panel {
     position: static;
@@ -530,7 +678,9 @@ select {
 @media (max-width: 520px) {
   .grid,
   .categories,
-  .form-grid {
+  .form-grid,
+  .account-content-grid,
+  .wishlist-row {
     grid-template-columns: 1fr;
   }
   .shell {

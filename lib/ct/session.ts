@@ -6,6 +6,8 @@ export type CommerceSession = {
   b2bCartId?: string;
   customerId?: string;
   customerEmail?: string;
+  customerFirstName?: string;
+  customerLastName?: string;
 };
 
 declare global {
@@ -28,9 +30,25 @@ export function getCartId(mode: StoreMode) {
   return mode === "b2b" ? session.b2bCartId : session.b2cCartId;
 }
 
-export function setCustomerSession(customer: { id: string; email: string }) {
+export function setCustomerSession(customer: {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}) {
   const session = readCommerceSession();
   session.customerId = customer.id;
   session.customerEmail = customer.email;
+  session.customerFirstName = customer.firstName;
+  session.customerLastName = customer.lastName;
+  return session;
+}
+
+export function clearCustomerSession() {
+  const session = readCommerceSession();
+  delete session.customerId;
+  delete session.customerEmail;
+  delete session.customerFirstName;
+  delete session.customerLastName;
   return session;
 }

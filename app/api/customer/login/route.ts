@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getEnvReadiness } from "@/lib/env";
 import { loginCustomer } from "@/lib/ct/customer";
+import { setCustomerSession } from "@/lib/ct/session";
 
 const input = z.object({
   email: z.string().email(),
@@ -15,6 +16,10 @@ export async function POST(request: Request) {
   }
 
   if (!getEnvReadiness().ready) {
+    setCustomerSession({
+      id: "training-customer",
+      email: parsed.data.email,
+    });
     return NextResponse.json({
       training: true,
       customer: { id: "training-customer", email: parsed.data.email },

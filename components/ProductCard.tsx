@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Product } from "@/lib/types";
+import { AddToWishlist } from "./AddToWishlist";
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="card">
@@ -15,6 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Link href={`/products/${product.slug}`}>{product.name}</Link>
         </h3>
         <p className="muted">{product.description}</p>
+        <AddToWishlist compact productId={product.id} />
       </div>
     </article>
   );
