@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 import type {
   CustomerAddress,
   CustomerOrderSummary,
@@ -88,6 +89,9 @@ function ProfilePage({
     newPassword: "",
   });
   const [status, setStatus] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+  const showToast = useToast();
 
   useEffect(() => {
     setProfile({
@@ -98,6 +102,8 @@ function ProfilePage({
   }, [customer]);
 
   async function saveProfile() {
+    if (savingProfile) return;
+    setSavingProfile(true);
     setStatus("Saving account information...");
     try {
       const data = await readJson<{ customer: CustomerProfile }>(
@@ -109,12 +115,19 @@ function ProfilePage({
       );
       onCustomerChange(data.customer);
       setStatus("Account information saved.");
+      showToast("Account information saved.", "success");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Profile update failed");
+      const message = e instanceof Error ? e.message : "Profile update failed";
+      setStatus(message);
+      showToast(message, "error");
+    } finally {
+      setSavingProfile(false);
     }
   }
 
   async function savePassword() {
+    if (savingPassword) return;
+    setSavingPassword(true);
     setStatus("Changing password...");
     try {
       await readJson<{ changed: true }>(
@@ -126,8 +139,13 @@ function ProfilePage({
       );
       setPasswords({ currentPassword: "", newPassword: "" });
       setStatus("Password changed.");
+      showToast("Password changed.", "success");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Password update failed");
+      const message = e instanceof Error ? e.message : "Password update failed";
+      setStatus(message);
+      showToast(message, "error");
+    } finally {
+      setSavingPassword(false);
     }
   }
 
@@ -161,8 +179,12 @@ function ProfilePage({
             }
           />
         </div>
-        <button className="button accent" onClick={saveProfile}>
-          Save account
+        <button
+          className="button accent"
+          disabled={savingProfile}
+          onClick={saveProfile}
+        >
+          {savingProfile ? "Saving…" : "Save account"}
         </button>
       </section>
 
@@ -188,8 +210,12 @@ function ProfilePage({
             }
           />
         </div>
-        <button className="button" onClick={savePassword}>
-          Change password
+        <button
+          className="button"
+          disabled={savingPassword}
+          onClick={savePassword}
+        >
+          {savingPassword ? "Changing…" : "Change password"}
         </button>
       </section>
       {status && <p className="muted">{status}</p>}
@@ -207,6 +233,10 @@ function AddressBookPage({
   const [addresses, setAddresses] = useState<CustomerAddress[]>(customer.addresses);
   const [editing, setEditing] = useState<CustomerAddress>(emptyAddress);
   const [status, setStatus] = useState("");
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [removingAddressId, setRemovingAddressId] = useState<string | null>(null);
+  const showToast = useToast();
+  const busy = savingAddress || removingAddressId !== null;
 
   useEffect(() => {
     setAddresses(customer.addresses);
@@ -226,6 +256,8 @@ function AddressBookPage({
   }, []);
 
   async function saveAddress() {
+    if (busy) return;
+    setSavingAddress(true);
     setStatus("Saving address...");
     try {
       const data = await readJson<{ customer: CustomerProfile }>(
@@ -238,12 +270,19 @@ function AddressBookPage({
       onCustomerChange(data.customer);
       setEditing(emptyAddress);
       setStatus("Address saved.");
+      showToast("Address saved.", "success");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Address update failed");
+      const message = e instanceof Error ? e.message : "Address update failed";
+      setStatus(message);
+      showToast(message, "error");
+    } finally {
+      setSavingAddress(false);
     }
   }
 
   async function removeAddress(addressId: string) {
+    if (busy) return;
+    setRemovingAddressId(addressId);
     setStatus("Removing address...");
     try {
       const data = await readJson<{ customer: CustomerProfile }>(
@@ -253,8 +292,13 @@ function AddressBookPage({
       );
       onCustomerChange(data.customer);
       setStatus("Address removed.");
+      showToast("Address removed.", "success");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Address remove failed");
+      const message = e instanceof Error ? e.message : "Address remove failed";
+      setStatus(message);
+      showToast(message, "error");
+    } finally {
+      setRemovingAddressId(null);
     }
   }
 
@@ -288,9 +332,10 @@ function AddressBookPage({
                   {address.id && (
                     <button
                       className="text-button danger"
+                      disabled={busy}
                       onClick={() => removeAddress(address.id!)}
                     >
-                      Delete
+                      {removingAddressId === address.id ? "Deleting…" : "Delete"}
                     </button>
                   )}
                 </div>
@@ -378,8 +423,12 @@ function AddressBookPage({
             }
           />
         </div>
-        <button className="button accent" onClick={saveAddress}>
-          Save address
+        <button
+          className="button accent"
+          disabled={busy}
+          onClick={saveAddress}
+        >
+          {savingAddress ? "Saving…" : "Save address"}
         </button>
       </section>
       {status && <p className="muted">{status}</p>}
@@ -436,6 +485,8 @@ function OrdersPage() {
 function WishlistPage() {
   const [wishlist, setWishlist] = useState<Wishlist | null>(null);
   const [status, setStatus] = useState("Loading wishlist...");
+  const [removingLineId, setRemovingLineId] = useState<string | null>(null);
+  const showToast = useToast();
 
   async function refreshWishlist() {
     const data = await readJson<{ wishlist: Wishlist }>(await fetch("/api/wishlist"));
@@ -450,6 +501,8 @@ function WishlistPage() {
   }, []);
 
   async function removeLine(lineItemId: string) {
+    if (removingLineId) return;
+    setRemovingLineId(lineItemId);
     setStatus("Removing wishlist item...");
     try {
       const data = await readJson<{ wishlist: Wishlist }>(
@@ -460,8 +513,13 @@ function WishlistPage() {
       );
       setWishlist(data.wishlist);
       setStatus(data.wishlist.lines.length ? "" : "Your wishlist is empty.");
+      showToast("Item removed from your wishlist.", "success");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Wishlist remove failed");
+      const message = e instanceof Error ? e.message : "Wishlist remove failed";
+      setStatus(message);
+      showToast(message, "error");
+    } finally {
+      setRemovingLineId(null);
     }
   }
 
@@ -478,8 +536,12 @@ function WishlistPage() {
               SKU: {line.sku} · Quantity: {line.quantity}
             </p>
           </div>
-          <button className="text-button danger" onClick={() => removeLine(line.id)}>
-            Remove
+          <button
+            className="text-button danger"
+            disabled={removingLineId !== null}
+            onClick={() => removeLine(line.id)}
+          >
+            {removingLineId === line.id ? "Removing…" : "Remove"}
           </button>
         </article>
       ))}
@@ -492,10 +554,12 @@ export function AccountDashboard({
   customer,
   onLogout,
   status,
+  loggingOut = false,
 }: {
   customer: CustomerProfile;
   onLogout: () => void;
   status: string;
+  loggingOut?: boolean;
 }) {
   const [activePage, setActivePage] = useState<AccountPage>("dashboard");
   const [currentCustomer, setCurrentCustomer] = useState<CustomerProfile>(customer);
@@ -545,8 +609,8 @@ export function AccountDashboard({
             </button>
           ))}
         </nav>
-        <button className="button" onClick={onLogout}>
-          Logout
+        <button className="button" disabled={loggingOut} onClick={onLogout}>
+          {loggingOut ? "Logging out…" : "Logout"}
         </button>
       </aside>
 
@@ -562,14 +626,23 @@ export function AccountDashboard({
   );
 }
 
-export function AccountAuth() {
+export function AccountAuth({
+  initialCustomer = null,
+}: {
+  initialCustomer?: CustomerProfile | null;
+}) {
   const [action, setAction] = useState<Action>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [state, setState] = useState("");
-  const [customer, setCustomer] = useState<CustomerProfile | null>(null);
+  const [customer, setCustomer] = useState<CustomerProfile | null>(
+    initialCustomer,
+  );
+  const [submitting, setSubmitting] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const showToast = useToast();
 
   async function loadCustomer(quiet = false) {
     try {
@@ -584,17 +657,22 @@ export function AccountAuth() {
   }
 
   useEffect(() => {
+    // The server already resolved the session; re-checking only causes a
+    // login-form flash on first paint.
+    if (initialCustomer) return;
     loadCustomer(true);
-  }, []);
+  }, [initialCustomer]);
 
   async function submit() {
+    if (submitting) return;
+    setSubmitting(true);
     setState(`${action === "login" ? "Logging in" : "Registering"}...`);
-    const response = await fetch(`/api/customer/${action}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, firstName, lastName }),
-    });
     try {
+      const response = await fetch(`/api/customer/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
       const data = await readJson<{
         training?: boolean;
         customer: CustomerProfile;
@@ -606,20 +684,46 @@ export function AccountAuth() {
           ? `Training customer ready: ${data.customer.email}`
           : `Live customer ready: ${data.customer.email}`,
       );
+      showToast(
+        action === "login" ? "Logged in successfully." : "Account created.",
+        "success",
+      );
     } catch (e) {
-      setState(e instanceof Error ? e.message : "Customer request failed");
+      const message = e instanceof Error ? e.message : "Customer request failed";
+      setState(message);
+      showToast(message, "error");
+    } finally {
+      setSubmitting(false);
     }
   }
 
   async function logout() {
-    await fetch("/api/customer/logout", { method: "POST" });
-    setCustomer(null);
-    setState("");
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      const response = await fetch("/api/customer/logout", { method: "POST" });
+      if (!response.ok) {
+        showToast("Logout failed. Please try again.", "error");
+        return;
+      }
+      setCustomer(null);
+      setState("");
+      showToast("You are logged out.", "success");
+    } catch {
+      showToast("Network error — logout failed.", "error");
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   if (customer) {
     return (
-      <AccountDashboard customer={customer} onLogout={logout} status={state} />
+      <AccountDashboard
+        customer={customer}
+        loggingOut={loggingOut}
+        onLogout={logout}
+        status={state}
+      />
     );
   }
 
@@ -630,12 +734,14 @@ export function AccountAuth() {
       <div className="steps">
         <button
           className={`step ${action === "login" ? "on" : ""}`}
+          disabled={submitting}
           onClick={() => setAction("login")}
         >
           Login
         </button>
         <button
           className={`step ${action === "register" ? "on" : ""}`}
+          disabled={submitting}
           onClick={() => setAction("register")}
         >
           Register
@@ -672,8 +778,12 @@ export function AccountAuth() {
           </>
         )}
       </div>
-      <button className="button accent" onClick={submit}>
-        {action === "login" ? "Login customer" : "Register customer"} →
+      <button className="button accent" disabled={submitting} onClick={submit}>
+        {submitting
+          ? action === "login"
+            ? "Logging in…"
+            : "Registering…"
+          : `${action === "login" ? "Login customer" : "Register customer"} →`}
       </button>
       <p className="muted">{state}</p>
     </section>

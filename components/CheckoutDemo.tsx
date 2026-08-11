@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { checkoutFlow, paymentFlow } from "@commercetools/checkout-browser-sdk";
+import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
 export function CheckoutDemo({
   mode,
@@ -13,55 +14,84 @@ export function CheckoutDemo({
     "checkoutFlow",
   );
   const [state, setState] = useState("");
+  const [startingSession, setStartingSession] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const showToast = useToast();
+  const busy = startingSession || placingOrder;
+  function fail(message: string) {
+    setState(message);
+    showToast(message, "error");
+  }
+  function succeed(message: string) {
+    setState(message);
+    showToast(message, "success");
+  }
   async function start() {
+    if (busy) return;
+    setStartingSession(true);
     setState("Creating secure session…");
-    const r = await fetch("/api/checkout/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode }),
-    });
-    const data = await r.json();
-    if (data.training) {
-      setState(
-        mode === "b2b"
-          ? "Training result: PO-4821 submitted and awaiting approval."
-          : "Training result: Order WS-1042 confirmed.",
-      );
-      return;
+    try {
+      const r = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (data.training) {
+        succeed(
+          mode === "b2b"
+            ? "Training result: PO-4821 submitted and awaiting approval."
+            : "Training result: Order WS-1042 confirmed.",
+        );
+        return;
+      }
+      if (!r.ok) {
+        fail(data.error || "Could not create session");
+        return;
+      }
+      const options = {
+        projectKey: data.projectKey,
+        region: data.region,
+        sessionId: data.sessionId,
+        locale: "en-US",
+        onError: (e: unknown) => fail(String(e)),
+        onInfo: () => succeed("Checkout completed"),
+      };
+      showToast("Secure checkout session created.", "success");
+      if (flow === "checkoutFlow") checkoutFlow(options);
+      else paymentFlow(options);
+    } catch {
+      fail("Network error — could not create session");
+    } finally {
+      setStartingSession(false);
     }
-    if (!r.ok) {
-      setState(data.error || "Could not create session");
-      return;
-    }
-    const options = {
-      projectKey: data.projectKey,
-      region: data.region,
-      sessionId: data.sessionId,
-      locale: "en-US",
-      onError: (e: unknown) => setState(String(e)),
-      onInfo: () => setState("Checkout completed"),
-    };
-    if (flow === "checkoutFlow") checkoutFlow(options);
-    else paymentFlow(options);
   }
   async function placeOrder() {
+    if (busy) return;
+    setPlacingOrder(true);
     setState("Creating order from active cart…");
-    const r = await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode, purchaseOrderNumber }),
-    });
-    const data = await r.json();
-    if (!r.ok) {
-      setState(data.error || "Order creation failed");
-      return;
+    try {
+      const r = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, purchaseOrderNumber }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        fail(data.error || "Order creation failed");
+        return;
+      }
+      const order = data.order;
+      succeed(
+        data.training
+          ? `Training order created: ${order.orderNumber}`
+          : `Live order created: ${order.orderNumber || order.id}`,
+      );
+    } catch {
+      fail("Network error — order creation failed");
+    } finally {
+      setPlacingOrder(false);
     }
-    const order = data.order;
-    setState(
-      data.training
-        ? `Training order created: ${order.orderNumber}`
-        : `Live order created: ${order.orderNumber || order.id}`,
-    );
   }
   return (
     <div className="panel">
@@ -81,11 +111,11 @@ export function CheckoutDemo({
       </select>
       <div data-ctc />
       <p>{state}</p>
-      <button className="button accent" onClick={start}>
-        Launch {flow} →
+      <button className="button accent" disabled={busy} onClick={start}>
+        {startingSession ? "Creating session…" : `Launch ${flow} →`}
       </button>
-      <button className="button" onClick={placeOrder}>
-        Create order via Cart API →
+      <button className="button" disabled={busy} onClick={placeOrder}>
+        {placingOrder ? "Creating order…" : "Create order via Cart API →"}
       </button>
     </div>
   );

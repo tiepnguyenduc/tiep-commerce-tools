@@ -1,15 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useToast } from "@/components/Toast";
 import type { Cart } from "@/lib/types";
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [discountCode, setDiscountCode] = useState("");
   const [discountError, setDiscountError] = useState("");
   const [applyingDiscount, setApplyingDiscount] = useState(false);
+  const [pendingLineId, setPendingLineId] = useState<string | null>(null);
   const [removingDiscountId, setRemovingDiscountId] = useState<string | null>(
     null,
   );
+  const showToast = useToast();
   async function load() {
     const response = await fetch("/api/cart");
     const data = await response.json();
@@ -18,14 +21,30 @@ export function CartView() {
   useEffect(() => {
     void load();
   }, []);
-  async function setQty(productId: string, quantity: number) {
-    const r = await fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId, quantity }),
-    });
-    const data = await r.json();
-    if (r.ok) setCart(data);
+  async function setQty(lineId: string, productId: string, quantity: number) {
+    if (pendingLineId) return;
+    setPendingLineId(lineId);
+    try {
+      const r = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId, quantity }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        showToast(data.error || "Could not update the cart.", "error");
+        return;
+      }
+      setCart(data);
+      showToast(
+        quantity === 0 ? "Item removed from your cart." : "Cart updated.",
+        "success",
+      );
+    } catch {
+      showToast("Network error — could not update the cart.", "error");
+    } finally {
+      setPendingLineId(null);
+    }
   }
   async function updateDiscount(
     method: "POST" | "DELETE",
@@ -52,10 +71,12 @@ export function CartView() {
     try {
       await updateDiscount("POST", { code });
       setDiscountCode("");
+      showToast(`Discount code ${code} applied.`, "success");
     } catch (error) {
-      setDiscountError(
-        error instanceof Error ? error.message : "Discount update failed.",
-      );
+      const message =
+        error instanceof Error ? error.message : "Discount update failed.";
+      setDiscountError(message);
+      showToast(message, "error");
     } finally {
       setApplyingDiscount(false);
     }
@@ -66,10 +87,12 @@ export function CartView() {
     setDiscountError("");
     try {
       await updateDiscount("DELETE", { discountCodeId });
+      showToast("Discount code removed.", "success");
     } catch (error) {
-      setDiscountError(
-        error instanceof Error ? error.message : "Discount update failed.",
-      );
+      const message =
+        error instanceof Error ? error.message : "Discount update failed.";
+      setDiscountError(message);
+      showToast(message, "error");
     } finally {
       setRemovingDiscountId(null);
     }
@@ -98,18 +121,25 @@ export function CartView() {
                   {l.sku} · {l.unitPrice.formatted}
                 </p>
                 <div className="qty">
-                  <button onClick={() => setQty(l.productId, l.quantity - 1)}>
+                  <button
+                    disabled={pendingLineId !== null}
+                    onClick={() => setQty(l.id, l.productId, l.quantity - 1)}
+                  >
                     −
                   </button>
                   <span>{l.quantity}</span>
-                  <button onClick={() => setQty(l.productId, l.quantity + 1)}>
+                  <button
+                    disabled={pendingLineId !== null}
+                    onClick={() => setQty(l.id, l.productId, l.quantity + 1)}
+                  >
                     +
                   </button>
                   <button
                     className="pill"
-                    onClick={() => setQty(l.productId, 0)}
+                    disabled={pendingLineId !== null}
+                    onClick={() => setQty(l.id, l.productId, 0)}
                   >
-                    Remove
+                    {pendingLineId === l.id ? "Working…" : "Remove"}
                   </button>
                 </div>
               </div>
