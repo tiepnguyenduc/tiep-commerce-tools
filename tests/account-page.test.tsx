@@ -12,6 +12,21 @@ const customer = {
 
 const readCustomerProfile = vi.hoisted(() => vi.fn());
 vi.mock("../lib/ct/account", () => ({ readCustomerProfile }));
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: any) => (
+    <a {...props} href={href}>
+      {children}
+    </a>
+  ),
+}));
+vi.mock("next/navigation", () => ({
+  notFound: () => {
+    throw new Error("NEXT_NOT_FOUND");
+  },
+  useRouter: () => ({
+    replace: vi.fn(),
+  }),
+}));
 
 describe("account page", () => {
   it("server-renders the dashboard when the session already has a customer", async () => {
@@ -34,6 +49,19 @@ describe("account page", () => {
 
     expect(html).toContain("Login / register");
     expect(html).not.toContain("Account Dashboard");
+  });
+
+  it("server-renders the requested account URL instead of falling back to dashboard", async () => {
+    readCustomerProfile.mockResolvedValueOnce(customer);
+    const { default: Page } = await import("../app/account/[page]/page");
+
+    const html = renderToStaticMarkup(
+      await Page({ params: Promise.resolve({ page: "wishlist" }) }),
+    );
+
+    expect(html).toContain("My Wishlist");
+    expect(html).toContain("Loading wishlist");
+    expect(html).not.toContain("Contact Information");
   });
 
   it("shows only login and register forms before the customer is authenticated", () => {

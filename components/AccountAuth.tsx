@@ -1,6 +1,13 @@
 "use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/Toast";
+import {
+  accountHref,
+  accountPages,
+  type AccountPage,
+} from "@/lib/account-pages";
 import type {
   CustomerAddress,
   CustomerOrderSummary,
@@ -9,15 +16,6 @@ import type {
 } from "@/lib/types";
 
 type Action = "login" | "register";
-type AccountPage = "dashboard" | "profile" | "addresses" | "orders" | "wishlist";
-
-const accountPages: { id: AccountPage; label: string }[] = [
-  { id: "dashboard", label: "Account Dashboard" },
-  { id: "profile", label: "Profile" },
-  { id: "addresses", label: "Addresses" },
-  { id: "orders", label: "My Orders" },
-  { id: "wishlist", label: "My Wishlist" },
-];
 
 const emptyAddress: CustomerAddress = {
   country: "US",
@@ -40,10 +38,8 @@ async function readJson<T>(response: Response): Promise<T> {
 
 function DashboardPage({
   customer,
-  onNavigate,
 }: {
   customer: CustomerProfile;
-  onNavigate: (page: AccountPage) => void;
 }) {
   return (
     <div className="account-content-grid">
@@ -51,9 +47,9 @@ function DashboardPage({
         <h3>Contact Information</h3>
         <p>{customerName(customer)}</p>
         <p className="muted">{customer.email}</p>
-        <button className="text-button" onClick={() => onNavigate("profile")}>
+        <Link className="text-button" href={accountHref("profile")}>
           Edit
-        </button>
+        </Link>
       </section>
       <section className="account-box">
         <h3>Address Book</h3>
@@ -64,9 +60,9 @@ function DashboardPage({
               }`
             : "You have no saved addresses."}
         </p>
-        <button className="text-button" onClick={() => onNavigate("addresses")}>
+        <Link className="text-button" href={accountHref("addresses")}>
           Manage addresses
-        </button>
+        </Link>
       </section>
     </div>
   );
@@ -555,18 +551,24 @@ export function AccountDashboard({
   onLogout,
   status,
   loggingOut = false,
+  initialPage = "dashboard",
 }: {
   customer: CustomerProfile;
   onLogout: () => void;
   status: string;
   loggingOut?: boolean;
+  initialPage?: AccountPage;
 }) {
-  const [activePage, setActivePage] = useState<AccountPage>("dashboard");
+  const [activePage, setActivePage] = useState<AccountPage>(initialPage);
   const [currentCustomer, setCurrentCustomer] = useState<CustomerProfile>(customer);
 
   useEffect(() => {
     setCurrentCustomer(customer);
   }, [customer]);
+
+  useEffect(() => {
+    setActivePage(initialPage);
+  }, [initialPage]);
 
   function renderPage() {
     if (activePage === "profile") {
@@ -587,7 +589,7 @@ export function AccountDashboard({
     }
     if (activePage === "orders") return <OrdersPage />;
     if (activePage === "wishlist") return <WishlistPage />;
-    return <DashboardPage customer={currentCustomer} onNavigate={setActivePage} />;
+    return <DashboardPage customer={currentCustomer} />;
   }
 
   return (
@@ -600,13 +602,14 @@ export function AccountDashboard({
         </div>
         <nav className="account-menu" aria-label="My account pages">
           {accountPages.map((page) => (
-            <button
+            <Link
               aria-current={activePage === page.id ? "page" : undefined}
+              href={page.href}
               key={page.id}
               onClick={() => setActivePage(page.id)}
             >
               {page.label}
-            </button>
+            </Link>
           ))}
         </nav>
         <button className="button" disabled={loggingOut} onClick={onLogout}>
@@ -628,8 +631,10 @@ export function AccountDashboard({
 
 export function AccountAuth({
   initialCustomer = null,
+  initialPage = "dashboard",
 }: {
   initialCustomer?: CustomerProfile | null;
+  initialPage?: AccountPage;
 }) {
   const [action, setAction] = useState<Action>("login");
   const [email, setEmail] = useState("");
@@ -643,6 +648,7 @@ export function AccountAuth({
   const [submitting, setSubmitting] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const showToast = useToast();
+  const router = useRouter();
 
   async function loadCustomer(quiet = false) {
     try {
@@ -708,6 +714,7 @@ export function AccountAuth({
       }
       setCustomer(null);
       setState("");
+      router.replace("/account");
       showToast("You are logged out.", "success");
     } catch {
       showToast("Network error — logout failed.", "error");
@@ -720,6 +727,7 @@ export function AccountAuth({
     return (
       <AccountDashboard
         customer={customer}
+        initialPage={initialPage}
         loggingOut={loggingOut}
         onLogout={logout}
         status={state}
