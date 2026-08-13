@@ -26,8 +26,8 @@ async function HeaderCategoryLinks() {
 
 export function Header() {
   return (
-    <>
-      <header className="header shell">
+    <header className="header">
+      <div className="shell header-inner">
         <Link className="brand" href="/">
           WORK<i>/</i>SHOP
         </Link>
@@ -39,7 +39,7 @@ export function Header() {
           <Link href="/account">Account</Link>
           <HeaderCartButton />
         </nav>
-      </header>
-    </>
+      </div>
+    </header>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { A11y, Navigation } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { useMiniCart } from "@/components/MiniCart";
 import {
   type RecentlyViewedProduct,
@@ -26,7 +28,7 @@ export function CartView() {
   const { syncCart } = useMiniCart();
   const showToast = useToast();
   const suggestedProducts = useMemo(
-    () => recentlyViewedProducts.slice(0, 4),
+    () => recentlyViewedProducts.slice(0, 8),
     [recentlyViewedProducts],
   );
 
@@ -205,9 +207,6 @@ export function CartView() {
               <p className="muted">
                 Add a product to demonstrate the BFF-backed cart flow.
               </p>
-              <Link className="button" href="/products">
-                Browse catalog
-              </Link>
             </div>
           ) : (
             cart.lines.map((l) => {
@@ -384,11 +383,34 @@ export function CartView() {
               <span className="eyebrow">Recently viewed</span>
               <h2>Products you looked at</h2>
             </div>
-            <Link className="text-button" href="/products">
-              Browse catalog
-            </Link>
+            <div className="recent-slider-actions">
+              <button
+                aria-label="Show previous recently viewed products"
+                className="recent-slider-prev"
+                type="button"
+              >
+                ‹
+              </button>
+              <button
+                aria-label="Show next recently viewed products"
+                className="recent-slider-next"
+                type="button"
+              >
+                ›
+              </button>
+            </div>
           </div>
-          <div className="recent-grid">
+          <Swiper
+            a11y={{ enabled: true }}
+            className="recent-slider"
+            modules={[A11y, Navigation]}
+            navigation={{
+              nextEl: ".recent-slider-next",
+              prevEl: ".recent-slider-prev",
+            }}
+            slidesPerView="auto"
+            spaceBetween={16}
+          >
             {suggestedProducts.map((product) => {
               const existingLine = cart.lines.find(
                 (line) => line.productId === product.id,
@@ -396,40 +418,42 @@ export function CartView() {
               const pendingProductLineId =
                 existingLine?.id ?? `recent-${product.id}`;
               return (
-                <article className="recent-product" key={product.id}>
-                  <Link href={`/products/${product.slug}`}>
-                    <img src={product.image} alt={product.name} />
-                  </Link>
-                  <div>
-                    <span className="tag">{product.category}</span>
-                    <h3>
-                      <Link href={`/products/${product.slug}`}>
-                        {product.name}
-                      </Link>
-                    </h3>
-                    <p className="muted">{product.sku}</p>
-                    <div className="row">
-                      <strong>{product.price.formatted}</strong>
-                      <button
-                        className="pill"
-                        disabled={
-                          pendingLineId !== null ||
-                          clearingCart ||
-                          (existingLine?.quantity ?? 0) >= 99
-                        }
-                        onClick={() => addRecentlyViewedProduct(product)}
-                        type="button"
-                      >
-                        {pendingLineId === pendingProductLineId
-                          ? "Adding…"
-                          : "Add"}
-                      </button>
+                <SwiperSlide className="recent-slide" key={product.id}>
+                  <article className="recent-product">
+                    <Link href={`/products/${product.slug}`}>
+                      <img src={product.image} alt={product.name} />
+                    </Link>
+                    <div>
+                      <span className="tag">{product.category}</span>
+                      <h3>
+                        <Link href={`/products/${product.slug}`}>
+                          {product.name}
+                        </Link>
+                      </h3>
+                      <p className="muted">{product.sku}</p>
+                      <div className="row">
+                        <strong>{product.price.formatted}</strong>
+                        <button
+                          className="pill"
+                          disabled={
+                            pendingLineId !== null ||
+                            clearingCart ||
+                            (existingLine?.quantity ?? 0) >= 99
+                          }
+                          onClick={() => addRecentlyViewedProduct(product)}
+                          type="button"
+                        >
+                          {pendingLineId === pendingProductLineId
+                            ? "Adding…"
+                            : "Add"}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </article>
+                  </article>
+                </SwiperSlide>
               );
             })}
-          </div>
+          </Swiper>
         </section>
       )}
     </>
