@@ -66,6 +66,7 @@ export type Wishlist = {
 export type CartLine = {
   id: string;
   productId: string;
+  slug: string;
   sku: string;
   name: string;
   image: string;
@@ -85,6 +86,7 @@ export type Cart = {
   lines: CartLine[];
   itemCount: number;
   subtotal: Money;
+  taxTotal: Money;
   discountTotal: Money;
   total: Money;
   discountCodes: AppliedDiscountCode[];

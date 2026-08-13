@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMiniCart } from "@/components/MiniCart";
 import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
 export function AddToCart({
@@ -11,25 +11,34 @@ export function AddToCart({
   mode?: StoreMode;
 }) {
   const [busy, setBusy] = useState(false);
-  const router = useRouter();
+  const { cart, loadCart, openCart, syncCart } = useMiniCart();
   const showToast = useToast();
   async function addToCart() {
     if (busy) return;
     setBusy(true);
     try {
+      const currentCart = cart ?? (await loadCart());
+      const existingLine =
+        currentCart?.mode === mode
+          ? currentCart.lines.find((line) => line.productId === productId)
+          : undefined;
       const response = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, quantity: 1, mode }),
+        body: JSON.stringify({
+          productId,
+          quantity: (existingLine?.quantity ?? 0) + 1,
+          mode,
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         showToast(data.error || "Could not add the product to your cart.", "error");
         return;
       }
+      syncCart(data);
+      openCart();
       showToast("Product added to your cart.", "success");
-      router.push("/cart");
-      router.refresh();
     } catch {
       showToast("Network error — could not add the product to your cart.", "error");
     } finally {

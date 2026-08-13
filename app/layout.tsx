@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { MiniCartProvider } from "@/components/MiniCart";
 import { ToastProvider } from "@/components/Toast";
 export const metadata: Metadata = {
   title: "WORK/SHOP · Commerce Launchpad",
@@ -12,9 +13,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <body>
         <ToastProvider>
-          <Header />
-          {children}
-          <Footer />
+          <MiniCartProvider>
+            <Header />
+            {children}
+            <Footer />
+          </MiniCartProvider>
         </ToastProvider>
       </body>
     </html>

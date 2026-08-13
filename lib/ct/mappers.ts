@@ -37,10 +37,24 @@ function localizedName(line: Pick<LineItem, "name">, locale: string) {
   return line.name[locale] || line.name.en || Object.values(line.name)[0] || "";
 }
 
+function localizedSlug(line: Pick<LineItem, "productId" | "productSlug">, locale: string) {
+  return (
+    line.productSlug?.[locale] ||
+    line.productSlug?.en ||
+    Object.values(line.productSlug ?? {})[0] ||
+    line.productId
+  );
+}
+
 export function mapCommercetoolsCart(
   cart: Pick<
     CtCart,
-    "id" | "version" | "lineItems" | "totalPrice" | "discountCodes"
+    | "id"
+    | "version"
+    | "lineItems"
+    | "totalPrice"
+    | "taxedPrice"
+    | "discountCodes"
   >,
   mode: StoreMode,
   locale = "en-US",
@@ -50,6 +64,7 @@ export function mapCommercetoolsCart(
     return {
       id: line.id,
       productId: line.productId,
+      slug: localizedSlug(line, locale),
       sku: line.variant.sku || line.id,
       name: localizedName(line, locale),
       image: line.variant.images?.[0]?.url || fallbackImage,
@@ -66,11 +81,18 @@ export function mapCommercetoolsCart(
     { ...cart.totalPrice, centAmount: subtotalCents },
     locale,
   );
+  const taxTotal = mapMoney(
+    cart.taxedPrice?.totalTax ?? { ...cart.totalPrice, centAmount: 0 },
+    locale,
+  );
   const total = mapMoney(cart.totalPrice, locale);
   const discountTotal = mapMoney(
     {
       ...cart.totalPrice,
-      centAmount: Math.max(0, subtotalCents - cart.totalPrice.centAmount),
+      centAmount: Math.max(
+        0,
+        subtotalCents + taxTotal.centAmount - cart.totalPrice.centAmount,
+      ),
     },
     locale,
   );
@@ -94,6 +116,7 @@ export function mapCommercetoolsCart(
     lines,
     itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
     subtotal,
+    taxTotal,
     discountTotal,
     total,
     discountCodes,

@@ -211,8 +211,8 @@ export async function searchProducts(
 export async function getProduct(slug: string) {
   const result = await searchProducts();
   return (
-    result.products.find((p) => p.slug === slug) ||
-    products.find((p) => p.slug === slug) ||
+    result.products.find((p) => p.slug === slug || p.id === slug) ||
+    products.find((p) => p.slug === slug || p.id === slug) ||
     null
   );
 }

@@ -17,9 +17,17 @@ export function emptyCart(mode: StoreMode = "b2c"): Cart {
     lines: [],
     itemCount: 0,
     subtotal,
+    taxTotal: format(0),
     discountTotal: format(0),
     total: subtotal,
     discountCodes: [],
+  };
+}
+export function clearCart(cart: Cart, mode: StoreMode = cart.mode): Cart {
+  return {
+    ...emptyCart(mode),
+    id: cart.id,
+    version: cart.version + 1,
   };
 }
 export function updateCart(
@@ -34,6 +42,7 @@ export function updateCart(
     rest.push({
       id: `line-${p.id}`,
       productId: p.id,
+      slug: p.slug,
       sku: p.sku,
       name: p.name,
       image: p.image,
@@ -49,6 +58,7 @@ export function updateCart(
     lines: rest,
     itemCount: rest.reduce((n, x) => n + x.quantity, 0),
     subtotal,
+    taxTotal: format(0),
     discountTotal: format(0),
     total: subtotal,
     discountCodes: [],

@@ -17,6 +17,7 @@ describe("commercetools cart mapping", () => {
           {
             id: "line-1",
             productId: "product-1",
+            productSlug: { "en-US": "desk-lamp" },
             name: { "en-US": "Desk Lamp" },
             variant: {
               id: 1,
@@ -57,6 +58,7 @@ describe("commercetools cart mapping", () => {
       mode: "b2c",
       itemCount: 1,
       subtotal: { centAmount: 2599, formatted: "$25.99" },
+      taxTotal: { centAmount: 0, formatted: "$0.00" },
       discountTotal: { centAmount: 0, formatted: "$0.00" },
       total: { centAmount: 2599, formatted: "$25.99" },
       discountCodes: [],
@@ -64,6 +66,7 @@ describe("commercetools cart mapping", () => {
         {
           id: "line-1",
           productId: "product-1",
+          slug: "desk-lamp",
           sku: "lamp-001",
           name: "Desk Lamp",
           image: "https://example.com/lamp.png",
@@ -137,5 +140,72 @@ describe("commercetools cart mapping", () => {
     expect(cart.discountCodes).toEqual([
       { id: "discount-code-id", code: "SAVE10", state: "MatchesCart" },
     ]);
+  });
+
+  it("maps taxed cart totals separately from discounts", () => {
+    const cart = mapCommercetoolsCart(
+      {
+        id: "cart-taxed",
+        version: 9,
+        totalPrice: {
+          type: "centPrecision",
+          currencyCode: "USD",
+          centAmount: 10800,
+          fractionDigits: 2,
+        },
+        taxedPrice: {
+          totalNet: {
+            type: "centPrecision",
+            currencyCode: "USD",
+            centAmount: 10000,
+            fractionDigits: 2,
+          },
+          totalGross: {
+            type: "centPrecision",
+            currencyCode: "USD",
+            centAmount: 10800,
+            fractionDigits: 2,
+          },
+          totalTax: {
+            type: "centPrecision",
+            currencyCode: "USD",
+            centAmount: 800,
+            fractionDigits: 2,
+          },
+          taxPortions: [],
+        },
+        lineItems: [
+          {
+            id: "line-taxed",
+            productId: "product-1",
+            name: { "en-US": "Desk Lamp" },
+            variant: { id: 1, sku: "lamp-001", images: [] },
+            quantity: 4,
+            price: {
+              id: "price-1",
+              value: {
+                type: "centPrecision",
+                currencyCode: "USD",
+                centAmount: 2500,
+                fractionDigits: 2,
+              },
+            },
+            totalPrice: {
+              type: "centPrecision",
+              currencyCode: "USD",
+              centAmount: 10000,
+              fractionDigits: 2,
+            },
+          },
+        ],
+      } as any,
+      "b2c",
+      "en-US",
+    );
+
+    expect(cart.subtotal.centAmount).toBe(10000);
+    expect(cart.taxTotal.centAmount).toBe(800);
+    expect(cart.discountTotal.centAmount).toBe(0);
+    expect(cart.total.centAmount).toBe(10800);
   });
 });

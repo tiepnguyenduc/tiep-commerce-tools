@@ -11,6 +11,7 @@ import {
   addDiscountCodeAction,
   removeDiscountCodeAction,
 } from "../cart-discount";
+import { emptyCart } from "../cart-engine";
 import type { Cart, StoreMode } from "../types";
 import { apiRoot } from "./client";
 import {
@@ -206,6 +207,41 @@ export async function updateLiveCart(input: CartUpdateInput): Promise<Cart> {
   const target = await targetForCart(input.mode, cartId);
   const updated = await withRetry(target, updateActions(input));
   return mapCommercetoolsCart(updated, input.mode, requireCommerceConfig().locale);
+}
+
+export async function clearLiveCart(mode: StoreMode): Promise<Cart> {
+  const cartId = getCartId(mode);
+  if (!cartId) return emptyCart(mode);
+
+  const target = await targetForCart(mode, cartId);
+  const actionsFor = (cart: CtCart): CartUpdateAction[] => [
+    ...cart.lineItems.map((line): CartUpdateAction => ({
+      action: "removeLineItem" as const,
+      lineItemId: line.id,
+    })),
+    ...(cart.discountCodes ?? []).map((info) =>
+      removeDiscountCodeAction(info.discountCode.id),
+    ),
+  ];
+
+  let cart = await target.get();
+  let actions = actionsFor(cart);
+  if (actions.length === 0) {
+    return mapCommercetoolsCart(cart, mode, requireCommerceConfig().locale);
+  }
+
+  let updated: CtCart;
+  try {
+    updated = await target.update(cart.version, actions);
+  } catch (error) {
+    if (!isConcurrentModification(error)) throw error;
+    cart = await target.get();
+    actions = actionsFor(cart);
+    updated =
+      actions.length === 0 ? cart : await target.update(cart.version, actions);
+  }
+
+  return mapCommercetoolsCart(updated, mode, requireCommerceConfig().locale);
 }
 
 async function updateLiveCartWithActions(

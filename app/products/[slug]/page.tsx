@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getProduct } from "@/lib/ct/catalog";
 import { AddToCart } from "@/components/AddToCart";
 import { AddToWishlist } from "@/components/AddToWishlist";
+import { TrackRecentlyViewedProduct } from "@/components/RecentlyViewedProducts";
 export default async function Page({
   params,
 }: {
@@ -12,6 +13,7 @@ export default async function Page({
   if (!p) notFound();
   return (
     <main className="shell detail">
+      <TrackRecentlyViewedProduct product={p} />
       <img src={p.image} alt={p.name} />
       <div>
         <span className="eyebrow">

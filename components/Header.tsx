@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { listHeaderCategories } from "@/lib/ct/catalog";
+import { HeaderCartButton } from "@/components/MiniCart";
 
 async function HeaderCategoryLinks() {
   await connection();
@@ -36,9 +37,7 @@ export function Header() {
             <HeaderCategoryLinks />
           </Suspense>
           <Link href="/account">Account</Link>
-          <Link className="pill" href="/cart">
-            Cart →
-          </Link>
+          <HeaderCartButton />
         </nav>
       </header>
     </>
