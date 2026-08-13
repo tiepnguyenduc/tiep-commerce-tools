@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { useMiniCart } from "@/components/MiniCart";
 import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
@@ -47,7 +49,14 @@ export function AddToCart({
   }
   return (
     <button className="button accent" disabled={busy} onClick={addToCart}>
-      {busy ? "Adding…" : "Add to cart →"}
+      {busy ? (
+        "Adding…"
+      ) : (
+        <>
+          <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />
+          <span>Add to cart</span>
+        </>
+      )}
     </button>
   );
 }

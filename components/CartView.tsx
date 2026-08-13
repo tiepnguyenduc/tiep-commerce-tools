@@ -1,6 +1,15 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faChevronRight,
+  faArrowRight,
+  faMinus,
+  faPlus,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { A11y, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useMiniCart } from "@/components/MiniCart";
@@ -234,7 +243,7 @@ export function CartView() {
                         onClick={() => setQty(l.id, l.productId, l.quantity - 1)}
                         type="button"
                       >
-                        −
+                        <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
                       </button>
                       <label className="sr-only" htmlFor={`quantity-${l.id}`}>
                         Quantity for {l.name}
@@ -250,6 +259,8 @@ export function CartView() {
                             [l.id]: event.target.value,
                           }))
                         }
+                        required
+                        step={1}
                         type="number"
                         value={quantityDrafts[l.id] ?? String(l.quantity)}
                       />
@@ -262,7 +273,7 @@ export function CartView() {
                         onClick={() => setQty(l.id, l.productId, l.quantity + 1)}
                         type="button"
                       >
-                        +
+                        <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
                       </button>
                       <button
                         className="pill qty-update"
@@ -277,7 +288,8 @@ export function CartView() {
                         onClick={() => setQty(l.id, l.productId, 0)}
                         type="button"
                       >
-                        Remove
+                        <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
+                        <span>Remove</span>
                       </button>
                     </form>
                   </div>
@@ -319,14 +331,19 @@ export function CartView() {
                 <label htmlFor="discount-code">Discount code</label>
                 <div className="discount-form-controls">
                   <input
+                    autoComplete="off"
                     id="discount-code"
+                    maxLength={32}
+                    minLength={2}
+                    pattern="\\S.*"
+                    required
                     value={discountCode}
                     onChange={(event) => {
                       setDiscountCode(event.target.value);
                       setDiscountError("");
                     }}
                     placeholder="Enter code"
-                    autoComplete="off"
+                    title="Enter a valid discount code."
                   />
                   <button
                     type="submit"
@@ -370,7 +387,8 @@ export function CartView() {
           <p className="muted">Shipping is calculated during checkout.</p>
           {cart.itemCount > 0 && (
             <Link className="button accent" href={`/checkout/${cart.mode}`}>
-              Checkout as {cart.mode.toUpperCase()} →
+              <span>Checkout as {cart.mode.toUpperCase()}</span>
+              <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
             </Link>
           )}
         </aside>
@@ -389,14 +407,14 @@ export function CartView() {
                 className="recent-slider-prev"
                 type="button"
               >
-                ‹
+                <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
               </button>
               <button
                 aria-label="Show next recently viewed products"
                 className="recent-slider-next"
                 type="button"
               >
-                ›
+                <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
               </button>
             </div>
           </div>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStore, faUser } from "@fortawesome/free-solid-svg-icons";
 import { listHeaderCategories } from "@/lib/ct/catalog";
 import { HeaderCartButton } from "@/components/MiniCart";
 
@@ -32,11 +34,17 @@ export function Header() {
           WORK<i>/</i>SHOP
         </Link>
         <nav className="nav">
-          <Link href="/products">Catalog</Link>
+          <Link href="/products">
+            <FontAwesomeIcon aria-hidden="true" icon={faStore} />
+            <span>Catalog</span>
+          </Link>
           <Suspense fallback={null}>
             <HeaderCategoryLinks />
           </Suspense>
-          <Link href="/account">Account</Link>
+          <Link href="/account">
+            <FontAwesomeIcon aria-hidden="true" icon={faUser} />
+            <span>Account</span>
+          </Link>
           <HeaderCartButton />
         </nav>
       </div>

@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 export type ToastTone = "success" | "error" | "info";
 export type ShowToast = (message: string, tone?: ToastTone) => void;
@@ -63,7 +65,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               onClick={() => dismiss(toast.id)}
               type="button"
             >
-              ×
+              <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
             </button>
           </output>
         ))}

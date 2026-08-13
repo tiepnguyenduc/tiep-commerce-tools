@@ -8,6 +8,14 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCartShopping,
+  faMinus,
+  faPlus,
+  faTrashCan,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import type { Cart, CartLine } from "@/lib/types";
 
@@ -149,13 +157,7 @@ export function HeaderCartButton() {
       onClick={openCart}
       type="button"
     >
-      <span aria-hidden="true" className="cart-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M7 8h13l-2 8H8L6 4H3" />
-          <circle cx="9" cy="20" r="1.5" />
-          <circle cx="17" cy="20" r="1.5" />
-        </svg>
-      </span>
+      <FontAwesomeIcon aria-hidden="true" icon={faCartShopping} />
       <span>Cart</span>
       <strong>{itemCount}</strong>
     </button>
@@ -203,7 +205,7 @@ function MiniCartDrawer({
             </h2>
           </div>
           <button aria-label="Close mini cart" onClick={onClose} type="button">
-            ×
+            <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
           </button>
         </header>
 
@@ -243,7 +245,7 @@ function MiniCartDrawer({
                             }
                             type="button"
                           >
-                            −
+                            <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
                           </button>
                           <span>{line.quantity}</span>
                           <button
@@ -255,7 +257,7 @@ function MiniCartDrawer({
                             }
                             type="button"
                           >
-                            +
+                            <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
                           </button>
                         </div>
                         <button
@@ -264,7 +266,8 @@ function MiniCartDrawer({
                           onClick={() => setLineQuantity(line, 0)}
                           type="button"
                         >
-                          Remove
+                          <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
+                          <span>Remove</span>
                         </button>
                       </div>
                     </div>

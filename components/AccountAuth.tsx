@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import {
   accountHref,
@@ -97,7 +99,8 @@ function ProfilePage({
     });
   }, [customer]);
 
-  async function saveProfile() {
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (savingProfile) return;
     setSavingProfile(true);
     setStatus("Saving account information...");
@@ -106,7 +109,12 @@ function ProfilePage({
         await fetch("/api/customer/profile", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(profile),
+          body: JSON.stringify({
+            ...profile,
+            email: profile.email.trim(),
+            firstName: profile.firstName.trim(),
+            lastName: profile.lastName.trim(),
+          }),
         }),
       );
       onCustomerChange(data.customer);
@@ -121,7 +129,8 @@ function ProfilePage({
     }
   }
 
-  async function savePassword() {
+  async function savePassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (savingPassword) return;
     setSavingPassword(true);
     setStatus("Changing password...");
@@ -149,70 +158,82 @@ function ProfilePage({
     <div className="account-stack">
       <section className="account-box">
         <h3>Account Information</h3>
-        <div className="form-grid compact">
-          <input
-            className="field"
-            placeholder="First name"
-            value={profile.firstName}
-            onChange={(event) =>
-              setProfile({ ...profile, firstName: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Last name"
-            value={profile.lastName}
-            onChange={(event) =>
-              setProfile({ ...profile, lastName: event.target.value })
-            }
-          />
-          <input
-            className="field wide"
-            placeholder="Email"
-            value={profile.email}
-            onChange={(event) =>
-              setProfile({ ...profile, email: event.target.value })
-            }
-          />
-        </div>
-        <button
-          className="button accent"
-          disabled={savingProfile}
-          onClick={saveProfile}
-        >
-          {savingProfile ? "Saving…" : "Save account"}
-        </button>
+        <form className="account-stack" onSubmit={saveProfile}>
+          <div className="form-grid compact">
+            <input
+              autoComplete="given-name"
+              className="field"
+              maxLength={50}
+              placeholder="First name"
+              value={profile.firstName}
+              onChange={(event) =>
+                setProfile({ ...profile, firstName: event.target.value })
+              }
+            />
+            <input
+              autoComplete="family-name"
+              className="field"
+              maxLength={50}
+              placeholder="Last name"
+              value={profile.lastName}
+              onChange={(event) =>
+                setProfile({ ...profile, lastName: event.target.value })
+              }
+            />
+            <input
+              autoComplete="email"
+              className="field wide"
+              placeholder="Email"
+              required
+              type="email"
+              value={profile.email}
+              onChange={(event) =>
+                setProfile({ ...profile, email: event.target.value })
+              }
+            />
+          </div>
+          <button className="button accent" disabled={savingProfile} type="submit">
+            {savingProfile ? "Saving…" : "Save account"}
+          </button>
+        </form>
       </section>
 
       <section className="account-box">
         <h3>Change Password</h3>
-        <div className="form-grid compact">
-          <input
-            className="field"
-            placeholder="Current password"
-            type="password"
-            value={passwords.currentPassword}
-            onChange={(event) =>
-              setPasswords({ ...passwords, currentPassword: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="New password"
-            type="password"
-            value={passwords.newPassword}
-            onChange={(event) =>
-              setPasswords({ ...passwords, newPassword: event.target.value })
-            }
-          />
-        </div>
-        <button
-          className="button"
-          disabled={savingPassword}
-          onClick={savePassword}
-        >
-          {savingPassword ? "Changing…" : "Change password"}
-        </button>
+        <form className="account-stack" onSubmit={savePassword}>
+          <div className="form-grid compact">
+            <input
+              autoComplete="current-password"
+              className="field"
+              minLength={1}
+              placeholder="Current password"
+              required
+              type="password"
+              value={passwords.currentPassword}
+              onChange={(event) =>
+                setPasswords({
+                  ...passwords,
+                  currentPassword: event.target.value,
+                })
+              }
+            />
+            <input
+              autoComplete="new-password"
+              className="field"
+              minLength={8}
+              placeholder="New password"
+              required
+              type="password"
+              value={passwords.newPassword}
+              onChange={(event) =>
+                setPasswords({ ...passwords, newPassword: event.target.value })
+              }
+            />
+          </div>
+          <button className="button" disabled={savingPassword} type="submit">
+            {savingPassword ? "Changing…" : "Change password"}
+          </button>
+        </form>
       </section>
       {status && <p className="muted">{status}</p>}
     </div>
@@ -251,16 +272,29 @@ function AddressBookPage({
     );
   }, []);
 
-  async function saveAddress() {
+  async function saveAddress(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (busy) return;
     setSavingAddress(true);
     setStatus("Saving address...");
     try {
+      const nextAddress = {
+        ...editing,
+        firstName: editing.firstName?.trim(),
+        lastName: editing.lastName?.trim(),
+        streetNumber: editing.streetNumber?.trim(),
+        streetName: editing.streetName?.trim(),
+        city: editing.city?.trim(),
+        region: editing.region?.trim(),
+        postalCode: editing.postalCode?.trim(),
+        country: editing.country.trim().toUpperCase(),
+        phone: editing.phone?.trim(),
+      };
       const data = await readJson<{ customer: CustomerProfile }>(
         await fetch("/api/customer/addresses", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editing),
+          body: JSON.stringify(nextAddress),
         }),
       );
       onCustomerChange(data.customer);
@@ -345,87 +379,115 @@ function AddressBookPage({
 
       <section className="account-box">
         <h3>{editing.id ? "Edit Address" : "Add New Address"}</h3>
-        <div className="form-grid compact">
-          <input
-            className="field"
-            placeholder="First name"
-            value={editing.firstName ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, firstName: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Last name"
-            value={editing.lastName ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, lastName: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Street number"
-            value={editing.streetNumber ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, streetNumber: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Street name"
-            value={editing.streetName ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, streetName: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="City"
-            value={editing.city ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, city: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Region"
-            value={editing.region ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, region: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Postal code"
-            value={editing.postalCode ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, postalCode: event.target.value })
-            }
-          />
-          <input
-            className="field"
-            placeholder="Country"
-            value={editing.country}
-            onChange={(event) =>
-              setEditing({ ...editing, country: event.target.value.toUpperCase() })
-            }
-          />
-          <input
-            className="field wide"
-            placeholder="Phone"
-            value={editing.phone ?? ""}
-            onChange={(event) =>
-              setEditing({ ...editing, phone: event.target.value })
-            }
-          />
-        </div>
-        <button
-          className="button accent"
-          disabled={busy}
-          onClick={saveAddress}
-        >
-          {savingAddress ? "Saving…" : "Save address"}
-        </button>
+        <form className="account-stack" onSubmit={saveAddress}>
+          <div className="form-grid compact">
+            <input
+              autoComplete="given-name"
+              className="field"
+              maxLength={50}
+              placeholder="First name"
+              required
+              value={editing.firstName ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, firstName: event.target.value })
+              }
+            />
+            <input
+              autoComplete="family-name"
+              className="field"
+              maxLength={50}
+              placeholder="Last name"
+              required
+              value={editing.lastName ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, lastName: event.target.value })
+              }
+            />
+            <input
+              autoComplete="address-line2"
+              className="field"
+              maxLength={20}
+              placeholder="Street number"
+              value={editing.streetNumber ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, streetNumber: event.target.value })
+              }
+            />
+            <input
+              autoComplete="address-line1"
+              className="field"
+              maxLength={120}
+              placeholder="Street name"
+              required
+              value={editing.streetName ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, streetName: event.target.value })
+              }
+            />
+            <input
+              autoComplete="address-level2"
+              className="field"
+              maxLength={80}
+              placeholder="City"
+              required
+              value={editing.city ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, city: event.target.value })
+              }
+            />
+            <input
+              autoComplete="address-level1"
+              className="field"
+              maxLength={80}
+              placeholder="Region"
+              value={editing.region ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, region: event.target.value })
+              }
+            />
+            <input
+              autoComplete="postal-code"
+              className="field"
+              maxLength={16}
+              placeholder="Postal code"
+              required
+              value={editing.postalCode ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, postalCode: event.target.value })
+              }
+            />
+            <input
+              autoComplete="country"
+              className="field"
+              maxLength={2}
+              minLength={2}
+              pattern="[A-Za-z]{2}"
+              placeholder="Country"
+              required
+              title="Use a 2-letter country code, for example US."
+              value={editing.country}
+              onChange={(event) =>
+                setEditing({ ...editing, country: event.target.value.toUpperCase() })
+              }
+            />
+            <input
+              autoComplete="tel"
+              className="field wide"
+              maxLength={30}
+              pattern="^[0-9+().\\-\\s]{7,30}$"
+              placeholder="Phone"
+              title="Use 7 to 30 digits, spaces, or phone symbols."
+              type="tel"
+              value={editing.phone ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, phone: event.target.value })
+              }
+            />
+          </div>
+          <button className="button accent" disabled={busy} type="submit">
+            {savingAddress ? "Saving…" : "Save address"}
+          </button>
+        </form>
       </section>
       {status && <p className="muted">{status}</p>}
     </div>
@@ -669,7 +731,8 @@ export function AccountAuth({
     loadCustomer(true);
   }, [initialCustomer]);
 
-  async function submit() {
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (submitting) return;
     setSubmitting(true);
     setState(`${action === "login" ? "Logging in" : "Registering"}...`);
@@ -677,7 +740,12 @@ export function AccountAuth({
       const response = await fetch(`/api/customer/${action}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstName, lastName }),
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        }),
       });
       const data = await readJson<{
         training?: boolean;
@@ -744,6 +812,7 @@ export function AccountAuth({
           className={`step ${action === "login" ? "on" : ""}`}
           disabled={submitting}
           onClick={() => setAction("login")}
+          type="button"
         >
           Login
         </button>
@@ -751,48 +820,74 @@ export function AccountAuth({
           className={`step ${action === "register" ? "on" : ""}`}
           disabled={submitting}
           onClick={() => setAction("register")}
+          type="button"
         >
           Register
         </button>
       </div>
-      <div className="form-grid">
-        <input
-          className="field wide"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email"
-        />
-        <input
-          className="field wide"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Password"
-          type="password"
-        />
-        {action === "register" && (
-          <>
-            <input
-              className="field"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
-              placeholder="First name"
-            />
-            <input
-              className="field"
-              value={lastName}
-              onChange={(event) => setLastName(event.target.value)}
-              placeholder="Last name"
-            />
-          </>
-        )}
-      </div>
-      <button className="button accent" disabled={submitting} onClick={submit}>
-        {submitting
-          ? action === "login"
-            ? "Logging in…"
-            : "Registering…"
-          : `${action === "login" ? "Login customer" : "Register customer"} →`}
-      </button>
+      <form className="account-stack" onSubmit={submit}>
+        <div className="form-grid">
+          <input
+            autoComplete="email"
+            className="field wide"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Email"
+            required
+            type="email"
+          />
+          <input
+            autoComplete={
+              action === "login" ? "current-password" : "new-password"
+            }
+            className="field wide"
+            minLength={action === "register" ? 8 : 1}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Password"
+            required
+            type="password"
+          />
+          {action === "register" && (
+            <>
+              <input
+                autoComplete="given-name"
+                className="field"
+                maxLength={50}
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                placeholder="First name"
+                required
+              />
+              <input
+                autoComplete="family-name"
+                className="field"
+                maxLength={50}
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                placeholder="Last name"
+                required
+              />
+            </>
+          )}
+        </div>
+        <button className="button accent" disabled={submitting} type="submit">
+          {submitting ? (
+            action === "login" ? (
+              "Logging in…"
+            ) : (
+              "Registering…"
+            )
+          ) : (
+            <>
+              <span>
+                {action === "login" ? "Login customer" : "Register customer"}
+              </span>
+              <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+            </>
+          )}
+        </button>
+      </form>
       <p className="muted">{state}</p>
     </section>
   );

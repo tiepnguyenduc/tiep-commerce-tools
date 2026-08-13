@@ -1,6 +1,22 @@
+"use client";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBriefcase,
+  faPalette,
+  faSwatchbook,
+} from "@fortawesome/free-solid-svg-icons";
+import { useToast } from "@/components/Toast";
 
 export function Footer() {
+  const showToast = useToast();
+
+  function submitNewsletter(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    event.currentTarget.reset();
+    showToast("Thanks for signing up.", "success");
+  }
+
   return (
     <footer className="footer">
       <div className="shell footer-inner">
@@ -14,29 +30,46 @@ export function Footer() {
               teams.
             </p>
           </div>
-          <form className="footer-signup">
+          <form className="footer-signup" onSubmit={submitNewsletter}>
             <label htmlFor="footer-email">Join our trade notes</label>
             <div>
               <input
+                autoComplete="email"
                 id="footer-email"
                 placeholder="Email address"
+                required
                 type="email"
               />
-              <button type="button">Sign up</button>
+              <button type="submit">Sign up</button>
             </div>
           </form>
         </section>
 
         <section className="footer-service-row" aria-label="Store services">
           <div>
+            <FontAwesomeIcon
+              aria-hidden="true"
+              className="footer-service-icon"
+              icon={faPalette}
+            />
             <strong>Free design consults</strong>
             <span>Room planning for home and office projects.</span>
           </div>
           <div>
+            <FontAwesomeIcon
+              aria-hidden="true"
+              className="footer-service-icon"
+              icon={faBriefcase}
+            />
             <strong>Trade-ready checkout</strong>
             <span>B2C and B2B purchasing paths in one storefront.</span>
           </div>
           <div>
+            <FontAwesomeIcon
+              aria-hidden="true"
+              className="footer-service-icon"
+              icon={faSwatchbook}
+            />
             <strong>Fast sample support</strong>
             <span>Material and finish guidance before you order.</span>
           </div>

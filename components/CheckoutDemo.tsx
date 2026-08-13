@@ -1,12 +1,16 @@
 "use client";
 import { useState } from "react";
 import { checkoutFlow, paymentFlow } from "@commercetools/checkout-browser-sdk";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
 export function CheckoutDemo({
+  detailsFormId,
   mode,
   purchaseOrderNumber,
 }: {
+  detailsFormId?: string;
   mode: StoreMode;
   purchaseOrderNumber?: string;
 }) {
@@ -26,8 +30,19 @@ export function CheckoutDemo({
     setState(message);
     showToast(message, "success");
   }
+  function validateDetails() {
+    if (!detailsFormId) return true;
+    const form = document.getElementById(detailsFormId);
+    if (!(form instanceof HTMLFormElement)) return true;
+    const valid = form.reportValidity();
+    if (!valid) {
+      showToast("Complete the required checkout details.", "error");
+    }
+    return valid;
+  }
   async function start() {
     if (busy) return;
+    if (!validateDetails()) return;
     setStartingSession(true);
     setState("Creating secure session…");
     try {
@@ -68,6 +83,7 @@ export function CheckoutDemo({
   }
   async function placeOrder() {
     if (busy) return;
+    if (!validateDetails()) return;
     setPlacingOrder(true);
     setState("Creating order from active cart…");
     try {
@@ -112,10 +128,24 @@ export function CheckoutDemo({
       <div data-ctc />
       <p>{state}</p>
       <button className="button accent" disabled={busy} onClick={start}>
-        {startingSession ? "Creating session…" : `Launch ${flow} →`}
+        {startingSession ? (
+          "Creating session…"
+        ) : (
+          <>
+            <span>Launch {flow}</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+          </>
+        )}
       </button>
       <button className="button" disabled={busy} onClick={placeOrder}>
-        {placingOrder ? "Creating order…" : "Create order via Cart API →"}
+        {placingOrder ? (
+          "Creating order…"
+        ) : (
+          <>
+            <span>Create order via Cart API</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+          </>
+        )}
       </button>
     </div>
   );

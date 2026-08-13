@@ -1,3 +1,5 @@
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import "@/lib/fontawesome";
 import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";

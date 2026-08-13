@@ -69,6 +69,12 @@ select {
     min-width: 0;
 }
 
+.nav > a {
+    align-items: center;
+    display: inline-flex;
+    gap: 7px;
+}
+
 .category-nav {
     display: flex;
     gap: 16px;
@@ -108,6 +114,16 @@ select {
     color: var(--ink);
 }
 
+.button,
+.pill,
+.wishlist-button,
+.text-button {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+}
+
 .cart-icon-button {
     align-items: center;
     background: var(--ink);
@@ -122,22 +138,9 @@ select {
     padding: 9px 12px;
 }
 
-.cart-icon {
-    align-items: center;
-    display: inline-flex;
-    height: 20px;
-    justify-content: center;
-    width: 20px;
-}
-
-.cart-icon svg {
-    fill: none;
-    height: 20px;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 2;
-    width: 20px;
+.cart-icon-button svg {
+    height: 18px;
+    width: 18px;
 }
 
 .cart-icon-button strong {
@@ -230,6 +233,13 @@ select {
     background: #fff;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+}
+
+.category h3 {
+    align-items: center;
+    display: flex;
+    gap: 8px;
     justify-content: space-between;
 }
 
@@ -1013,6 +1023,12 @@ select {
     display: grid;
     gap: 6px;
     padding: 18px;
+}
+
+.footer-service-icon {
+    color: var(--lime);
+    font-size: 22px;
+    margin-bottom: 8px;
 }
 
 .footer-service-row span {

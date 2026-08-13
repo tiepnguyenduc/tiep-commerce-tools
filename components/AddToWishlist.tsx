@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/Toast";
 
@@ -59,7 +61,14 @@ export function AddToWishlist({
       onClick={addToWishlist}
       type="button"
     >
-      {busy ? "Saving..." : saved ? "Saved to wishlist" : "Add to wishlist"}
+      {busy ? (
+        "Saving..."
+      ) : (
+        <>
+          <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
+          <span>{saved ? "Saved to wishlist" : "Add to wishlist"}</span>
+        </>
+      )}
     </button>
   );
 }

@@ -1,5 +1,7 @@
 import { ProductCard } from "@/components/ProductCard";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 const priceRanges = [
   { label: "Under $25", value: "-25" },
@@ -149,7 +151,10 @@ export default async function Page({
             <input type="hidden" name="category" value={selectedCategoryName} />
             <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
             <input type="hidden" name="color" value={p.color ?? ""} />
-            <button className="button">Search</button>
+            <button className="button">
+              <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
+              <span>Search</span>
+            </button>
           </form>
 
           {result.products.length ? (

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ModeBar } from "./ModeBar";
 import { ProductCard } from "./ProductCard";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
@@ -32,7 +34,8 @@ export async function Home({ mode }: { mode: StoreMode }) {
             </p>
             <p>
               <Link className="button accent" href="/products">
-                Explore the collection →
+                <span>Explore the collection</span>
+                <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
               </Link>
             </p>
           </div>
@@ -59,7 +62,10 @@ export async function Home({ mode }: { mode: StoreMode }) {
                 key={category.id}
               >
                 <span>0{i + 1}</span>
-                <h3>{category.name} →</h3>
+                <h3>
+                  <span>{category.name}</span>
+                  <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+                </h3>
               </Link>
             ))}
           </div>
