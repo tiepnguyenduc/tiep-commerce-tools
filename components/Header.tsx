@@ -2,9 +2,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStore, faUser } from "@fortawesome/free-solid-svg-icons";
-import { listHeaderCategories } from "@/lib/ct/catalog";
+import {
+  faMagnifyingGlass,
+  faStore,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import { HeaderCartButton } from "@/components/MiniCart";
+import { HeaderSearch } from "@/components/HeaderSearch";
 
 async function HeaderCategoryLinks() {
   await connection();
@@ -26,6 +31,16 @@ async function HeaderCategoryLinks() {
   );
 }
 
+async function HeaderSearchSlot() {
+  await connection();
+  const [categories, result] = await Promise.all([
+    listHeaderCategories(),
+    searchProducts("", "", { perPage: 5 }),
+  ]);
+
+  return <HeaderSearch categories={categories} products={result.products} />;
+}
+
 export function Header() {
   return (
     <header className="header">
@@ -40,6 +55,20 @@ export function Header() {
           </Link>
           <Suspense fallback={null}>
             <HeaderCategoryLinks />
+          </Suspense>
+          <Suspense
+            fallback={
+              <button
+                aria-label="Loading search"
+                className="header-search-trigger"
+                disabled
+                type="button"
+              >
+                <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
+              </button>
+            }
+          >
+            <HeaderSearchSlot />
           </Suspense>
           <Link href="/account">
             <FontAwesomeIcon aria-hidden="true" icon={faUser} />
