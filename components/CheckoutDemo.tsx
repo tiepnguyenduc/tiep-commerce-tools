@@ -1,50 +1,45 @@
 "use client";
-import { useState } from "react";
-import { checkoutFlow, paymentFlow } from "@commercetools/checkout-browser-sdk";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { checkoutFlow, type Message } from "@commercetools/checkout-browser-sdk";
 import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
-export function CheckoutDemo({
-  detailsFormId,
-  mode,
-  purchaseOrderNumber,
-}: {
-  detailsFormId?: string;
-  mode: StoreMode;
-  purchaseOrderNumber?: string;
-}) {
-  const [flow, setFlow] = useState<"checkoutFlow" | "paymentFlow">(
-    "checkoutFlow",
-  );
-  const [state, setState] = useState("");
+
+export function CheckoutDemo({ mode }: { mode: StoreMode }) {
+  const [state, setState] = useState("Opening hosted checkout...");
+  const [canRetry, setCanRetry] = useState(false);
+  const started = useRef(false);
   const [startingSession, setStartingSession] = useState(false);
-  const [placingOrder, setPlacingOrder] = useState(false);
   const showToast = useToast();
-  const busy = startingSession || placingOrder;
+
   function fail(message: string) {
     setState(message);
+    setCanRetry(true);
     showToast(message, "error");
   }
+
   function succeed(message: string) {
     setState(message);
+    setCanRetry(false);
     showToast(message, "success");
   }
-  function validateDetails() {
-    if (!detailsFormId) return true;
-    const form = document.getElementById(detailsFormId);
-    if (!(form instanceof HTMLFormElement)) return true;
-    const valid = form.reportValidity();
-    if (!valid) {
-      showToast("Complete the required checkout details.", "error");
-    }
-    return valid;
+
+  function handleError(message: Message) {
+    fail(String(message.payload ?? message.code ?? "Checkout error"));
   }
-  async function start() {
-    if (busy) return;
-    if (!validateDetails()) return;
+
+  function handleInfo(message: Message) {
+    if (message.code === "checkout_completed") {
+      succeed("Checkout completed");
+    }
+  }
+
+  const startCheckout = useCallback(async (force = false) => {
+    if (startingSession) return;
+    if (started.current && !force) return;
+    started.current = true;
     setStartingSession(true);
-    setState("Creating secure session…");
+    setCanRetry(false);
+    setState("Creating secure session...");
     try {
       const r = await fetch("/api/checkout/session", {
         method: "POST",
@@ -55,7 +50,7 @@ export function CheckoutDemo({
       if (data.training) {
         succeed(
           mode === "b2b"
-            ? "Training result: PO-4821 submitted and awaiting approval."
+            ? "Training result: hosted checkout submitted for approval."
             : "Training result: Order WS-1042 confirmed.",
         );
         return;
@@ -64,89 +59,41 @@ export function CheckoutDemo({
         fail(data.error || "Could not create session");
         return;
       }
-      const options = {
+      checkoutFlow({
         projectKey: data.projectKey,
         region: data.region,
         sessionId: data.sessionId,
         locale: "en-US",
-        onError: (e: unknown) => fail(String(e)),
-        onInfo: () => succeed("Checkout completed"),
-      };
+        onError: handleError,
+        onInfo: handleInfo,
+      });
       showToast("Secure checkout session created.", "success");
-      if (flow === "checkoutFlow") checkoutFlow(options);
-      else paymentFlow(options);
+      setCanRetry(false);
+      setState("Hosted checkout is open.");
     } catch {
-      fail("Network error — could not create session");
+      fail("Network error - could not create session");
     } finally {
       setStartingSession(false);
     }
-  }
-  async function placeOrder() {
-    if (busy) return;
-    if (!validateDetails()) return;
-    setPlacingOrder(true);
-    setState("Creating order from active cart…");
-    try {
-      const r = await fetch("/api/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, purchaseOrderNumber }),
-      });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        fail(data.error || "Order creation failed");
-        return;
-      }
-      const order = data.order;
-      succeed(
-        data.training
-          ? `Training order created: ${order.orderNumber}`
-          : `Live order created: ${order.orderNumber || order.id}`,
-      );
-    } catch {
-      fail("Network error — order creation failed");
-    } finally {
-      setPlacingOrder(false);
-    }
-  }
+  }, [mode, showToast, startingSession]);
+
+  useEffect(() => {
+    void startCheckout();
+  }, [startCheckout]);
+
   return (
-    <div className="panel">
-      <span className="eyebrow">Hosted checkout integration</span>
-      <h2>Checkout Browser SDK</h2>
-      <p className="muted">
-        The BFF creates a short-lived session. Credentials never enter the
-        browser bundle.
-      </p>
-      <select
-        className="field"
-        value={flow}
-        onChange={(e) => setFlow(e.target.value as typeof flow)}
-      >
-        <option value="checkoutFlow">checkoutFlow — full hosted</option>
-        <option value="paymentFlow">paymentFlow — payments only</option>
-      </select>
-      <div data-ctc />
+    <div className="panel checkout-direct-panel">
+      <span className="eyebrow">Hosted checkout</span>
+      <h2>{startingSession ? "Opening checkout" : "Checkout status"}</h2>
       <p>{state}</p>
-      <button className="button accent" disabled={busy} onClick={start}>
-        {startingSession ? (
-          "Creating session…"
-        ) : (
-          <>
-            <span>Launch {flow}</span>
-            <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-          </>
-        )}
-      </button>
-      <button className="button" disabled={busy} onClick={placeOrder}>
-        {placingOrder ? (
-          "Creating order…"
-        ) : (
-          <>
-            <span>Create order via Cart API</span>
-            <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-          </>
-        )}
-      </button>
+      {!startingSession && canRetry && (
+        <button
+          className="button accent"
+          onClick={() => void startCheckout(true)}
+        >
+          Try again
+        </button>
+      )}
     </div>
   );
 }

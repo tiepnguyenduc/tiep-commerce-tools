@@ -83,12 +83,9 @@ Your API Client scopes must allow cart/order/customer operations and B2B associa
 
 ## Checkout Browser SDK mapping
 
-`/api/checkout/session` is the credentialed boundary. With complete env plus `CTP_CHECKOUT_APP_KEY`, it obtains an OAuth token server-side and creates a short-lived session using the cart reference. The browser receives only `sessionId`, `projectKey`, and derived `region`, then `CheckoutDemo` can initialize either:
+`/api/checkout/session` is the credentialed boundary. With complete env plus `CTP_CHECKOUT_APP_KEY`, it obtains an OAuth token server-side and creates a short-lived session using the cart reference. The browser receives only `sessionId`, `projectKey`, and derived `region`, then `CheckoutDemo` initializes `checkoutFlow` for the full hosted address, shipping, payment, and order completion experience.
 
-- `checkoutFlow` for the full hosted address/shipping/payment experience (the default demo selection)
-- `paymentFlow` when the storefront owns address and delivery and Checkout owns payment
-
-The widget mount `<div data-ctc />` is present. Configure a Checkout Application and PSP Connector (Stripe, Adyen, Mollie, etc.) in Merchant Center, including the exact payment return URL. Sessions should be created only when checkout starts. With missing config, the BFF returns a deterministic local confirmation or approval-pending result.
+Configure a Checkout Application and PSP Connector (Stripe, Adyen, Mollie, etc.) in Merchant Center, including the exact payment return URL. Sessions should be created only when checkout starts. With missing config, the BFF returns a deterministic local confirmation or approval-pending result.
 
 Important: hosted Checkout now uses the active real cart ID when the app is connected. If the app is in training mode, `/api/checkout/session` returns a deterministic training result because Checkout Sessions require a real active cart in the configured project.
 
