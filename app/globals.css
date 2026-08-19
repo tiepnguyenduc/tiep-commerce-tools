@@ -2324,7 +2324,7 @@ select {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 8px;
+    margin: 12px 0;
 }
 
 .cart-line-variant span {
