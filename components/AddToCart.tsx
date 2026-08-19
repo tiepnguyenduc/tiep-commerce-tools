@@ -6,11 +6,13 @@ import { useMiniCart } from "@/components/MiniCart";
 import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
 export function AddToCart({
+  compact = false,
   productId,
   sku,
   quantity = 1,
   mode = "b2c",
 }: {
+  compact?: boolean;
   productId: string;
   sku?: string;
   quantity?: number;
@@ -55,9 +57,19 @@ export function AddToCart({
     }
   }
   return (
-    <button className="button accent" disabled={busy} onClick={addToCart} type="button">
+    <button
+      className={compact ? "pill compact-add-to-cart" : "button accent"}
+      disabled={busy}
+      onClick={addToCart}
+      type="button"
+    >
       {busy ? (
         "Adding…"
+      ) : compact ? (
+        <>
+          <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />
+          <span>Add</span>
+        </>
       ) : (
         <>
           <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />

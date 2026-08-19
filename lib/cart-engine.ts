@@ -1,5 +1,5 @@
 import { products } from "./sample-data";
-import type { Cart, StoreMode } from "./types";
+import type { Cart, ProductVariant, StoreMode } from "./types";
 const format = (n: number) => ({
   centAmount: n,
   currencyCode: "USD",
@@ -34,21 +34,32 @@ export function updateCart(
   cart: Cart,
   productId: string,
   quantity: number,
+  sku?: string,
 ): Cart {
   const p = products.find((x) => x.id === productId);
   if (!p) throw new Error("Product not found");
-  const rest = cart.lines.filter((x) => x.productId !== productId);
+  const variant = sku
+    ? p.variants?.find((item) => item.sku === sku)
+    : p.variants?.[0];
+  const selectedSku = variant?.sku ?? sku ?? p.sku;
+  const rest = cart.lines.filter((x) =>
+    sku ? x.sku !== selectedSku : x.productId !== productId,
+  );
   if (quantity > 0)
     rest.push({
-      id: `line-${p.id}`,
+      id: `line-${p.id}-${selectedSku}`,
       productId: p.id,
       slug: p.slug,
-      sku: p.sku,
+      variantId: variant?.id,
+      variantKey: variant?.key,
+      variantLabel: variantLabel(variant),
+      variantAttributes: variant?.attributes,
+      sku: selectedSku,
       name: p.name,
-      image: p.image,
+      image: variant?.image ?? p.image,
       quantity,
-      unitPrice: p.price,
-      total: format(p.price.centAmount * quantity),
+      unitPrice: variant?.price ?? p.price,
+      total: format((variant?.price ?? p.price).centAmount * quantity),
     });
   const cents = rest.reduce((n, x) => n + x.total.centAmount, 0);
   const subtotal = format(cents);
@@ -63,4 +74,9 @@ export function updateCart(
     total: subtotal,
     discountCodes: [],
   };
+}
+
+function variantLabel(variant?: ProductVariant) {
+  if (!variant) return undefined;
+  return variant.key || variant.sku || `Variant ${variant.id}`;
 }

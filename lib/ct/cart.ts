@@ -136,7 +136,9 @@ async function withRetry(target: CartUpdateTarget, actionsFor: (cart: CtCart) =>
 }
 
 function lineMatches(line: CtCart["lineItems"][number], input: Pick<CartUpdateInput, "productId" | "sku">) {
-  return line.productId === input.productId || Boolean(input.sku && line.variant.sku === input.sku);
+  return input.sku
+    ? line.variant.sku === input.sku
+    : line.productId === input.productId;
 }
 
 function addLineAction(input: CartUpdateInput): CartUpdateAction {

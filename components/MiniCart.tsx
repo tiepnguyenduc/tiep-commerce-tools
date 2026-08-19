@@ -16,6 +16,7 @@ import {
   faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { CartLineVariant } from "@/components/CartLineVariant";
 import { useToast } from "@/components/Toast";
 import type { Cart, CartLine } from "@/lib/types";
 
@@ -96,6 +97,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             productId: line.productId,
+            sku: line.sku,
             quantity,
             mode: cart.mode,
           }),
@@ -236,6 +238,7 @@ function MiniCartDrawer({
                       <p className="muted">
                         {line.sku} · {line.unitPrice.formatted}
                       </p>
+                      <CartLineVariant line={line} />
                       <div className="mini-cart-line-actions">
                         <div className="mini-cart-qty">
                           <button

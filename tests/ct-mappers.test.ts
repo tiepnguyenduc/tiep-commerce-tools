@@ -21,7 +21,12 @@ describe("commercetools cart mapping", () => {
             name: { "en-US": "Desk Lamp" },
             variant: {
               id: 1,
+              key: "lamp-black",
               sku: "lamp-001",
+              attributes: [
+                { name: "colorLabel", value: "Black" },
+                { name: "searchColor", value: { key: "black", label: "Black" } },
+              ],
               images: [
                 {
                   url: "https://example.com/lamp.png",
@@ -67,6 +72,13 @@ describe("commercetools cart mapping", () => {
           id: "line-1",
           productId: "product-1",
           slug: "desk-lamp",
+          variantId: 1,
+          variantKey: "lamp-black",
+          variantLabel: "lamp-black",
+          variantAttributes: [
+            { name: "colorLabel", label: "Color Label", value: "Black" },
+            { name: "searchColor", label: "Search Color", value: "Black" },
+          ],
           sku: "lamp-001",
           name: "Desk Lamp",
           image: "https://example.com/lamp.png",

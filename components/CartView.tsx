@@ -8,6 +8,7 @@ import {
   faPlus,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import { CartLineVariant } from "@/components/CartLineVariant";
 import { useMiniCart } from "@/components/MiniCart";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
 import {
@@ -15,7 +16,7 @@ import {
   useRecentlyViewedProducts,
 } from "@/components/RecentlyViewedProducts";
 import { useToast } from "@/components/Toast";
-import type { Cart } from "@/lib/types";
+import type { Cart, CartLine } from "@/lib/types";
 
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
@@ -58,14 +59,22 @@ export function CartView() {
     void load();
   }, []);
 
-  async function setQty(lineId: string, productId: string, quantity: number) {
+  async function setQty(
+    line: Pick<CartLine, "id" | "productId" | "sku">,
+    quantity: number,
+  ) {
     if (!cart || pendingLineId || clearingCart) return;
-    setPendingLineId(lineId);
+    setPendingLineId(line.id);
     try {
       const r = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, quantity, mode: cart.mode }),
+        body: JSON.stringify({
+          productId: line.productId,
+          sku: line.sku,
+          quantity,
+          mode: cart.mode,
+        }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -86,26 +95,30 @@ export function CartView() {
 
   async function updateLineQuantity(
     event: React.FormEvent<HTMLFormElement>,
-    lineId: string,
-    productId: string,
+    line: CartLine,
     currentQuantity: number,
   ) {
     event.preventDefault();
-    const quantity = Number.parseInt(quantityDrafts[lineId] ?? "", 10);
+    const quantity = Number.parseInt(quantityDrafts[line.id] ?? "", 10);
     if (!Number.isInteger(quantity) || quantity < 0 || quantity > 99) {
       showToast("Enter a quantity from 0 to 99.", "error");
       return;
     }
     if (quantity === currentQuantity) return;
-    await setQty(lineId, productId, quantity);
+    await setQty(line, quantity);
   }
 
   async function addRecentlyViewedProduct(product: RecentlyViewedProduct) {
     if (!cart) return;
-    const existing = cart.lines.find((line) => line.productId === product.id);
+    const existing = cart.lines.find(
+      (line) => line.sku === product.sku || line.productId === product.id,
+    );
     await setQty(
-      existing?.id ?? `recent-${product.id}`,
-      product.id,
+      existing ?? {
+        id: `recent-${product.id}`,
+        productId: product.id,
+        sku: product.sku,
+      },
       (existing?.quantity ?? 0) + 1,
     );
   }
@@ -229,15 +242,16 @@ export function CartView() {
                     <p className="muted">
                       {l.sku} · {l.unitPrice.formatted}
                     </p>
+                    <CartLineVariant line={l} />
                     <form
                       className="qty"
                       onSubmit={(event) =>
-                        updateLineQuantity(event, l.id, l.productId, l.quantity)
+                        updateLineQuantity(event, l, l.quantity)
                       }
                     >
                       <button
                         disabled={pendingLineId !== null || clearingCart}
-                        onClick={() => setQty(l.id, l.productId, l.quantity - 1)}
+                        onClick={() => setQty(l, l.quantity - 1)}
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
@@ -267,7 +281,7 @@ export function CartView() {
                           clearingCart ||
                           l.quantity >= 99
                         }
-                        onClick={() => setQty(l.id, l.productId, l.quantity + 1)}
+                        onClick={() => setQty(l, l.quantity + 1)}
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
@@ -282,7 +296,7 @@ export function CartView() {
                       <button
                         className="pill"
                         disabled={pendingLineId !== null || clearingCart}
-                        onClick={() => setQty(l.id, l.productId, 0)}
+                        onClick={() => setQty(l, 0)}
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />

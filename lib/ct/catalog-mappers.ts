@@ -26,7 +26,7 @@ function localized(
   return value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback;
 }
 
-function attributeLabel(name: string) {
+export function attributeLabel(name: string) {
   const labels: Record<string, string> = {
     colorlabel: "Color Label",
     searchcolor: "Search Color",
@@ -52,7 +52,7 @@ function localizedUnknown(value: unknown, locale: string) {
   return typeof preferred === "string" ? preferred : "";
 }
 
-function formatAttributeValue(value: unknown, locale: string): string {
+export function formatAttributeValue(value: unknown, locale: string): string {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number") return String(value);
@@ -93,7 +93,7 @@ function formatAttributeValue(value: unknown, locale: string): string {
   return "";
 }
 
-function variantAttributes(
+export function variantAttributes(
   variant: CtProductVariant,
   locale: string,
 ): ProductSpecification[] {

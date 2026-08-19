@@ -5,6 +5,7 @@ import type {
   TypedMoney,
 } from "@commercetools/platform-sdk";
 import type { Cart, CartLine, Money, StoreMode } from "../types";
+import { variantAttributes } from "./catalog-mappers";
 
 const fallbackImage =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23f3f0ea'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23847b6d' font-family='Arial' font-size='28'%3EProduct image%3C/text%3E%3C/svg%3E";
@@ -65,6 +66,10 @@ export function mapCommercetoolsCart(
       id: line.id,
       productId: line.productId,
       slug: localizedSlug(line, locale),
+      variantId: line.variant.id,
+      variantKey: line.variant.key,
+      variantLabel: line.variant.key || line.variant.sku || `Variant ${line.variant.id}`,
+      variantAttributes: variantAttributes(line.variant, locale),
       sku: line.variant.sku || line.id,
       name: localizedName(line, locale),
       image: line.variant.images?.[0]?.url || fallbackImage,

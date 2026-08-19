@@ -10,12 +10,14 @@ export function writeTrainingCart(
   productId: string,
   quantity: number,
   mode?: StoreMode,
+  sku?: string,
 ) {
   const current = readTrainingCart();
   globalThis.__trainingCart = updateCart(
     { ...current, mode: mode ?? current.mode },
     productId,
     quantity,
+    sku,
   );
   return globalThis.__trainingCart;
 }

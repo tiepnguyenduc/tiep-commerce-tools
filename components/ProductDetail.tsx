@@ -436,6 +436,9 @@ export function ProductDetail({
           className="panel product-related"
           eyebrow="Selected for this room"
           products={relatedItems}
+          renderAction={(item) => (
+            <AddToCart compact productId={item.id} sku={item.sku} />
+          )}
           title="Related products"
         />
       ) : null}

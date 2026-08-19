@@ -79,6 +79,7 @@ export async function POST(request: Request) {
         parsed.data.productId,
         parsed.data.quantity,
         mode,
+        parsed.data.sku,
       ),
     );
   } catch (e) {

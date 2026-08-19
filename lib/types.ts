@@ -85,6 +85,10 @@ export type CartLine = {
   id: string;
   productId: string;
   slug: string;
+  variantId?: number;
+  variantKey?: string;
+  variantLabel?: string;
+  variantAttributes?: ProductSpecification[];
   sku: string;
   name: string;
   image: string;
