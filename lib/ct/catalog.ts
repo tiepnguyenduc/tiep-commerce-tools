@@ -155,33 +155,16 @@ export async function searchProducts(
     const resources = await listProductResources(where);
     const mapped: Product[] = resources.map((resource, i) => {
       const data = resource.masterData.current;
-      const master = data.masterVariant;
-      const price = master.prices?.[0]?.value;
-      const cents = price?.centAmount ?? 0;
       const productCategoryName = data.categories
         .map((productCategory) => categoryNameById.get(productCategory.id))
         .find((name): name is string => Boolean(name));
       const categoryName = productCategoryName || category || "Catalog";
-
-      return {
-        id: resource.id,
-        slug: data.slug?.["en-US"] ?? resource.id,
-        sku: master.sku ?? `SKU-${i}`,
-        name: data.name?.["en-US"] ?? "Product",
-        description: data.description?.["en-US"] ?? "",
-        category: categoryName,
-        color: "Standard",
-        image: master.images?.[0]?.url ?? products[i % products.length].image,
-        price: {
-          centAmount: cents,
-          currencyCode: price?.currencyCode ?? "USD",
-          formatted: new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: price?.currencyCode ?? "USD",
-          }).format(cents / 100),
-        },
-        badges: ["Live catalog"],
-      };
+      return mapProductResourceToStorefrontProduct(
+        resource,
+        i,
+        "en-US",
+        categoryName,
+      );
     });
     return applyCatalogFilters(mapped, {
       q,
@@ -215,4 +198,15 @@ export async function getProduct(slug: string) {
     products.find((p) => p.slug === slug || p.id === slug) ||
     null
   );
+}
+
+export async function getRelatedProducts(product: Product, limit = 8) {
+  const result = await searchProducts("", "", { perPage: 100 });
+  const candidates = result.products.filter((item) => item.id !== product.id);
+  const sameCategory = candidates.filter(
+    (item) => item.category === product.category,
+  );
+  const fallback = candidates.filter((item) => item.category !== product.category);
+
+  return [...sameCategory, ...fallback].slice(0, limit);
 }

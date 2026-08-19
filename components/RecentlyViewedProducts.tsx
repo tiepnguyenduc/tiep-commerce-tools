@@ -1,30 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
+import {
+  isProductItemData,
+  productToProductItem,
+  type ProductItemData,
+} from "@/components/ProductItemData";
 import type { Product } from "@/lib/types";
 
-export type RecentlyViewedProduct = Pick<
-  Product,
-  "id" | "slug" | "sku" | "name" | "category" | "image" | "price"
->;
+export type RecentlyViewedProduct = ProductItemData;
 
 const storageKey = "launchpad-recently-viewed-products";
 const maxStoredProducts = 8;
-
-function isRecentlyViewedProduct(value: unknown): value is RecentlyViewedProduct {
-  if (typeof value !== "object" || value === null) return false;
-  const candidate = value as Partial<RecentlyViewedProduct>;
-  return (
-    typeof candidate.id === "string" &&
-    typeof candidate.slug === "string" &&
-    typeof candidate.sku === "string" &&
-    typeof candidate.name === "string" &&
-    typeof candidate.category === "string" &&
-    typeof candidate.image === "string" &&
-    typeof candidate.price?.formatted === "string" &&
-    typeof candidate.price?.centAmount === "number" &&
-    typeof candidate.price?.currencyCode === "string"
-  );
-}
 
 function readRecentlyViewedProducts() {
   if (typeof window === "undefined") return [];
@@ -32,7 +18,7 @@ function readRecentlyViewedProducts() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(storageKey) ?? "[]");
     return Array.isArray(parsed)
-      ? parsed.filter(isRecentlyViewedProduct).slice(0, maxStoredProducts)
+      ? parsed.filter(isProductItemData).slice(0, maxStoredProducts)
       : [];
   } catch {
     return [];
@@ -59,15 +45,7 @@ export function useRecentlyViewedProducts() {
 
 export function TrackRecentlyViewedProduct({ product }: { product: Product }) {
   useEffect(() => {
-    const viewed: RecentlyViewedProduct = {
-      id: product.id,
-      slug: product.slug,
-      sku: product.sku,
-      name: product.name,
-      category: product.category,
-      image: product.image,
-      price: product.price,
-    };
+    const viewed = productToProductItem(product);
     const current = readRecentlyViewedProducts();
     const next = [
       viewed,

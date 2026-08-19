@@ -4,6 +4,21 @@ export type Money = {
   currencyCode: string;
   formatted: string;
 };
+export type ProductSpecification = {
+  name: string;
+  label: string;
+  value: string;
+};
+export type ProductVariant = {
+  id: number;
+  sku: string;
+  key?: string;
+  image: string;
+  images: string[];
+  price: Money;
+  attributes: ProductSpecification[];
+  specifications: ProductSpecification[];
+};
 export type Product = {
   id: string;
   slug: string;
@@ -15,6 +30,9 @@ export type Product = {
   image: string;
   price: Money;
   badges: string[];
+  images?: string[];
+  specifications?: ProductSpecification[];
+  variants?: ProductVariant[];
 };
 export type HeaderCategory = {
   id: string;

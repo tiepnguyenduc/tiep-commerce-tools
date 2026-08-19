@@ -7,9 +7,13 @@ import { useToast } from "@/components/Toast";
 import type { StoreMode } from "@/lib/types";
 export function AddToCart({
   productId,
+  sku,
+  quantity = 1,
   mode = "b2c",
 }: {
   productId: string;
+  sku?: string;
+  quantity?: number;
   mode?: StoreMode;
 }) {
   const [busy, setBusy] = useState(false);
@@ -22,14 +26,17 @@ export function AddToCart({
       const currentCart = cart ?? (await loadCart());
       const existingLine =
         currentCart?.mode === mode
-          ? currentCart.lines.find((line) => line.productId === productId)
+          ? currentCart.lines.find((line) =>
+              sku ? line.sku === sku : line.productId === productId,
+            )
           : undefined;
       const response = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId,
-          quantity: (existingLine?.quantity ?? 0) + 1,
+          sku,
+          quantity: (existingLine?.quantity ?? 0) + quantity,
           mode,
         }),
       });
@@ -48,7 +55,7 @@ export function AddToCart({
     }
   }
   return (
-    <button className="button accent" disabled={busy} onClick={addToCart}>
+    <button className="button accent" disabled={busy} onClick={addToCart} type="button">
       {busy ? (
         "Adding…"
       ) : (

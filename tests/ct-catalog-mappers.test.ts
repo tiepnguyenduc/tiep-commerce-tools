@@ -57,6 +57,14 @@ describe("commercetools catalog mapping", () => {
             masterVariant: {
               id: 1,
               sku: "SKU-ART-DECO",
+              key: "art-deco-black",
+              attributes: [
+                {
+                  name: "colorLabel",
+                  value: { key: "walnut", label: "Walnut" },
+                },
+                { name: "newArrival", value: true },
+              ],
               images: [
                 {
                   url: "https://example.com/table.png",
@@ -76,6 +84,77 @@ describe("commercetools catalog mapping", () => {
               ],
             },
           },
+          staged: {
+            slug: { "en-US": "art-deco-coffee-table" },
+            name: { "en-US": "Art Deco Coffee Table" },
+            description: { "en-US": "Live product from Merchant Center" },
+            categories: [{ typeId: "category", id: "category-1" }],
+            masterVariant: {
+              id: 1,
+              sku: "SKU-ART-DECO",
+              key: "art-deco-black",
+              attributes: [
+                {
+                  name: "colorLabel",
+                  value: { key: "walnut", label: "Walnut" },
+                },
+                { name: "newArrival", value: true },
+              ],
+              images: [
+                {
+                  url: "https://example.com/table.png",
+                  dimensions: { w: 800, h: 600 },
+                },
+              ],
+              prices: [
+                {
+                  id: "price-1",
+                  value: {
+                    type: "centPrecision",
+                    currencyCode: "USD",
+                    centAmount: 129900,
+                    fractionDigits: 2,
+                  },
+                },
+              ],
+            },
+            variants: [
+              {
+                id: 2,
+                sku: "SKU-ART-DECO-OAK",
+                key: "art-deco-oak",
+                attributes: [
+                  { name: "colorLabel", value: { key: "oak", label: "Oak" } },
+                  { name: "newArrival", value: false },
+                  {
+                    name: "productSpecifications",
+                    value: "Solid oak top - brass-capped legs",
+                  },
+                ],
+                images: [
+                  {
+                    url: "https://example.com/table-oak-main.png",
+                    dimensions: { w: 800, h: 600 },
+                  },
+                  {
+                    url: "https://example.com/table-oak-side.png",
+                    dimensions: { w: 800, h: 600 },
+                  },
+                ],
+                prices: [
+                  {
+                    id: "price-2",
+                    value: {
+                      type: "centPrecision",
+                      currencyCode: "USD",
+                      centAmount: 139900,
+                      fractionDigits: 2,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         },
       } as any,
       0,
@@ -93,7 +172,32 @@ describe("commercetools catalog mapping", () => {
         currencyCode: "USD",
         formatted: "$1,299.00",
       },
+      color: "Walnut",
       badges: ["Live catalog"],
+    });
+    expect(product.variants).toHaveLength(2);
+    expect(product.variants?.[1]).toMatchObject({
+      id: 2,
+      sku: "SKU-ART-DECO-OAK",
+      key: "art-deco-oak",
+      image: "https://example.com/table-oak-main.png",
+      images: [
+        "https://example.com/table-oak-main.png",
+        "https://example.com/table-oak-side.png",
+      ],
+      price: {
+        centAmount: 139900,
+        formatted: "$1,399.00",
+      },
+      specifications: [
+        { name: "colorLabel", label: "Color Label", value: "Oak" },
+        { name: "newArrival", label: "New Arrival", value: "No" },
+        {
+          name: "productSpecifications",
+          label: "Product Specifications",
+          value: "Solid oak top - brass-capped legs",
+        },
+      ],
     });
   });
 });

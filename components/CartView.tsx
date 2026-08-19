@@ -3,16 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronLeft,
-  faChevronRight,
   faArrowRight,
   faMinus,
   faPlus,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import { A11y, Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { useMiniCart } from "@/components/MiniCart";
+import { ProductItemSlider } from "@/components/ProductItemSlider";
 import {
   type RecentlyViewedProduct,
   useRecentlyViewedProducts,
@@ -395,84 +392,33 @@ export function CartView() {
       </div>
 
       {suggestedProducts.length > 0 && (
-        <section className="panel recently-viewed">
-          <div className="cart-panel-head">
-            <div>
-              <span className="eyebrow">Recently viewed</span>
-              <h2>Products you looked at</h2>
-            </div>
-            <div className="recent-slider-actions">
+        <ProductItemSlider
+          className="panel recently-viewed"
+          eyebrow="Recently viewed"
+          products={suggestedProducts}
+          renderAction={(product) => {
+            const existingLine = cart.lines.find(
+              (line) => line.productId === product.id,
+            );
+            const pendingProductLineId =
+              existingLine?.id ?? `recent-${product.id}`;
+            return (
               <button
-                aria-label="Show previous recently viewed products"
-                className="recent-slider-prev"
+                className="pill"
+                disabled={
+                  pendingLineId !== null ||
+                  clearingCart ||
+                  (existingLine?.quantity ?? 0) >= 99
+                }
+                onClick={() => addRecentlyViewedProduct(product)}
                 type="button"
               >
-                <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
+                {pendingLineId === pendingProductLineId ? "Adding…" : "Add"}
               </button>
-              <button
-                aria-label="Show next recently viewed products"
-                className="recent-slider-next"
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-              </button>
-            </div>
-          </div>
-          <Swiper
-            a11y={{ enabled: true }}
-            className="recent-slider"
-            modules={[A11y, Navigation]}
-            navigation={{
-              nextEl: ".recent-slider-next",
-              prevEl: ".recent-slider-prev",
-            }}
-            slidesPerView="auto"
-            spaceBetween={16}
-          >
-            {suggestedProducts.map((product) => {
-              const existingLine = cart.lines.find(
-                (line) => line.productId === product.id,
-              );
-              const pendingProductLineId =
-                existingLine?.id ?? `recent-${product.id}`;
-              return (
-                <SwiperSlide className="recent-slide" key={product.id}>
-                  <article className="recent-product">
-                    <Link href={`/products/${product.slug}`}>
-                      <img src={product.image} alt={product.name} />
-                    </Link>
-                    <div>
-                      <span className="tag">{product.category}</span>
-                      <h3>
-                        <Link href={`/products/${product.slug}`}>
-                          {product.name}
-                        </Link>
-                      </h3>
-                      <p className="muted">{product.sku}</p>
-                      <div className="row">
-                        <strong>{product.price.formatted}</strong>
-                        <button
-                          className="pill"
-                          disabled={
-                            pendingLineId !== null ||
-                            clearingCart ||
-                            (existingLine?.quantity ?? 0) >= 99
-                          }
-                          onClick={() => addRecentlyViewedProduct(product)}
-                          type="button"
-                        >
-                          {pendingLineId === pendingProductLineId
-                            ? "Adding…"
-                            : "Add"}
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-        </section>
+            );
+          }}
+          title="Products you looked at"
+        />
       )}
     </>
   );

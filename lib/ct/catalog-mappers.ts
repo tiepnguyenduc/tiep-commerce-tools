@@ -1,9 +1,10 @@
 import type {
   Category as CtCategory,
   Product as CtProduct,
+  ProductVariant as CtProductVariant,
 } from "@commercetools/platform-sdk";
 import { products as sampleProducts } from "../sample-data";
-import type { HeaderCategory, Product } from "../types";
+import type { HeaderCategory, Product, ProductSpecification } from "../types";
 
 function formatMoney(
   centAmount: number,
@@ -23,6 +24,128 @@ function localized(
   fallback = "",
 ) {
   return value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback;
+}
+
+function attributeLabel(name: string) {
+  const labels: Record<string, string> = {
+    colorlabel: "Color Label",
+    searchcolor: "Search Color",
+    productspec: "Product Specifications",
+    productspecifications: "Product Specifications",
+    newarrival: "New Arrival",
+  };
+  const key = name.replace(/[^a-z0-9]/gi, "").toLowerCase();
+  if (labels[key]) return labels[key];
+
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function localizedUnknown(value: unknown, locale: string) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "";
+  const record = value as Record<string, unknown>;
+  const preferred = record[locale] ?? record.en ?? Object.values(record)[0];
+  return typeof preferred === "string" ? preferred : "";
+}
+
+function formatAttributeValue(value: unknown, locale: string): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => formatAttributeValue(item, locale))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (
+      typeof record.centAmount === "number" &&
+      typeof record.currencyCode === "string"
+    ) {
+      return formatMoney(
+        record.centAmount,
+        record.currencyCode,
+        typeof record.fractionDigits === "number" ? record.fractionDigits : 2,
+        locale,
+      );
+    }
+
+    const label = record.label;
+    if (typeof label === "string") return label;
+    const localizedLabel = localizedUnknown(label, locale);
+    if (localizedLabel) return localizedLabel;
+
+    const localizedValue = localizedUnknown(value, locale);
+    if (localizedValue) return localizedValue;
+
+    if (typeof record.key === "string") return attributeLabel(record.key);
+    if (typeof record.id === "string") return record.id;
+  }
+
+  return "";
+}
+
+function variantAttributes(
+  variant: CtProductVariant,
+  locale: string,
+): ProductSpecification[] {
+  return (variant.attributes ?? [])
+    .map((attribute) => ({
+      name: attribute.name,
+      label: attributeLabel(attribute.name),
+      value: formatAttributeValue(attribute.value, locale),
+    }))
+    .filter((attribute) => attribute.value.length > 0);
+}
+
+function variantImageUrls(variant: CtProductVariant, fallbackImage: string) {
+  const urls = variant.images?.map((image) => image.url).filter(Boolean) ?? [];
+  return urls.length ? urls : [fallbackImage];
+}
+
+function mapVariant(
+  variant: CtProductVariant,
+  locale: string,
+  fallbackImage: string,
+) {
+  const price = variant.prices?.[0]?.value;
+  const centAmount = price?.centAmount ?? 0;
+  const currencyCode = price?.currencyCode ?? "USD";
+  const fractionDigits = price?.fractionDigits ?? 2;
+  const images = variantImageUrls(variant, fallbackImage);
+  const attributes = variantAttributes(variant, locale);
+
+  return {
+    id: variant.id,
+    sku: variant.sku ?? `VARIANT-${variant.id}`,
+    key: variant.key,
+    image: images[0],
+    images,
+    price: {
+      centAmount,
+      currencyCode,
+      formatted: formatMoney(centAmount, currencyCode, fractionDigits, locale),
+    },
+    attributes,
+    specifications: attributes,
+  };
+}
+
+function variantCount(data: CtProduct["masterData"]["current"]) {
+  return 1 + (data.variants?.length ?? 0);
+}
+
+function productData(resource: CtProduct) {
+  const { current, staged } = resource.masterData;
+  return staged && variantCount(staged) > variantCount(current) ? staged : current;
 }
 
 export function mapCategoryResourcesToHeaderCategories(
@@ -73,27 +196,34 @@ export function mapProductResourceToStorefrontProduct(
   locale = "en-US",
   categoryName = "Catalog",
 ): Product {
-  const data = resource.masterData.current;
+  const data = productData(resource);
   const master = data.masterVariant;
-  const price = master.prices?.[0]?.value;
-  const centAmount = price?.centAmount ?? 0;
-  const currencyCode = price?.currencyCode ?? "USD";
-  const fractionDigits = price?.fractionDigits ?? 2;
+  const fallbackImage = sampleProducts[index % sampleProducts.length].image;
+  const variants = [master, ...(data.variants ?? [])].map((variant) =>
+    mapVariant(variant, locale, fallbackImage),
+  );
+  const selectedVariant = variants[0];
+  const color =
+    selectedVariant.attributes.find((attribute) =>
+      ["Color Label", "Search Color"].includes(attribute.label),
+    )?.value ?? "Standard";
+  const images = Array.from(
+    new Set(variants.flatMap((variant) => variant.images).filter(Boolean)),
+  );
 
   return {
     id: resource.id,
     slug: localized(data.slug, locale, resource.key || resource.id),
-    sku: master.sku ?? resource.key ?? `SKU-${index}`,
+    sku: selectedVariant.sku || resource.key || `SKU-${index}`,
     name: localized(data.name, locale, "Product"),
     description: localized(data.description, locale),
     category: categoryName,
-    color: "Standard",
-    image: master.images?.[0]?.url ?? sampleProducts[index % sampleProducts.length].image,
-    price: {
-      centAmount,
-      currencyCode,
-      formatted: formatMoney(centAmount, currencyCode, fractionDigits, locale),
-    },
+    color,
+    image: selectedVariant.image,
+    price: selectedVariant.price,
     badges: ["Live catalog"],
+    images,
+    specifications: selectedVariant.specifications,
+    variants,
   };
 }
