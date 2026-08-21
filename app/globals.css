@@ -182,7 +182,6 @@ select {
     background: #fbe8dc;
     border-color: var(--orange);
     color: #a33a2b;
-    cursor: default;
 }
 
 .cart-icon-button {

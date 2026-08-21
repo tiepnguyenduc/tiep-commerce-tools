@@ -98,9 +98,7 @@ export async function addWishlistItem(input: {
 
   const list = await getOrCreateLiveWishlist();
   const existingLine = list.lineItems.find(
-    (line) =>
-      line.productId === input.productId &&
-      (input.variantId === undefined || line.variantId === input.variantId),
+    (line) => line.productId === input.productId,
   );
 
   if (existingLine) return mapWishlist(list, requireCommerceConfig().locale);

@@ -78,11 +78,17 @@ export function AddToCompare({
   compact?: boolean;
   product: CompareProductData;
 }) {
-  const { add, products } = useCompareProducts();
+  const { add, products, remove } = useCompareProducts();
   const showToast = useToast();
   const selected = products.some((item) => item.id === product.id);
 
-  function addToCompare() {
+  function toggleCompare() {
+    if (selected) {
+      remove(product.id);
+      showToast("Product removed from compare.", "success");
+      return;
+    }
+
     const result = add(product);
 
     if (result === "exists") {
@@ -96,14 +102,14 @@ export function AddToCompare({
   return (
     <button
       aria-label={
-        selected ? "Product added to compare" : "Add product to compare"
+        selected ? "Remove product from compare" : "Add product to compare"
       }
       aria-pressed={selected}
       className={`compare-button${compact ? " compact" : ""}${
         selected ? " selected" : ""
       }`}
-      onClick={addToCompare}
-      title={selected ? "Added to compare" : "Add to compare"}
+      onClick={toggleCompare}
+      title={selected ? "Remove from compare" : "Add to compare"}
       type="button"
     >
       <FontAwesomeIcon aria-hidden="true" icon={faCodeCompare} />
