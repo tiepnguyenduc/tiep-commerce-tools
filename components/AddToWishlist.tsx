@@ -20,7 +20,7 @@ export function AddToWishlist({
   const showToast = useToast();
 
   async function addToWishlist() {
-    if (busy) return;
+    if (busy || saved) return;
     setBusy(true);
     setSaved(false);
     try {
@@ -54,21 +54,22 @@ export function AddToWishlist({
 
   return (
     <button
+      aria-label={
+        saved
+          ? "Product added to wishlist"
+          : busy
+            ? "Adding product to wishlist"
+            : "Add product to wishlist"
+      }
       className={`wishlist-button${compact ? " compact" : ""}${
         saved ? " saved" : ""
       }`}
       disabled={busy || saved}
       onClick={addToWishlist}
+      title={saved ? "Added to wishlist" : "Add to wishlist"}
       type="button"
     >
-      {busy ? (
-        "Saving..."
-      ) : (
-        <>
-          <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
-          <span>{saved ? "Saved to wishlist" : "Add to wishlist"}</span>
-        </>
-      )}
+      <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
     </button>
   );
 }

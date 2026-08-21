@@ -75,6 +75,23 @@ select {
     gap: 7px;
 }
 
+.header-compare-link {
+    position: relative;
+}
+
+.header-compare-link strong {
+    align-items: center;
+    background: var(--lime);
+    border-radius: 999px;
+    color: var(--ink);
+    display: inline-flex;
+    font-size: 12px;
+    height: 20px;
+    justify-content: center;
+    min-width: 20px;
+    padding: 0 6px;
+}
+
 .category-nav {
     display: flex;
     gap: 16px;
@@ -116,12 +133,55 @@ select {
 
 .button,
 .pill,
+.compare-button,
 .wishlist-button,
 .text-button {
     align-items: center;
     display: inline-flex;
     gap: 8px;
     justify-content: center;
+}
+
+.compare-button,
+.wishlist-button {
+    align-items: center;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 800;
+    height: 42px;
+    justify-content: center;
+    padding: 0;
+    width: 42px;
+}
+
+.compare-button.compact,
+.wishlist-button.compact {
+    font-size: 13px;
+    height: 38px;
+    width: 38px;
+}
+
+.compare-button svg,
+.wishlist-button svg {
+    height: 16px;
+    width: 16px;
+}
+
+.compare-button.selected,
+.compare-button[aria-pressed="true"] {
+    background: #edf6cf;
+    border-color: #bacf53;
+    color: #4f6f13;
+}
+
+.wishlist-button.saved {
+    background: #fbe8dc;
+    border-color: var(--orange);
+    color: #a33a2b;
 }
 
 .cart-icon-button {
@@ -706,6 +766,14 @@ select {
 
 .card-body {
     padding: 20px;
+}
+
+.card-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
 }
 
 .row {
@@ -1346,7 +1414,7 @@ select {
 
 .product-detail .product-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) 50px 50px;
     margin-top: 0;
 }
 
@@ -1361,7 +1429,13 @@ select {
 .product-detail .wishlist-button {
     background: white;
     border-color: var(--line);
-    min-height: 50px;
+    height: 50px;
+    width: 50px;
+}
+
+.product-detail .compare-button {
+    height: 50px;
+    width: 50px;
 }
 
 .shipping-panel {
@@ -1793,6 +1867,19 @@ select {
     padding: 14px;
 }
 
+.recent-product-actions {
+    align-self: end;
+    display: grid;
+    gap: 10px;
+}
+
+.recent-product-actions > div {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .compact-add-to-cart {
     background: white;
     min-height: 40px;
@@ -1802,6 +1889,113 @@ select {
 .recent-product h3 {
     font-size: 18px;
     margin: 0;
+}
+
+.compare-page {
+    padding-bottom: 70px;
+    padding-top: 42px;
+}
+
+.compare-page-head {
+    align-items: flex-end;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.compare-page-head h1 {
+    margin: 6px 0 8px;
+}
+
+.compare-empty {
+    align-items: flex-start;
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.compare-table-wrap {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-top: 26px;
+    overflow-x: auto;
+}
+
+.compare-table {
+    border-collapse: collapse;
+    min-width: 100%;
+    table-layout: fixed;
+    width: max-content;
+}
+
+.compare-table th,
+.compare-table td {
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    text-align: left;
+    vertical-align: top;
+    width: 240px;
+}
+
+.compare-table th:first-child {
+    background: #f8f5ee;
+    color: #4f5a52;
+    font-size: 13px;
+    left: 0;
+    min-width: 180px;
+    position: sticky;
+    text-transform: uppercase;
+    width: 180px;
+    z-index: 1;
+}
+
+.compare-table th:last-child,
+.compare-table td:last-child {
+    border-right: 0;
+}
+
+.compare-table tr:last-child th,
+.compare-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.compare-product-head {
+    display: grid;
+    gap: 12px;
+    position: relative;
+}
+
+.compare-product-head > button {
+    align-items: center;
+    background: #f8f5ee;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    justify-self: end;
+    width: 32px;
+}
+
+.compare-product-head a {
+    display: grid;
+    gap: 12px;
+}
+
+.compare-product-head img {
+    background: #f8f5ee;
+    border-radius: 6px;
+    height: 150px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.compare-product-head span {
+    font-size: 18px;
+    line-height: 1.25;
 }
 
 .steps {
@@ -1933,8 +2127,7 @@ select {
     margin: 14px 0 18px;
 }
 
-.text-button,
-.wishlist-button {
+.text-button {
     background: transparent;
     border: 0;
     color: var(--orange);
@@ -1996,18 +2189,16 @@ select {
 }
 
 .wishlist-button {
-    border: 1px solid var(--ink);
-    border-radius: 999px;
     color: var(--ink);
-    padding: 11px 17px;
 }
 
 .wishlist-button.saved {
-    border-color: var(--cream);
-    background: var(--cream);
+    background: #fbe8dc;
+    border-color: var(--orange);
+    color: #a33a2b;
 }
 
-.wishlist-button:disabled {
+.wishlist-button:disabled:not(.saved) {
     cursor: not-allowed;
     opacity: 0.6;
 }
@@ -2565,6 +2756,11 @@ select {
         grid-template-columns: 1fr;
     }
 
+    .compare-page-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .shipping-panel dd {
         text-align: left;
     }
@@ -2594,6 +2790,11 @@ select {
 
     .shell {
         padding: 0 18px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+        padding: 12px;
     }
 
     .detail h1 {

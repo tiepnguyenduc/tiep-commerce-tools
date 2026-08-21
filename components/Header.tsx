@@ -10,6 +10,7 @@ import {
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import { HeaderCartButton } from "@/components/MiniCart";
 import { HeaderSearch } from "@/components/HeaderSearch";
+import { HeaderCompareLink } from "@/components/ProductCompare";
 
 async function HeaderCategoryLinks() {
   await connection();
@@ -74,6 +75,7 @@ export function Header() {
             <FontAwesomeIcon aria-hidden="true" icon={faUser} />
             <span>Account</span>
           </Link>
+          <HeaderCompareLink />
           <HeaderCartButton />
         </nav>
       </div>

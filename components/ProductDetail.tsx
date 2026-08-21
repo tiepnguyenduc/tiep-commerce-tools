@@ -12,6 +12,8 @@ import { A11y, FreeMode, Keyboard, Thumbs } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { AddToCart } from "@/components/AddToCart";
 import { AddToWishlist } from "@/components/AddToWishlist";
+import { AddToCompare } from "@/components/ProductCompare";
+import { productToCompareProduct } from "@/components/ProductCompareData";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
 import { productsToProductItems } from "@/components/ProductItemData";
 import type { Product, ProductSpecification, ProductVariant } from "@/lib/types";
@@ -396,6 +398,7 @@ export function ProductDetail({
             sku={selectedVariant.sku}
           />
           <AddToWishlist productId={product.id} variantId={selectedVariant.id} />
+          <AddToCompare product={productToCompareProduct(product)} />
         </div>
 
         <div className="shipping-panel">

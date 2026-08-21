@@ -7,8 +7,10 @@ export type ProductItemData = {
   name: string;
   category: string;
   color?: string;
+  description?: string;
   image: string;
   price: Product["price"];
+  specifications?: Product["specifications"];
 };
 
 export function productToProductItem(product: Product): ProductItemData {
@@ -19,8 +21,10 @@ export function productToProductItem(product: Product): ProductItemData {
     name: product.name,
     category: product.category,
     color: product.color,
+    description: product.description,
     image: product.image,
     price: product.price,
+    specifications: product.specifications,
   };
 }
 
@@ -39,6 +43,8 @@ export function isProductItemData(value: unknown): value is ProductItemData {
     typeof candidate.name === "string" &&
     typeof candidate.category === "string" &&
     (candidate.color === undefined || typeof candidate.color === "string") &&
+    (candidate.description === undefined ||
+      typeof candidate.description === "string") &&
     typeof candidate.image === "string" &&
     typeof candidate.price?.formatted === "string" &&
     typeof candidate.price?.centAmount === "number" &&

@@ -8,7 +8,10 @@ import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons
 import type { Swiper as SwiperClass } from "swiper";
 import { A11y, Keyboard } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { AddToWishlist } from "@/components/AddToWishlist";
 import type { ProductItemData } from "@/components/ProductItemData";
+import { AddToCompare } from "@/components/ProductCompare";
+import { itemToCompareProduct } from "@/components/ProductCompareData";
 
 type ProductItemSliderProps = {
   className?: string;
@@ -114,9 +117,16 @@ export function ProductItemSlider({
                   <Link href={`/products/${product.slug}`}>{product.name}</Link>
                 </h3>
                 <p className="muted">{product.sku}</p>
-                <div className="row">
+                <div className="recent-product-actions">
                   <strong>{product.price.formatted}</strong>
-                  {renderAction?.(product)}
+                  <div>
+                    {renderAction?.(product)}
+                    <AddToWishlist compact productId={product.id} />
+                    <AddToCompare
+                      compact
+                      product={itemToCompareProduct(product)}
+                    />
+                  </div>
                 </div>
               </div>
             </article>
