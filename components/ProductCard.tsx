@@ -10,17 +10,17 @@ export function ProductCard({ product }: { product: Product }) {
         <img src={product.image} alt={product.name} />
       </Link>
       <div className="card-body">
-        <div className="row">
-          <span className="tag">{product.category}</span>
-          <strong>{product.price.formatted}</strong>
-        </div>
+        <span className="tag">{product.category}</span>
         <h3>
           <Link href={`/products/${product.slug}`}>{product.name}</Link>
         </h3>
         <p className="muted">{product.description}</p>
-        <div className="card-actions">
-          <AddToWishlist compact productId={product.id} />
-          <AddToCompare compact product={productToCompareProduct(product)} />
+        <div className="card-purchase-row">
+          <strong>{product.price.formatted}</strong>
+          <div className="card-actions">
+            <AddToWishlist compact productId={product.id} />
+            <AddToCompare compact product={productToCompareProduct(product)} />
+          </div>
         </div>
       </div>
     </article>
