@@ -778,14 +778,28 @@ select {
 .card-body {
     display: grid;
     gap: 12px;
-    grid-template-rows: 28px minmax(58px, auto) minmax(44px, auto) 1fr auto;
+    grid-template-rows: minmax(28px, auto) minmax(58px, auto) minmax(44px, auto) 1fr auto;
     padding: 20px;
 }
 
-.card-body > .tag {
+.card-meta-row {
+    align-items: start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 28px;
+}
+
+.card-body > .tag,
+.card-meta-row .tag {
     align-self: start;
     justify-self: start;
     max-width: 100%;
+}
+
+.brand-tag {
+    background: #fbe8dc;
+    color: #8d3d22;
 }
 
 .card-actions {
@@ -1035,14 +1049,31 @@ select {
 .check-row {
     align-items: center;
     color: #4f5a52;
-    display: flex;
+    display: inline-flex;
     gap: 10px;
+    cursor: pointer;
 }
 
 .check-row input {
     accent-color: var(--orange);
     height: 16px;
     width: 16px;
+}
+
+.brand-filter-list {
+    display: grid;
+    gap: 12px;
+}
+
+.filter-toggle-button {
+    align-self: start;
+    background: transparent;
+    border: 0;
+    color: #bd744f;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 0;
 }
 
 .clear-filters {
@@ -1077,6 +1108,155 @@ select {
     background: var(--ink);
     border-color: var(--ink);
     color: white;
+}
+
+.shop-by-brand-page {
+    padding-bottom: 72px;
+}
+
+.brand-page-head {
+    align-items: end;
+    display: grid;
+    gap: 28px;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.brand-page-head .muted {
+    font-size: 18px;
+    line-height: 1.55;
+    max-width: 680px;
+}
+
+.brand-count-panel {
+    background: var(--ink);
+    border-radius: 8px;
+    color: white;
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(2, 130px);
+    margin: 0;
+    overflow: hidden;
+}
+
+.brand-count-panel div {
+    background: rgba(255, 255, 255, 0.08);
+    display: grid;
+    gap: 8px;
+    padding: 18px;
+}
+
+.brand-count-panel dt,
+.brand-count-panel dd {
+    margin: 0;
+}
+
+.brand-count-panel dt {
+    color: #dce5bd;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.brand-count-panel dd {
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.brand-nav-panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 34px;
+    padding: 22px;
+}
+
+.brand-nav-head {
+    align-items: end;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.brand-nav-head h2,
+.brand-product-group h2 {
+    font-size: 34px;
+    letter-spacing: -1px;
+    margin: 6px 0 0;
+}
+
+.brand-card-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.brand-card {
+    background: #f8f5ee;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    display: grid;
+    gap: 12px;
+    grid-template-rows: 118px auto auto;
+    min-height: 238px;
+    padding: 10px;
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+}
+
+.brand-card:hover,
+.brand-card[aria-current="page"] {
+    border-color: var(--orange);
+    box-shadow: 0 14px 32px rgba(21, 37, 29, 0.09);
+    transform: translateY(-2px);
+}
+
+.brand-card[aria-current="page"] {
+    background: #fff8ef;
+}
+
+.brand-card img {
+    background: white;
+    border-radius: 6px;
+    height: 118px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.brand-card span {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.brand-card strong {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+}
+
+.brand-card small,
+.brand-card em {
+    color: #667068;
+    font-size: 13px;
+}
+
+.brand-card em {
+    font-style: normal;
+    line-height: 1.35;
+}
+
+.brand-results-section {
+    display: grid;
+    gap: 34px;
+}
+
+.brand-product-group {
+    display: grid;
+    gap: 18px;
 }
 
 .detail {
@@ -1122,6 +1302,36 @@ select {
     min-height: 620px;
     overflow: hidden;
     position: relative;
+}
+
+.product-brand-badge {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(21, 37, 29, 0.12);
+    display: inline-flex;
+    gap: 10px;
+    left: 18px;
+    max-width: calc(100% - 36px);
+    padding: 10px 12px;
+    position: absolute;
+    top: 18px;
+    z-index: 4;
+}
+
+.product-brand-badge span {
+    color: #667068;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.product-brand-badge strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .product-gallery-swiper,
@@ -1888,6 +2098,7 @@ select {
 }
 
 .recent-product {
+    background: #fff;
     border: 1px solid var(--line);
     border-radius: 8px;
     display: grid;
@@ -1909,31 +2120,44 @@ select {
     width: 100%;
 }
 
-.recent-product > div {
+.recent-product-body {
     display: grid;
     gap: 10px;
-    grid-template-rows: 28px minmax(44px, auto) 20px 1fr auto;
+    grid-template-rows: minmax(28px, auto) minmax(44px, auto) minmax(42px, auto) 1fr auto;
+    min-width: 0;
     padding: 14px;
 }
 
-.recent-product > div > .tag {
+.recent-product-meta {
+    min-height: 28px;
+}
+
+.recent-product-meta .tag {
     align-self: start;
     justify-self: start;
     max-width: 100%;
 }
 
-.recent-product-actions {
+.recent-product-purchase-row {
     align-self: end;
+    align-items: center;
     display: grid;
     gap: 10px;
-    min-height: 90px;
+    justify-content: space-between;
+    min-height: 42px;
 }
 
-.recent-product-actions > div {
+.recent-product-purchase-row > strong {
+    line-height: 1.2;
+    min-width: 0;
+}
+
+.recent-product-actions {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: flex-end;
 }
 
 .compact-add-to-cart {
@@ -2751,8 +2975,18 @@ select {
     .search-modal-grid,
     .search-product-list,
     .results-meta-panel,
-    .results-toolbar {
+    .results-toolbar,
+    .brand-page-head {
         grid-template-columns: 1fr;
+    }
+
+    .brand-count-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+
+    .brand-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .catalog-search-hero {
@@ -2827,6 +3061,7 @@ select {
 @media (max-width: 520px) {
     .grid,
     .categories,
+    .brand-card-grid,
     .form-grid,
     .account-content-grid,
     .wishlist-row {

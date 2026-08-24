@@ -18,7 +18,7 @@ export function AutoSubmitFilterForm({
 
     for (const [key, value] of formData.entries()) {
       const stringValue = value.toString();
-      if (stringValue) search.set(key, stringValue);
+      if (stringValue) search.append(key, stringValue);
     }
 
     search.delete("page");

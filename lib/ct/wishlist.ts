@@ -5,7 +5,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import { getEnvReadiness } from "../env";
 import type { Wishlist } from "../types";
-import { apiRoot } from "./client";
+import { getApiRoot } from "./client";
 import { requireCommerceConfig } from "./context";
 import { mapWishlist } from "./account-mappers";
 import { readCommerceSession } from "./session";
@@ -13,6 +13,7 @@ import { readCommerceSession } from "./session";
 const expandVariant = "lineItems[*].variant";
 
 function requireApiRoot() {
+  const apiRoot = getApiRoot();
   if (!apiRoot || !getEnvReadiness().ready) {
     throw new Error("commercetools API is not configured.");
   }

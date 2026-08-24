@@ -1,8 +1,13 @@
 import "server-only";
 import type { Product as CtProduct } from "@commercetools/platform-sdk";
-import { apiRoot } from "./client";
+import { getApiRoot } from "./client";
 import { products } from "../sample-data";
-import type { HeaderCategory, Product, SearchResult } from "../types";
+import type {
+  HeaderCategory,
+  Product,
+  ProductBrandSummary,
+  SearchResult,
+} from "../types";
 import {
   mapCategoryResourceToHeaderCategory,
   mapCategoryResourcesToHeaderCategories,
@@ -33,6 +38,7 @@ function sampleHeaderCategories(limit = 6): HeaderCategory[] {
 }
 
 export async function listCatalogCategories(): Promise<HeaderCategory[]> {
+  const apiRoot = getApiRoot();
   if (!apiRoot) return sampleHeaderCategories(50);
 
   try {
@@ -60,6 +66,7 @@ export async function listCatalogCategories(): Promise<HeaderCategory[]> {
 }
 
 export async function listHeaderCategories(): Promise<HeaderCategory[]> {
+  const apiRoot = getApiRoot();
   if (!apiRoot) return sampleHeaderCategories();
 
   try {
@@ -81,6 +88,7 @@ export async function listHeaderCategories(): Promise<HeaderCategory[]> {
 }
 
 async function listCategorySubtreeIds(categoryId: string): Promise<string[]> {
+  const apiRoot = getApiRoot();
   if (!apiRoot || !categoryId) return categoryId ? [categoryId] : [];
 
   try {
@@ -101,6 +109,7 @@ async function listCategorySubtreeIds(categoryId: string): Promise<string[]> {
 }
 
 async function listProductResources(where?: string): Promise<CtProduct[]> {
+  const apiRoot = getApiRoot();
   if (!apiRoot) return [];
 
   const limit = 100;
@@ -142,6 +151,7 @@ export async function searchProducts(
     category: fallbackCategory,
   };
 
+  const apiRoot = getApiRoot();
   if (!apiRoot) return applyCatalogFilters(products, filterOptions);
   try {
     const categories = await listCatalogCategories();
@@ -168,6 +178,7 @@ export async function searchProducts(
     });
     return applyCatalogFilters(mapped, {
       q,
+      brand: options.brand,
       color: options.color,
       price: options.price,
       sort: options.sort,
@@ -197,6 +208,56 @@ export async function getProduct(slug: string) {
     result.products.find((p) => p.slug === slug || p.id === slug) ||
     products.find((p) => p.slug === slug || p.id === slug) ||
     null
+  );
+}
+
+function normalizedBrand(value = "") {
+  return value.trim().toLowerCase();
+}
+
+function productBrand(product: Product) {
+  return product.brand?.trim() || "WORK/SHOP";
+}
+
+function summarizeBrands(items: Product[]): ProductBrandSummary[] {
+  const byBrand = new Map<string, ProductBrandSummary>();
+
+  for (const product of items) {
+    const name = productBrand(product);
+    const current = byBrand.get(normalizedBrand(name));
+
+    if (current) {
+      current.count += 1;
+      current.categories = Array.from(
+        new Set([...current.categories, product.category]),
+      ).sort();
+      continue;
+    }
+
+    byBrand.set(normalizedBrand(name), {
+      name,
+      count: 1,
+      image: product.image,
+      categories: [product.category],
+    });
+  }
+
+  return Array.from(byBrand.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function listCatalogBrands(): Promise<ProductBrandSummary[]> {
+  const result = await searchProducts("", "", { perPage: 100 });
+  return summarizeBrands(result.products);
+}
+
+export async function listProductsByBrand(brand: string): Promise<Product[]> {
+  const result = await searchProducts("", "", { perPage: 100 });
+  const selectedBrand = normalizedBrand(brand);
+
+  if (!selectedBrand) return result.products;
+
+  return result.products.filter(
+    (product) => normalizedBrand(productBrand(product)) === selectedBrand,
   );
 }
 

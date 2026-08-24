@@ -15,6 +15,7 @@ export const products: Product[] = [
     name: "Aero Task Chair",
     description:
       "Responsive lumbar support and breathable knit for focused workdays.",
+    brand: "Aeroform",
     category: "Workspace",
     color: "Graphite",
     image:
@@ -29,6 +30,7 @@ export const products: Product[] = [
     name: "Arc Desk Lamp",
     description:
       "Warm, dimmable task light with a sculptural powder-coated arm.",
+    brand: "Lumina Works",
     category: "Lighting",
     color: "Saffron",
     image:
@@ -43,6 +45,7 @@ export const products: Product[] = [
     name: "Grid Shelving System",
     description:
       "Modular storage that grows from a quiet home office to a full studio.",
+    brand: "Grid & Grain",
     category: "Storage",
     color: "Oak",
     image:
@@ -57,6 +60,7 @@ export const products: Product[] = [
     name: "Field Lounge Chair",
     description:
       "A low, generous silhouette built for arrival spaces and reading corners.",
+    brand: "Grove Studio",
     category: "Seating",
     color: "Forest",
     image:
@@ -71,6 +75,7 @@ export const products: Product[] = [
     name: "Softscape Rug",
     description:
       "Tactile wool blend with a subtle tonal grid for warmer shared spaces.",
+    brand: "Grove Studio",
     category: "Textiles",
     color: "Sand",
     image:
@@ -85,6 +90,7 @@ export const products: Product[] = [
     name: "Relay Conference Table",
     description:
       "Cable-managed solid ash table sized for collaborative teams of eight.",
+    brand: "Relay Works",
     category: "Workspace",
     color: "Oak",
     image:

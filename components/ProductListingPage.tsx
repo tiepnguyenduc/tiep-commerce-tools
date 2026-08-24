@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AutoSubmitFilterForm } from "@/components/AutoSubmitFilterForm";
+import { BrandFilterList } from "@/components/BrandFilterList";
 import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import { ProductCard } from "@/components/ProductCard";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
@@ -14,6 +15,7 @@ import {
 
 export type ProductSearchParams = {
   q?: string;
+  brand?: string | string[];
   category?: string;
   categoryId?: string;
   color?: string;
@@ -38,10 +40,24 @@ const sortLabels: Record<string, string> = {
   "name-asc": "Name A-Z",
 };
 
+type ActiveFilter = { label: string; value: string; href: string };
+
+function searchParamValues(value: string | string[] | undefined) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.map((item) => item.trim()).filter(Boolean))];
+}
+
 function listingHref(basePath: string, params: ProductSearchParams) {
   const search = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item) search.append(key, item);
+      });
+      continue;
+    }
+
     if (value) search.set(key, value);
   }
 
@@ -64,6 +80,23 @@ function removeParamsHref(
   return listingHref(basePath, next);
 }
 
+function removeBrandHref(
+  basePath: string,
+  params: ProductSearchParams,
+  brandToRemove: string,
+) {
+  const selectedBrands = searchParamValues(params.brand).filter(
+    (brand) => brand !== brandToRemove,
+  );
+  const next: ProductSearchParams = {
+    ...params,
+    brand: selectedBrands.length ? selectedBrands : undefined,
+  };
+
+  delete next.page;
+  return listingHref(basePath, next);
+}
+
 export async function ProductListingPage({
   basePath,
   searchParams,
@@ -74,12 +107,14 @@ export async function ProductListingPage({
   variant?: "catalog" | "search";
 }) {
   const p = searchParams;
+  const selectedBrands = searchParamValues(p.brand);
   const categoryOptions = await listHeaderCategories();
   const selectedCategoryName =
     categoryOptions.find((category) => category.id === p.categoryId)?.name ??
     p.category ??
     "";
   const result = await searchProducts(p.q, selectedCategoryName, {
+    brand: selectedBrands,
     categoryId: p.categoryId,
     color: p.color,
     price: p.price,
@@ -89,6 +124,7 @@ export async function ProductListingPage({
   });
   const currentParams: ProductSearchParams = {
     q: p.q,
+    brand: selectedBrands,
     category: selectedCategoryName,
     categoryId: p.categoryId,
     color: p.color,
@@ -115,6 +151,11 @@ export async function ProductListingPage({
           ]),
         }
       : null,
+    ...selectedBrands.map((brand) => ({
+      label: "Brand",
+      value: brand,
+      href: removeBrandHref(basePath, currentParams, brand),
+    })),
     p.color
       ? {
           label: "Color",
@@ -136,7 +177,7 @@ export async function ProductListingPage({
           href: removeParamsHref(basePath, currentParams, ["sort"]),
         }
       : null,
-  ].filter((filter): filter is { label: string; value: string; href: string } =>
+  ].filter((filter): filter is ActiveFilter =>
     Boolean(filter),
   );
   const isSearch = variant === "search";
@@ -198,6 +239,12 @@ export async function ProductListingPage({
           </select>
         </label>
 
+        <BrandFilterList
+          brands={result.facets.brands}
+          key={`brand-filter-${selectedBrands.join("|")}`}
+          selectedBrands={selectedBrands}
+        />
+
         <label className="filter-group">
           <span className="filter-label">Color</span>
           <select className="field" name="color" defaultValue={p.color ?? ""}>
@@ -248,6 +295,9 @@ export async function ProductListingPage({
               />
               <input type="hidden" name="sort" value={p.sort ?? ""} />
               <input type="hidden" name="price" value={p.price ?? ""} />
+              {selectedBrands.map((brand) => (
+                <input key={brand} type="hidden" name="brand" value={brand} />
+              ))}
               <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
               <input type="hidden" name="color" value={p.color ?? ""} />
               <button className="button accent" type="submit">
@@ -286,7 +336,7 @@ export async function ProductListingPage({
                 <Link
                   className="active-filter-chip"
                   href={filter.href}
-                  key={filter.label}
+                  key={`${filter.label}-${filter.value}`}
                 >
                   <span>
                     {filter.label}: {filter.value}

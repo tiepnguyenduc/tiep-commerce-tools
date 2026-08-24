@@ -63,6 +63,7 @@ describe("commercetools catalog mapping", () => {
                   name: "colorLabel",
                   value: { key: "walnut", label: "Walnut" },
                 },
+                { name: "manufacturer", value: "Northline" },
                 { name: "newArrival", value: true },
               ],
               images: [
@@ -98,6 +99,7 @@ describe("commercetools catalog mapping", () => {
                   name: "colorLabel",
                   value: { key: "walnut", label: "Walnut" },
                 },
+                { name: "manufacturer", value: "Northline" },
                 { name: "newArrival", value: true },
               ],
               images: [
@@ -173,6 +175,7 @@ describe("commercetools catalog mapping", () => {
         formatted: "$1,299.00",
       },
       color: "Walnut",
+      brand: "Northline",
       badges: ["Live catalog"],
     });
     expect(product.variants).toHaveLength(2);

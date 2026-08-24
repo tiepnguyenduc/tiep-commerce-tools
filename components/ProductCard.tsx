@@ -10,7 +10,17 @@ export function ProductCard({ product }: { product: Product }) {
         <img src={product.image} alt={product.name} />
       </Link>
       <div className="card-body">
-        <span className="tag">{product.category}</span>
+        <div className="card-meta-row">
+          <span className="tag">{product.category}</span>
+          {product.brand ? (
+            <Link
+              className="tag brand-tag"
+              href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
+            >
+              {product.brand}
+            </Link>
+          ) : null}
+        </div>
         <h3>
           <Link href={`/products/${product.slug}`}>{product.name}</Link>
         </h3>

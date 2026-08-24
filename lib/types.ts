@@ -25,6 +25,7 @@ export type Product = {
   sku: string;
   name: string;
   description: string;
+  brand?: string;
   category: string;
   color: string;
   image: string;
@@ -33,6 +34,12 @@ export type Product = {
   images?: string[];
   specifications?: ProductSpecification[];
   variants?: ProductVariant[];
+};
+export type ProductBrandSummary = {
+  name: string;
+  count: number;
+  image: string;
+  categories: string[];
 };
 export type HeaderCategory = {
   id: string;
@@ -122,7 +129,7 @@ export type CheckoutResult = {
 export type SearchResult = {
   products: Product[];
   total: number;
-  facets: { categories: string[]; colors: string[] };
+  facets: { brands: string[]; categories: string[]; colors: string[] };
   pagination: {
     page: number;
     perPage: number;

@@ -2,6 +2,7 @@ import type { Product, SearchResult } from "./types";
 
 export type CatalogFilterOptions = {
   q?: string;
+  brand?: string | string[];
   category?: string;
   categoryId?: string;
   color?: string;
@@ -15,8 +16,20 @@ function normalize(value = "") {
   return value.trim().toLowerCase();
 }
 
+function normalizeValues(value: string | string[] | undefined) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.map(normalize).filter(Boolean))];
+}
+
 function getFacets(items: Product[]) {
   return {
+    brands: [
+      ...new Set(
+        items
+          .map((p) => p.brand?.trim())
+          .filter((brand): brand is string => Boolean(brand)),
+      ),
+    ].sort(),
     categories: [...new Set(items.map((p) => p.category))].sort(),
     colors: [...new Set(items.map((p) => p.color))].sort(),
   };
@@ -67,16 +80,18 @@ export function applyCatalogFilters(
   options: CatalogFilterOptions = {},
 ): SearchResult {
   const query = normalize(options.q);
+  const brands = normalizeValues(options.brand);
   const category = normalize(options.category);
   const color = normalize(options.color);
 
   const selected = items.filter((product) => {
     const searchable = normalize(
-      `${product.name} ${product.description} ${product.sku}`,
+      `${product.name} ${product.description} ${product.sku} ${product.brand ?? ""}`,
     );
 
     return (
       (!query || searchable.includes(query)) &&
+      (!brands.length || brands.includes(normalize(product.brand))) &&
       (!category || normalize(product.category) === category) &&
       (!color || normalize(product.color) === color) &&
       matchesPrice(product, options.price)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -255,6 +256,15 @@ export function ProductDetail({
     <main className="shell detail product-detail">
       <section className="product-gallery" aria-label={`${product.name} gallery`}>
         <div className="product-gallery-main">
+          {product.brand ? (
+            <Link
+              className="product-brand-badge"
+              href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
+            >
+              <span>Brand</span>
+              <strong>{product.brand}</strong>
+            </Link>
+          ) : null}
           <Swiper
             className="product-gallery-swiper"
             keyboard

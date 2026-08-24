@@ -111,15 +111,25 @@ export function ProductItemSlider({
               >
                 <img src={product.image} alt={product.name} />
               </Link>
-              <div>
-                <span className="tag">{product.category}</span>
+              <div className="recent-product-body">
+                <div className="card-meta-row recent-product-meta">
+                  <span className="tag">{product.category}</span>
+                  {product.brand ? (
+                    <Link
+                      className="tag brand-tag"
+                      href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
+                    >
+                      {product.brand}
+                    </Link>
+                  ) : null}
+                </div>
                 <h3>
                   <Link href={`/products/${product.slug}`}>{product.name}</Link>
                 </h3>
-                <p className="muted">{product.sku}</p>
-                <div className="recent-product-actions">
+                <p className="muted">{product.description}</p>
+                <div className="recent-product-purchase-row">
                   <strong>{product.price.formatted}</strong>
-                  <div>
+                  <div className="recent-product-actions">
                     {renderAction?.(product)}
                     <AddToWishlist compact productId={product.id} />
                     <AddToCompare

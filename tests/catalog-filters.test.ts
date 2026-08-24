@@ -8,6 +8,7 @@ function product(
   category: string,
   color: string,
   name = id,
+  brand = "",
 ): Product {
   return {
     id,
@@ -15,6 +16,7 @@ function product(
     sku: id.toUpperCase(),
     name,
     description: `${category} ${color}`,
+    brand,
     category,
     color,
     image: "image.png",
@@ -28,9 +30,16 @@ function product(
 }
 
 const products = [
-  product("cheap-red-chair", 2400, "Seating", "Red", "Cheap chair"),
-  product("mid-blue-desk", 7500, "Workspace", "Blue", "Desk"),
-  product("premium-red-desk", 25000, "Workspace", "Red", "Premium desk"),
+  product("cheap-red-chair", 2400, "Seating", "Red", "Cheap chair", "Aeroform"),
+  product("mid-blue-desk", 7500, "Workspace", "Blue", "Desk", "Relay Works"),
+  product(
+    "premium-red-desk",
+    25000,
+    "Workspace",
+    "Red",
+    "Premium desk",
+    "Relay Works",
+  ),
 ];
 
 describe("catalog filters", () => {
@@ -44,8 +53,43 @@ describe("catalog filters", () => {
 
     expect(result.products.map((x) => x.id)).toEqual(["premium-red-desk"]);
     expect(result.total).toBe(1);
+    expect(result.facets.brands).toEqual(["Aeroform", "Relay Works"]);
     expect(result.facets.categories).toEqual(["Seating", "Workspace"]);
     expect(result.facets.colors).toEqual(["Blue", "Red"]);
+  });
+
+  it("filters by product brand", () => {
+    const result = applyCatalogFilters(products, { brand: "Relay Works" });
+
+    expect(result.products.map((x) => x.id)).toEqual([
+      "mid-blue-desk",
+      "premium-red-desk",
+    ]);
+    expect(result.total).toBe(2);
+  });
+
+  it("filters by multiple product brands", () => {
+    const result = applyCatalogFilters(
+      [
+        ...products,
+        product(
+          "black-task-lamp",
+          4900,
+          "Lighting",
+          "Black",
+          "Lamp",
+          "Lumina Works",
+        ),
+      ],
+      { brand: ["Aeroform", "Relay Works"] },
+    );
+
+    expect(result.products.map((x) => x.id)).toEqual([
+      "cheap-red-chair",
+      "mid-blue-desk",
+      "premium-red-desk",
+    ]);
+    expect(result.total).toBe(3);
   });
 
   it("sorts by price ascending and descending", () => {
@@ -88,5 +132,17 @@ describe("catalog filters", () => {
       perPage: 12,
       totalPages: 3,
     });
+  });
+
+  it("matches product brand in keyword search", () => {
+    const result = applyCatalogFilters(
+      [
+        product("lamp", 4900, "Lighting", "Black", "Desk lamp", "Lumina Works"),
+        product("chair", 14900, "Seating", "Green", "Task chair", "Aeroform"),
+      ],
+      { q: "lumina" },
+    );
+
+    expect(result.products.map((x) => x.id)).toEqual(["lamp"]);
   });
 });

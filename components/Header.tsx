@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
   faStore,
+  faTags,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
@@ -53,6 +54,10 @@ export function Header() {
           <Link href="/products">
             <FontAwesomeIcon aria-hidden="true" icon={faStore} />
             <span>Catalog</span>
+          </Link>
+          <Link href="/shop-by-brand">
+            <FontAwesomeIcon aria-hidden="true" icon={faTags} />
+            <span>Brands</span>
           </Link>
           <Suspense fallback={null}>
             <HeaderCategoryLinks />

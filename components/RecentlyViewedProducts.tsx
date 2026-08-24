@@ -56,6 +56,8 @@ export function TrackRecentlyViewedProduct({ product }: { product: Product }) {
     window.dispatchEvent(new Event(storageKey));
   }, [
     product.category,
+    product.brand,
+    product.description,
     product.id,
     product.image,
     product.name,

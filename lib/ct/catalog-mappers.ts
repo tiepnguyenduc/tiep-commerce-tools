@@ -143,6 +143,16 @@ function variantCount(data: CtProduct["masterData"]["current"]) {
   return 1 + (data.variants?.length ?? 0);
 }
 
+function brandFromSpecifications(specifications: ProductSpecification[]) {
+  return specifications.find((specification) => {
+    const key = specification.name.replace(/[^a-z0-9]/gi, "").toLowerCase();
+    const label = specification.label.replace(/[^a-z0-9]/gi, "").toLowerCase();
+    return [key, label].some((value) =>
+      ["brand", "manufacturer", "vendor", "maker", "designer"].includes(value),
+    );
+  })?.value;
+}
+
 function productData(resource: CtProduct) {
   const { current, staged } = resource.masterData;
   return staged && variantCount(staged) > variantCount(current) ? staged : current;
@@ -203,6 +213,10 @@ export function mapProductResourceToStorefrontProduct(
     mapVariant(variant, locale, fallbackImage),
   );
   const selectedVariant = variants[0];
+  const brand =
+    brandFromSpecifications(variants.flatMap((variant) => variant.attributes)) ||
+    sampleProducts[index % sampleProducts.length].brand ||
+    "WORK/SHOP";
   const color =
     selectedVariant.attributes.find((attribute) =>
       ["Color Label", "Search Color"].includes(attribute.label),
@@ -217,6 +231,7 @@ export function mapProductResourceToStorefrontProduct(
     sku: selectedVariant.sku || resource.key || `SKU-${index}`,
     name: localized(data.name, locale, "Product"),
     description: localized(data.description, locale),
+    brand,
     category: categoryName,
     color,
     image: selectedVariant.image,

@@ -1,7 +1,7 @@
 import "server-only";
 import type { CustomerDraft, CustomerSignin } from "@commercetools/platform-sdk";
 import { getEnvReadiness } from "../env";
-import { apiRoot } from "./client";
+import { getApiRoot } from "./client";
 import { getCartId, setCartId, setCustomerSession } from "./session";
 
 export type CustomerAuthInput = {
@@ -12,6 +12,7 @@ export type CustomerAuthInput = {
 };
 
 function requireApiRoot() {
+  const apiRoot = getApiRoot();
   if (!apiRoot || !getEnvReadiness().ready) {
     throw new Error("commercetools API is not configured.");
   }

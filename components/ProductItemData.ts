@@ -5,6 +5,7 @@ export type ProductItemData = {
   slug: string;
   sku: string;
   name: string;
+  brand?: string;
   category: string;
   color?: string;
   description?: string;
@@ -19,6 +20,7 @@ export function productToProductItem(product: Product): ProductItemData {
     slug: product.slug,
     sku: product.sku,
     name: product.name,
+    brand: product.brand,
     category: product.category,
     color: product.color,
     description: product.description,
@@ -41,6 +43,7 @@ export function isProductItemData(value: unknown): value is ProductItemData {
     typeof candidate.slug === "string" &&
     typeof candidate.sku === "string" &&
     typeof candidate.name === "string" &&
+    (candidate.brand === undefined || typeof candidate.brand === "string") &&
     typeof candidate.category === "string" &&
     (candidate.color === undefined || typeof candidate.color === "string") &&
     (candidate.description === undefined ||

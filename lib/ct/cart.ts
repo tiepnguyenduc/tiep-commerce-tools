@@ -13,7 +13,7 @@ import {
 } from "../cart-discount";
 import { emptyCart } from "../cart-engine";
 import type { Cart, StoreMode } from "../types";
-import { apiRoot } from "./client";
+import { getApiRoot } from "./client";
 import {
   type B2BContext,
   requireB2BContext,
@@ -37,6 +37,7 @@ type CartUpdateInput = {
 };
 
 function requireApiRoot() {
+  const apiRoot = getApiRoot();
   if (!apiRoot || !getEnvReadiness().ready) {
     throw new Error("commercetools API is not configured.");
   }

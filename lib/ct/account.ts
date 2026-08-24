@@ -9,7 +9,7 @@ import type {
   CustomerOrderSummary,
   CustomerProfile,
 } from "../types";
-import { apiRoot } from "./client";
+import { getApiRoot } from "./client";
 import { requireCommerceConfig } from "./context";
 import {
   mapCustomerOrder,
@@ -35,6 +35,7 @@ export type PasswordUpdateInput = {
 export type AddressUpdateInput = CustomerAddress;
 
 function requireApiRoot() {
+  const apiRoot = getApiRoot();
   if (!apiRoot || !getEnvReadiness().ready) {
     throw new Error("commercetools API is not configured.");
   }

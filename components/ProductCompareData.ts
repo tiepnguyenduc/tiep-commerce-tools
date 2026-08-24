@@ -12,6 +12,7 @@ export function productToCompareProduct(product: Product): CompareProductData {
     slug: product.slug,
     sku: product.sku,
     name: product.name,
+    brand: product.brand,
     category: product.category,
     color: product.color,
     image: product.image,
@@ -29,6 +30,7 @@ export function itemToCompareProduct(
     slug: product.slug,
     sku: product.sku,
     name: product.name,
+    brand: product.brand,
     category: product.category,
     color: product.color,
     image: product.image,
@@ -59,6 +61,7 @@ export function isCompareProductData(
     typeof candidate.slug === "string" &&
     typeof candidate.sku === "string" &&
     typeof candidate.name === "string" &&
+    (candidate.brand === undefined || typeof candidate.brand === "string") &&
     typeof candidate.category === "string" &&
     (candidate.color === undefined || typeof candidate.color === "string") &&
     typeof candidate.image === "string" &&
