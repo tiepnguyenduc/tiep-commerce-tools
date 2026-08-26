@@ -102,4 +102,20 @@ describe("account page", () => {
     expect(html).not.toContain("In production");
     expect(html).not.toContain("protected BFF endpoints");
   });
+
+  it("renders linked location selects on the address page", () => {
+    const html = renderToStaticMarkup(
+      <AccountAuth initialCustomer={customer} initialPage="addresses" />,
+    );
+
+    expect(html).toContain('name="country"');
+    expect(html).toContain('name="region"');
+    expect(html).toContain("State / Region");
+    expect(html).toContain('name="city"');
+    expect(html).toContain('name="postalCode"');
+    expect(html).toContain('placeholder="Enter postal code"');
+    expect(html).not.toContain("<datalist");
+    expect(html).not.toMatch(/name="postalCode"[^>]*\slist=/);
+    expect(html).toContain("All four fields stay matched");
+  });
 });

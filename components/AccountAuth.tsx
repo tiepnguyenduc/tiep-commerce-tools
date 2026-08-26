@@ -5,6 +5,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
+import { LinkedAddressFields } from "@/components/LinkedAddressFields";
 import {
   accountHref,
   accountPages,
@@ -20,7 +21,7 @@ import type {
 type Action = "login" | "register";
 
 const emptyAddress: CustomerAddress = {
-  country: "US",
+  country: "",
 };
 
 function customerName(customer: CustomerProfile) {
@@ -424,51 +425,10 @@ function AddressBookPage({
                 setEditing({ ...editing, streetName: event.target.value })
               }
             />
-            <input
-              autoComplete="address-level2"
-              className="field"
-              maxLength={80}
-              placeholder="City"
-              required
-              value={editing.city ?? ""}
-              onChange={(event) =>
-                setEditing({ ...editing, city: event.target.value })
-              }
-            />
-            <input
-              autoComplete="address-level1"
-              className="field"
-              maxLength={80}
-              placeholder="Region"
-              value={editing.region ?? ""}
-              onChange={(event) =>
-                setEditing({ ...editing, region: event.target.value })
-              }
-            />
-            <input
-              autoComplete="postal-code"
-              className="field"
-              maxLength={16}
-              placeholder="Postal code"
-              required
-              value={editing.postalCode ?? ""}
-              onChange={(event) =>
-                setEditing({ ...editing, postalCode: event.target.value })
-              }
-            />
-            <input
-              autoComplete="country"
-              className="field"
-              maxLength={2}
-              minLength={2}
-              pattern="[A-Za-z]{2}"
-              placeholder="Country"
-              required
-              title="Use a 2-letter country code, for example US."
-              value={editing.country}
-              onChange={(event) =>
-                setEditing({ ...editing, country: event.target.value.toUpperCase() })
-              }
+            <LinkedAddressFields
+              address={editing}
+              disabled={busy}
+              onChange={setEditing}
             />
             <input
               autoComplete="tel"

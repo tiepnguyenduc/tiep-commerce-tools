@@ -2409,6 +2409,51 @@ select {
     margin: 14px 0 18px;
 }
 
+.select-field {
+    align-self: start;
+    display: grid;
+    gap: 6px;
+}
+
+.select-field > span {
+    color: #536058;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.select-field .field {
+    height: 44px;
+    min-width: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+    width: 100%;
+}
+
+.field[aria-invalid="true"] {
+    border-color: #b43b2b;
+    box-shadow: 0 0 0 2px rgba(180, 59, 43, 0.12);
+}
+
+.field-message {
+    color: #667169;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.field-message.error {
+    color: #a33a2b;
+    font-weight: 700;
+}
+
+.address-link-hint {
+    color: #667169;
+    font-size: 13px;
+    line-height: 1.45;
+    margin: -2px 0 0;
+}
+
 .text-button {
     background: transparent;
     border: 0;

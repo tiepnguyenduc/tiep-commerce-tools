@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  addressMatchesPostalCode,
+  findAddressLocationByPostalCode,
+  syncPostalCode,
+} from "@/lib/address-directory";
+import {
   readCustomerProfile,
   removeCustomerAddress,
   upsertCustomerAddress,
@@ -12,11 +17,27 @@ const addressInput = z.object({
   lastName: z.string().optional(),
   streetName: z.string().optional(),
   streetNumber: z.string().optional(),
-  city: z.string().optional(),
-  region: z.string().optional(),
-  postalCode: z.string().optional(),
-  country: z.string().min(2).default("US"),
+  city: z.string().min(1),
+  region: z.string().min(1),
+  postalCode: z.string().min(1),
+  country: z.string().length(2),
   phone: z.string().optional(),
+}).superRefine((address, context) => {
+  if (!findAddressLocationByPostalCode(address.postalCode)) {
+    context.addIssue({
+      code: "custom",
+      message: "Postal code was not found in the supported locations.",
+      path: ["postalCode"],
+    });
+    return;
+  }
+  if (!addressMatchesPostalCode(address)) {
+    context.addIssue({
+      code: "custom",
+      message: "City, state/region, and country must match the postal code.",
+      path: ["postalCode"],
+    });
+  }
 });
 
 export async function GET() {
@@ -34,12 +55,19 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const parsed = addressInput.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid address input" }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid address input" },
+      { status: 400 },
+    );
   }
 
   try {
+    const normalizedAddress = syncPostalCode(
+      parsed.data,
+      parsed.data.postalCode,
+    );
     return NextResponse.json({
-      customer: await upsertCustomerAddress(parsed.data),
+      customer: await upsertCustomerAddress(normalizedAddress),
     });
   } catch (e) {
     return NextResponse.json(
