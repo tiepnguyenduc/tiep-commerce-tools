@@ -6,6 +6,7 @@ import type {
 import { getEnvReadiness } from "../env";
 import type {
   CustomerAddress,
+  CustomerOrderDetail,
   CustomerOrderSummary,
   CustomerProfile,
 } from "../types";
@@ -13,6 +14,7 @@ import { getApiRoot } from "./client";
 import { requireCommerceConfig } from "./context";
 import {
   mapCustomerOrder,
+  mapCustomerOrderDetail,
   mapCustomerProfile,
 } from "./account-mappers";
 import {
@@ -213,6 +215,29 @@ export async function listCustomerOrders(): Promise<CustomerOrderSummary[]> {
     .execute();
 
   return response.body.results.map((order) => mapCustomerOrder(order, locale));
+}
+
+export async function readCustomerOrderDetail(
+  orderId: string,
+): Promise<CustomerOrderDetail> {
+  if (!getEnvReadiness().ready) throw new Error("Order not found.");
+
+  const customerId = requireCustomerId();
+  const { locale } = requireCommerceConfig();
+  const escapePredicate = (value: string) =>
+    value.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+  const response = await requireApiRoot()
+    .orders()
+    .get({
+      queryArgs: {
+        where: `id="${escapePredicate(orderId)}" and customerId="${escapePredicate(customerId)}"`,
+        limit: 1,
+      },
+    })
+    .execute();
+  const order = response.body.results[0];
+  if (!order) throw new Error("Order not found.");
+  return mapCustomerOrderDetail(order, locale);
 }
 
 export function logoutCustomer() {

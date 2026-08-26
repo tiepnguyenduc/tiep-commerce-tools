@@ -73,6 +73,27 @@ export type CustomerOrderSummary = {
   lineCount: number;
   total: Money;
 };
+export type CustomerOrderLine = {
+  id: string;
+  productId: string;
+  sku: string;
+  name: string;
+  image: string;
+  quantity: number;
+  unitPrice: Money;
+  total: Money;
+};
+export type CustomerOrderDetail = CustomerOrderSummary & {
+  paymentState?: string;
+  shipmentState?: string;
+  shippingMethod?: string;
+  shippingAddress?: CustomerAddress;
+  billingAddress?: CustomerAddress;
+  lines: CustomerOrderLine[];
+  itemsTotal: Money;
+  shipping?: Money;
+  tax?: Money;
+};
 export type WishlistLine = {
   id: string;
   productId: string;

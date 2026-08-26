@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { LinkedAddressFields } from "@/components/LinkedAddressFields";
+import { OrderDetails } from "@/components/OrderDetails";
 import {
   accountHref,
   accountPages,
@@ -13,10 +14,14 @@ import {
 } from "@/lib/account-pages";
 import type {
   CustomerAddress,
+  CustomerOrderDetail,
   CustomerOrderSummary,
   CustomerProfile,
   Wishlist,
 } from "@/lib/types";
+import {
+  fetchCustomerOrders,
+} from "@/lib/account-orders-api";
 
 type Action = "login" | "register";
 
@@ -454,27 +459,32 @@ function AddressBookPage({
   );
 }
 
-function OrdersPage() {
+function OrdersPage({
+  initialOrder,
+}: {
+  initialOrder?: CustomerOrderDetail;
+}) {
   const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
   const [status, setStatus] = useState("Loading orders...");
+  const router = useRouter();
 
   useEffect(() => {
-    fetch("/api/customer/orders")
-      .then((response) => readJson<{ orders: CustomerOrderSummary[] }>(response))
-      .then((data) => {
-        setOrders(data.orders);
-        setStatus(data.orders.length ? "" : "You have placed no orders.");
+    fetchCustomerOrders()
+      .then((nextOrders) => {
+        setOrders(nextOrders);
+        setStatus(nextOrders.length ? "" : "You have placed no orders.");
       })
       .catch((e) =>
         setStatus(e instanceof Error ? e.message : "Orders read failed"),
       );
   }, []);
 
-  if (!orders.length) return <p className="muted">{status}</p>;
+  if (!orders.length && !initialOrder) return <p className="muted">{status}</p>;
 
   return (
-    <div className="account-table-wrap">
-      <table className="account-table">
+    <div className="account-stack">
+      {orders.length > 0 && <div className="account-table-wrap">
+        <table className="account-table">
         <thead>
           <tr>
             <th>Order #</th>
@@ -482,6 +492,7 @@ function OrdersPage() {
             <th>Items</th>
             <th>Status</th>
             <th>Total</th>
+            <th><span className="sr-only">Actions</span></th>
           </tr>
         </thead>
         <tbody>
@@ -492,10 +503,27 @@ function OrdersPage() {
               <td>{order.lineCount}</td>
               <td>{order.orderState}</td>
               <td>{order.total.formatted}</td>
+              <td>
+                <Link
+                  aria-label={`View order ${order.orderNumber} details`}
+                  className="text-button order-detail-trigger"
+                  href={`/account/orders/${encodeURIComponent(order.id)}`}
+                >
+                  View details
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>}
+      {initialOrder && (
+        <OrderDetails
+          order={initialOrder}
+          onClose={() => router.push("/account/orders")}
+        />
+      )}
+      {status && <p className="muted">{status}</p>}
     </div>
   );
 }
@@ -570,12 +598,14 @@ function WishlistPage() {
 
 export function AccountDashboard({
   customer,
+  initialOrder,
   onLogout,
   status,
   loggingOut = false,
   initialPage = "dashboard",
 }: {
   customer: CustomerProfile;
+  initialOrder?: CustomerOrderDetail;
   onLogout: () => void;
   status: string;
   loggingOut?: boolean;
@@ -609,7 +639,7 @@ export function AccountDashboard({
         />
       );
     }
-    if (activePage === "orders") return <OrdersPage />;
+    if (activePage === "orders") return <OrdersPage initialOrder={initialOrder} />;
     if (activePage === "wishlist") return <WishlistPage />;
     return <DashboardPage customer={currentCustomer} />;
   }
@@ -653,9 +683,11 @@ export function AccountDashboard({
 
 export function AccountAuth({
   initialCustomer = null,
+  initialOrder,
   initialPage = "dashboard",
 }: {
   initialCustomer?: CustomerProfile | null;
+  initialOrder?: CustomerOrderDetail;
   initialPage?: AccountPage;
 }) {
   const [action, setAction] = useState<Action>("login");
@@ -755,6 +787,7 @@ export function AccountAuth({
     return (
       <AccountDashboard
         customer={customer}
+        initialOrder={initialOrder}
         initialPage={initialPage}
         loggingOut={loggingOut}
         onLogout={logout}

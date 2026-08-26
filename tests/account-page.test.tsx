@@ -11,7 +11,11 @@ const customer = {
 };
 
 const readCustomerProfile = vi.hoisted(() => vi.fn());
-vi.mock("../lib/ct/account", () => ({ readCustomerProfile }));
+const readCustomerOrderDetail = vi.hoisted(() => vi.fn());
+vi.mock("../lib/ct/account", () => ({
+  readCustomerOrderDetail,
+  readCustomerProfile,
+}));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: any) => (
     <a {...props} href={href}>
@@ -24,6 +28,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
   useRouter: () => ({
+    push: vi.fn(),
     replace: vi.fn(),
   }),
 }));
@@ -62,6 +67,39 @@ describe("account page", () => {
     expect(html).toContain("My Wishlist");
     expect(html).toContain("Loading wishlist");
     expect(html).not.toContain("Contact Information");
+  });
+
+  it("server-renders an order at /account/orders/[orderId]", async () => {
+    readCustomerProfile.mockResolvedValueOnce(customer);
+    readCustomerOrderDetail.mockResolvedValueOnce({
+      id: "order-1",
+      orderNumber: "100000001",
+      createdAt: "2026-08-07T00:00:00.000Z",
+      orderState: "Open",
+      lineCount: 1,
+      lines: [],
+      itemsTotal: {
+        centAmount: 5000,
+        currencyCode: "USD",
+        formatted: "$50.00",
+      },
+      total: {
+        centAmount: 5000,
+        currencyCode: "USD",
+        formatted: "$50.00",
+      },
+    });
+    const { default: Page } = await import(
+      "../app/account/orders/[orderId]/page"
+    );
+
+    const html = renderToStaticMarkup(
+      await Page({ params: Promise.resolve({ orderId: "order-1" }) }),
+    );
+
+    expect(html).toContain("My Orders");
+    expect(html).toContain("Order #100000001");
+    expect(readCustomerOrderDetail).toHaveBeenCalledWith("order-1");
   });
 
   it("shows only login and register forms before the customer is authenticated", () => {

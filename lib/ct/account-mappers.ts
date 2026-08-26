@@ -7,6 +7,8 @@ import type {
 } from "@commercetools/platform-sdk";
 import type {
   CustomerAddress,
+  CustomerOrderDetail,
+  CustomerOrderLine,
   CustomerOrderSummary,
   CustomerProfile,
   Wishlist,
@@ -64,6 +66,58 @@ export function mapCustomerOrder(
     orderState: order.orderState,
     lineCount: order.lineItems.reduce((sum, line) => sum + line.quantity, 0),
     total: mapMoney(order.totalPrice, locale),
+  };
+}
+
+function mapOrderLine(
+  line: Order["lineItems"][number],
+  locale: string,
+): CustomerOrderLine {
+  const selectedPrice = line.price.discounted?.value ?? line.price.value;
+  return {
+    id: line.id,
+    productId: line.productId,
+    sku: line.variant.sku || line.id,
+    name: localized(line.name, locale, "Order item"),
+    image: line.variant.images?.[0]?.url || fallbackImage,
+    quantity: line.quantity,
+    unitPrice: mapMoney(selectedPrice, locale),
+    total: mapMoney(line.totalPrice, locale),
+  };
+}
+
+export function mapCustomerOrderDetail(
+  order: Order,
+  locale = "en-US",
+): CustomerOrderDetail {
+  const summary = mapCustomerOrder(order, locale);
+  const lines = order.lineItems.map((line) => mapOrderLine(line, locale));
+  const itemsTotalCents = lines.reduce(
+    (sum, line) => sum + line.total.centAmount,
+    0,
+  );
+  return {
+    ...summary,
+    paymentState: order.paymentState,
+    shipmentState: order.shipmentState,
+    shippingMethod: order.shippingInfo?.shippingMethodName,
+    shippingAddress: order.shippingAddress
+      ? mapCustomerAddress(order.shippingAddress)
+      : undefined,
+    billingAddress: order.billingAddress
+      ? mapCustomerAddress(order.billingAddress)
+      : undefined,
+    lines,
+    itemsTotal: mapMoney(
+      { ...order.totalPrice, centAmount: itemsTotalCents },
+      locale,
+    ),
+    shipping: order.shippingInfo?.price
+      ? mapMoney(order.shippingInfo.price, locale)
+      : undefined,
+    tax: order.taxedPrice?.totalTax
+      ? mapMoney(order.taxedPrice.totalTax, locale)
+      : undefined,
   };
 }
 
