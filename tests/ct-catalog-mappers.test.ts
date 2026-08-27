@@ -178,6 +178,7 @@ describe("commercetools catalog mapping", () => {
       brand: "Northline",
       badges: ["Live catalog"],
     });
+    expect(product.originalPrice).toBeUndefined();
     expect(product.variants).toHaveLength(2);
     expect(product.variants?.[1]).toMatchObject({
       id: 2,
@@ -201,6 +202,60 @@ describe("commercetools catalog mapping", () => {
           value: "Solid oak top - brass-capped legs",
         },
       ],
+    });
+  });
+
+  it("exposes the special price and original list price when discounted", () => {
+    const product = mapProductResourceToStorefrontProduct(
+      {
+        id: "bruno-chair",
+        key: "bruno-chair",
+        masterData: {
+          current: {
+            slug: { "en-US": "bruno-chair" },
+            name: { "en-US": "Bruno Chair" },
+            description: { "en-US": "On sale" },
+            categories: [],
+            masterVariant: {
+              id: 1,
+              sku: "SKU-BRUNO",
+              attributes: [],
+              images: [],
+              prices: [
+                {
+                  id: "price-1",
+                  value: {
+                    type: "centPrecision",
+                    currencyCode: "USD",
+                    centAmount: 7999,
+                    fractionDigits: 2,
+                  },
+                  discounted: {
+                    value: {
+                      type: "centPrecision",
+                      currencyCode: "USD",
+                      centAmount: 6799,
+                      fractionDigits: 2,
+                    },
+                    discount: { typeId: "product-discount", id: "d-1" },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      } as any,
+      0,
+      "en-US",
+    );
+
+    expect(product.price).toMatchObject({
+      centAmount: 6799,
+      formatted: "$67.99",
+    });
+    expect(product.originalPrice).toMatchObject({
+      centAmount: 7999,
+      formatted: "$79.99",
     });
   });
 });

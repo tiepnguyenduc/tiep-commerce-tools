@@ -58,6 +58,20 @@ describe("catalog filters", () => {
     expect(result.facets.colors).toEqual(["Blue", "Red"]);
   });
 
+  it("filters to only products with a special price when sale is set", () => {
+    const onSale = product("sale-lamp", 4900, "Lighting", "Black", "Sale lamp");
+    onSale.originalPrice = {
+      centAmount: 6900,
+      currencyCode: "USD",
+      formatted: "$69",
+    };
+
+    const result = applyCatalogFilters([...products, onSale], { sale: true });
+
+    expect(result.products.map((x) => x.id)).toEqual(["sale-lamp"]);
+    expect(result.total).toBe(1);
+  });
+
   it("filters by product brand", () => {
     const result = applyCatalogFilters(products, { brand: "Relay Works" });
 

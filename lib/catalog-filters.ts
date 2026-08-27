@@ -8,6 +8,7 @@ export type CatalogFilterOptions = {
   color?: string;
   price?: string;
   sort?: string;
+  sale?: boolean;
   page?: string | number;
   perPage?: number;
 };
@@ -84,6 +85,8 @@ export function applyCatalogFilters(
   const category = normalize(options.category);
   const color = normalize(options.color);
 
+  const saleOnly = options.sale === true;
+
   const selected = items.filter((product) => {
     const searchable = normalize(
       `${product.name} ${product.description} ${product.sku} ${product.brand ?? ""}`,
@@ -94,6 +97,7 @@ export function applyCatalogFilters(
       (!brands.length || brands.includes(normalize(product.brand))) &&
       (!category || normalize(product.category) === category) &&
       (!color || normalize(product.color) === color) &&
+      (!saleOnly || Boolean(product.originalPrice)) &&
       matchesPrice(product, options.price)
     );
   });

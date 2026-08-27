@@ -92,6 +92,17 @@ select {
     padding: 0 6px;
 }
 
+.nav-sale {
+    color: var(--orange);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.nav-sale:hover {
+    color: var(--ink);
+}
+
 .category-nav {
     display: flex;
     gap: 16px;
@@ -819,9 +830,37 @@ select {
     min-height: 42px;
 }
 
-.card-purchase-row > strong {
+.card-purchase-row > strong,
+.card-purchase-row .price-now {
     line-height: 1.2;
     min-width: 0;
+}
+
+.price-block {
+    align-items: baseline;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+}
+
+.price-was,
+.product-price-block .price .price-was {
+    color: #8a8a8a;
+    font-weight: 600;
+    text-decoration: line-through;
+}
+
+.price-block.on-sale .price-now,
+.product-price-block .price.on-sale .price-now {
+    color: var(--orange);
+}
+
+.product-price-block .price.on-sale {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .row {

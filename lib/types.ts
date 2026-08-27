@@ -16,6 +16,8 @@ export type ProductVariant = {
   image: string;
   images: string[];
   price: Money;
+  /** Original list price, present only when `price` is a reduced special price. */
+  originalPrice?: Money;
   attributes: ProductSpecification[];
   specifications: ProductSpecification[];
 };
@@ -30,6 +32,8 @@ export type Product = {
   color: string;
   image: string;
   price: Money;
+  /** Original list price, present only when `price` is a reduced special price. */
+  originalPrice?: Money;
   badges: string[];
   images?: string[];
   specifications?: ProductSpecification[];

@@ -4,7 +4,12 @@ import type {
   ProductVariant as CtProductVariant,
 } from "@commercetools/platform-sdk";
 import { products as sampleProducts } from "../sample-data";
-import type { HeaderCategory, Product, ProductSpecification } from "../types";
+import type {
+  HeaderCategory,
+  Money,
+  Product,
+  ProductSpecification,
+} from "../types";
 
 function formatMoney(
   centAmount: number,
@@ -111,15 +116,35 @@ function variantImageUrls(variant: CtProductVariant, fallbackImage: string) {
   return urls.length ? urls : [fallbackImage];
 }
 
+type CtMoneyValue = {
+  centAmount?: number;
+  currencyCode?: string;
+  fractionDigits?: number;
+};
+
+function ctMoney(value: CtMoneyValue | undefined, locale: string): Money {
+  const centAmount = value?.centAmount ?? 0;
+  const currencyCode = value?.currencyCode ?? "USD";
+  const fractionDigits = value?.fractionDigits ?? 2;
+  return {
+    centAmount,
+    currencyCode,
+    formatted: formatMoney(centAmount, currencyCode, fractionDigits, locale),
+  };
+}
+
 function mapVariant(
   variant: CtProductVariant,
   locale: string,
   fallbackImage: string,
 ) {
-  const price = variant.prices?.[0]?.value;
-  const centAmount = price?.centAmount ?? 0;
-  const currencyCode = price?.currencyCode ?? "USD";
-  const fractionDigits = price?.fractionDigits ?? 2;
+  const priceEntry = variant.prices?.[0];
+  const baseValue = priceEntry?.value;
+  const specialValue = priceEntry?.discounted?.value;
+  // A special price applies only when the discounted amount is genuinely lower.
+  const hasSpecialPrice =
+    specialValue != null &&
+    specialValue.centAmount < (baseValue?.centAmount ?? 0);
   const images = variantImageUrls(variant, fallbackImage);
   const attributes = variantAttributes(variant, locale);
 
@@ -129,11 +154,8 @@ function mapVariant(
     key: variant.key,
     image: images[0],
     images,
-    price: {
-      centAmount,
-      currencyCode,
-      formatted: formatMoney(centAmount, currencyCode, fractionDigits, locale),
-    },
+    price: ctMoney(hasSpecialPrice ? specialValue : baseValue, locale),
+    ...(hasSpecialPrice ? { originalPrice: ctMoney(baseValue, locale) } : {}),
     attributes,
     specifications: attributes,
   };
@@ -236,6 +258,9 @@ export function mapProductResourceToStorefrontProduct(
     color,
     image: selectedVariant.image,
     price: selectedVariant.price,
+    ...(selectedVariant.originalPrice
+      ? { originalPrice: selectedVariant.originalPrice }
+      : {}),
     badges: ["Live catalog"],
     images,
     specifications: selectedVariant.specifications,

@@ -33,6 +33,7 @@ function fallbackVariant(product: Product): ProductVariant {
     image: product.image,
     images: product.images?.length ? product.images : [product.image],
     price: product.price,
+    originalPrice: product.originalPrice,
     attributes: product.specifications ?? [],
     specifications:
       product.specifications?.length
@@ -241,7 +242,14 @@ export function ProductDetail({
                   {color ? <small>{color}</small> : null}
                 </span>
                 <span className="variant-card-meta">
-                  <em>{variant.price.formatted}</em>
+                  <em>
+                    {variant.originalPrice ? (
+                      <s className="price-was">
+                        {variant.originalPrice.formatted}
+                      </s>
+                    ) : null}
+                    {variant.price.formatted}
+                  </em>
                   <small>{selected ? "Selected" : "Select"}</small>
                 </span>
               </button>
@@ -336,7 +344,14 @@ export function ProductDetail({
         <h1>{product.name}</h1>
         <p className="product-summary">{product.description}</p>
         <div className="product-price-block">
-          <p className="price">{selectedVariant.price.formatted}</p>
+          <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
+            {selectedVariant.originalPrice ? (
+              <span className="price-was">
+                {selectedVariant.originalPrice.formatted}
+              </span>
+            ) : null}
+            <span className="price-now">{selectedVariant.price.formatted}</span>
+          </p>
           <span>In stock and ready to ship</span>
         </div>
 

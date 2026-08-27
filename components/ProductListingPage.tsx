@@ -21,6 +21,7 @@ export type ProductSearchParams = {
   color?: string;
   price?: string;
   sort?: string;
+  sale?: string;
   page?: string;
 };
 
@@ -108,6 +109,7 @@ export async function ProductListingPage({
 }) {
   const p = searchParams;
   const selectedBrands = searchParamValues(p.brand);
+  const saleOnly = p.sale === "true";
   const categoryOptions = await listHeaderCategories();
   const selectedCategoryName =
     categoryOptions.find((category) => category.id === p.categoryId)?.name ??
@@ -119,6 +121,7 @@ export async function ProductListingPage({
     color: p.color,
     price: p.price,
     sort: p.sort,
+    sale: saleOnly,
     page: p.page,
     perPage: productsPerPage,
   });
@@ -130,6 +133,7 @@ export async function ProductListingPage({
     color: p.color,
     price: p.price,
     sort: p.sort,
+    sale: saleOnly ? "true" : undefined,
   };
   const selectedPriceLabel =
     priceRanges.find((range) => range.value === p.price)?.label ?? "";
@@ -177,6 +181,13 @@ export async function ProductListingPage({
           href: removeParamsHref(basePath, currentParams, ["sort"]),
         }
       : null,
+    saleOnly
+      ? {
+          label: "On sale",
+          value: "Special price",
+          href: removeParamsHref(basePath, currentParams, ["sale"]),
+        }
+      : null,
   ].filter((filter): filter is ActiveFilter =>
     Boolean(filter),
   );
@@ -185,7 +196,9 @@ export async function ProductListingPage({
     ? p.q
       ? `Search results for "${p.q}"`
       : "Search products"
-    : "All Products";
+    : saleOnly
+      ? "Sale"
+      : "All Products";
   const resultStart = result.total
     ? (result.pagination.page - 1) * result.pagination.perPage + 1
     : 0;
@@ -197,6 +210,7 @@ export async function ProductListingPage({
     return (
       <AutoSubmitFilterForm action={basePath}>
         <input type="hidden" name="q" value={p.q ?? ""} />
+        {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
 
         <label className="filter-group">
           <span className="filter-label">Sort by</span>
@@ -272,8 +286,9 @@ export async function ProductListingPage({
           <h1>{title}</h1>
           {!isSearch ? (
             <p className="muted">
-              Browse products from the live catalog with filters for category,
-              price, color, and sort order.
+              {saleOnly
+                ? "Products with a special price, discounted from their original list price."
+                : "Browse products from the live catalog with filters for category, price, color, and sort order."}
             </p>
           ) : null}
         </div>
@@ -300,6 +315,7 @@ export async function ProductListingPage({
               ))}
               <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
               <input type="hidden" name="color" value={p.color ?? ""} />
+              {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
               <button className="button accent" type="submit">
                 <span>Search</span>
                 <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />

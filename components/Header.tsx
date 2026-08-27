@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faFire,
   faMagnifyingGlass,
   faStore,
   faTags,
@@ -58,6 +59,10 @@ export function Header() {
           <Link href="/shop-by-brand">
             <FontAwesomeIcon aria-hidden="true" icon={faTags} />
             <span>Brands</span>
+          </Link>
+          <Link className="nav-sale" href="/products?sale=true">
+            <FontAwesomeIcon aria-hidden="true" icon={faFire} />
+            <span>Sale</span>
           </Link>
           <Suspense fallback={null}>
             <HeaderCategoryLinks />

@@ -19,6 +19,13 @@ import {
   type CatalogFilterOptions,
 } from "../catalog-filters";
 
+/**
+ * Key of the auto-maintained "Sale" category. Kept in sync with
+ * scripts/collect-sale-products.mjs, which creates the category and assigns
+ * discounted products to it.
+ */
+export const SALE_CATEGORY_KEY = "sale";
+
 function sampleHeaderCategories(limit = 6): HeaderCategory[] {
   const seenNames = new Set<string>();
 
@@ -80,10 +87,34 @@ export async function listHeaderCategories(): Promise<HeaderCategory[]> {
         },
       })
       .execute();
-    const categories = mapCategoryResourcesToHeaderCategories(body.results);
+    const categories = mapCategoryResourcesToHeaderCategories(
+      // The dedicated Sale link is rendered separately, so keep it out of the
+      // generic category list to avoid a duplicate entry.
+      body.results.filter((category) => category.key !== SALE_CATEGORY_KEY),
+    );
     return categories.length ? categories : sampleHeaderCategories();
   } catch {
     return sampleHeaderCategories();
+  }
+}
+
+/**
+ * Resolve the auto-maintained "Sale" category, if it exists in the project.
+ * Returns null in training mode or when the category has not been created yet.
+ */
+export async function getSaleCategory(): Promise<HeaderCategory | null> {
+  const apiRoot = getApiRoot();
+  if (!apiRoot) return null;
+
+  try {
+    const { body } = await apiRoot
+      .categories()
+      .withKey({ key: SALE_CATEGORY_KEY })
+      .get()
+      .execute();
+    return mapCategoryResourceToHeaderCategory(body);
+  } catch {
+    return null;
   }
 }
 
@@ -182,6 +213,7 @@ export async function searchProducts(
       color: options.color,
       price: options.price,
       sort: options.sort,
+      sale: options.sale,
       page: options.page,
       perPage: options.perPage,
     });

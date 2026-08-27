@@ -26,7 +26,12 @@ export function ProductCard({ product }: { product: Product }) {
         </h3>
         <p className="muted">{product.description}</p>
         <div className="card-purchase-row">
-          <strong>{product.price.formatted}</strong>
+          <span className={product.originalPrice ? "price-block on-sale" : "price-block"}>
+            {product.originalPrice ? (
+              <span className="price-was">{product.originalPrice.formatted}</span>
+            ) : null}
+            <strong className="price-now">{product.price.formatted}</strong>
+          </span>
           <div className="card-actions">
             <AddToWishlist compact productId={product.id} />
             <AddToCompare compact product={productToCompareProduct(product)} />
