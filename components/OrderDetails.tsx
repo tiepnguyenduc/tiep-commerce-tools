@@ -1,6 +1,30 @@
 "use client";
 
-import type { CustomerAddress, CustomerOrderDetail } from "@/lib/types";
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { useMiniCart } from "@/components/MiniCart";
+import { useToast } from "@/components/Toast";
+import type {
+  Cart,
+  CustomerAddress,
+  CustomerOrderDetail,
+  StoreMode,
+} from "@/lib/types";
+
+const REORDER_MODE: StoreMode = "b2c";
+
+function existingQuantity(
+  cart: Cart | null,
+  productId: string,
+  sku: string,
+): number {
+  if (!cart || cart.mode !== REORDER_MODE) return 0;
+  const line = cart.lines.find((item) =>
+    sku ? item.sku === sku : item.productId === productId,
+  );
+  return line?.quantity ?? 0;
+}
 
 function addressLines(address: CustomerAddress) {
   return [
@@ -39,6 +63,59 @@ export function OrderDetails({
   onClose: () => void;
   order: CustomerOrderDetail;
 }) {
+  const { cart, loadCart, openCart, syncCart } = useMiniCart();
+  const showToast = useToast();
+  const [reordering, setReordering] = useState(false);
+
+  async function reorder() {
+    if (reordering || order.lines.length === 0) return;
+    setReordering(true);
+    try {
+      let currentCart = cart ?? (await loadCart());
+      let added = 0;
+      for (const line of order.lines) {
+        const response = await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: line.productId,
+            sku: line.sku,
+            quantity:
+              existingQuantity(currentCart, line.productId, line.sku) +
+              line.quantity,
+            mode: REORDER_MODE,
+          }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          showToast(
+            data.error || `Could not add ${line.name} to your cart.`,
+            "error",
+          );
+          continue;
+        }
+        currentCart = data as Cart;
+        added += 1;
+      }
+      if (currentCart) syncCart(currentCart);
+      if (added === 0) {
+        showToast("Could not reorder these items.", "error");
+        return;
+      }
+      openCart();
+      showToast(
+        added === order.lines.length
+          ? "Order items added to your cart."
+          : "Some order items were added to your cart.",
+        added === order.lines.length ? "success" : "info",
+      );
+    } catch {
+      showToast("Network error — could not reorder these items.", "error");
+    } finally {
+      setReordering(false);
+    }
+  }
+
   return (
     <section
       aria-labelledby={`order-detail-${order.id}`}
@@ -56,9 +133,20 @@ export function OrderDetails({
             })}
           </p>
         </div>
-        <button className="text-button" onClick={onClose} type="button">
-          Close
-        </button>
+        <div className="order-detail-actions">
+          <button
+            className="button accent"
+            disabled={reordering || order.lines.length === 0}
+            onClick={reorder}
+            type="button"
+          >
+            <FontAwesomeIcon aria-hidden="true" icon={faRotateRight} />
+            <span>{reordering ? "Reordering…" : "Reorder"}</span>
+          </button>
+          <button className="text-button" onClick={onClose} type="button">
+            Close
+          </button>
+        </div>
       </header>
 
       <dl className="order-status-grid">

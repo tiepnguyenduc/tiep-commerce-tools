@@ -64,5 +64,6 @@ describe("order details", () => {
     expect(html).toContain("Paid");
     expect(html).toContain("Destin, Florida, 32541");
     expect(html).toContain("Order total");
+    expect(html).toContain("Reorder");
   });
 });

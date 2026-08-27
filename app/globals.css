@@ -2530,6 +2530,20 @@ select {
     margin: 6px 0 0;
 }
 
+.order-detail-actions {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.order-detail-actions .button {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    white-space: nowrap;
+}
+
 .order-status-grid {
     display: grid;
     gap: 12px;
