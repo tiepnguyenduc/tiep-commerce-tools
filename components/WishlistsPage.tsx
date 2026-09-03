@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
+  faPen,
   faPlus,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +14,7 @@ import {
   createWishlist,
   deleteWishlist,
   removeItemFromWishlist,
+  renameWishlist,
   useWishlists,
 } from "@/lib/wishlist-api";
 
@@ -22,6 +24,12 @@ export function WishlistsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [renameTarget, setRenameTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [renameName, setRenameName] = useState("");
+  const [savingRename, setSavingRename] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [removingLineId, setRemovingLineId] = useState<string | null>(null);
   const showToast = useToast();
@@ -72,6 +80,41 @@ export function WishlistsPage() {
     }
   }
 
+  function openRename(id: string, name: string) {
+    setRenameTarget({ id, name });
+    setRenameName(name);
+  }
+
+  async function submitRename(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const name = renameName.trim();
+    if (
+      !renameTarget ||
+      !name ||
+      name === renameTarget.name ||
+      savingRename
+    ) {
+      return;
+    }
+
+    setSavingRename(true);
+    try {
+      const wishlist = await renameWishlist(renameTarget.id, name);
+      setRenameTarget(null);
+      setRenameName("");
+      showToast(`Wishlist renamed to ${wishlist.name}.`, "success");
+    } catch (requestError) {
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not rename the wishlist.",
+        "error",
+      );
+    } finally {
+      setSavingRename(false);
+    }
+  }
+
   async function removeLine(wishlistId: string, lineItemId: string) {
     if (removingLineId) return;
     setRemovingLineId(lineItemId);
@@ -90,6 +133,49 @@ export function WishlistsPage() {
     }
   }
 
+  const renameModal = renameTarget ? (
+    <WishlistModal
+      onClose={() => {
+        if (!savingRename) setRenameTarget(null);
+      }}
+      title="Rename wishlist"
+    >
+      <form className="wishlist-create-form" onSubmit={submitRename}>
+        <label htmlFor="wishlist-rename">Wishlist name</label>
+        <input
+          autoFocus
+          className="field"
+          id="wishlist-rename"
+          maxLength={100}
+          onChange={(event) => setRenameName(event.target.value)}
+          required
+          value={renameName}
+        />
+        <div className="wishlist-modal-actions">
+          <button
+            className="pill"
+            disabled={savingRename}
+            onClick={() => setRenameTarget(null)}
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            className="button"
+            disabled={
+              savingRename ||
+              !renameName.trim() ||
+              renameName.trim() === renameTarget.name
+            }
+            type="submit"
+          >
+            {savingRename ? "Saving…" : "Save name"}
+          </button>
+        </div>
+      </form>
+    </WishlistModal>
+  ) : null;
+
   if (isLoading) return <p className="muted">Loading wishlists...</p>;
   if (error) return <p className="muted">{error}</p>;
 
@@ -105,17 +191,28 @@ export function WishlistsPage() {
             <FontAwesomeIcon aria-hidden="true" icon={faArrowLeft} />
             All wishlists
           </button>
-          {!selected.isDefault && (
+          <div className="wishlist-detail-actions">
             <button
-              className="text-button danger"
-              disabled={deletingId !== null}
-              onClick={() => removeWishlist(selected.id, selected.name)}
+              className="text-button"
+              disabled={savingRename}
+              onClick={() => openRename(selected.id, selected.name)}
               type="button"
             >
-              <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
-              {deletingId === selected.id ? "Deleting…" : "Delete wishlist"}
+              <FontAwesomeIcon aria-hidden="true" icon={faPen} />
+              Rename
             </button>
-          )}
+            {!selected.isDefault && (
+              <button
+                className="text-button danger"
+                disabled={deletingId !== null}
+                onClick={() => removeWishlist(selected.id, selected.name)}
+                type="button"
+              >
+                <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
+                {deletingId === selected.id ? "Deleting…" : "Delete wishlist"}
+              </button>
+            )}
+          </div>
         </div>
         <div className="wishlist-detail-title">
           <div>
@@ -154,6 +251,7 @@ export function WishlistsPage() {
             ))}
           </div>
         )}
+        {renameModal}
       </div>
     );
   }
@@ -198,21 +296,35 @@ export function WishlistsPage() {
                 {wishlist.lines.length === 0 && <i>No saved items yet</i>}
               </span>
             </button>
-            {!wishlist.isDefault && (
+            <span className="wishlist-card-actions">
               <button
-                aria-label={`Delete ${wishlist.name}`}
-                className="wishlist-card-delete"
-                disabled={deletingId !== null}
-                onClick={() => removeWishlist(wishlist.id, wishlist.name)}
-                title="Delete wishlist"
+                aria-label={`Rename ${wishlist.name}`}
+                className="wishlist-card-action"
+                disabled={savingRename}
+                onClick={() => openRename(wishlist.id, wishlist.name)}
+                title="Rename wishlist"
                 type="button"
               >
-                <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
+                <FontAwesomeIcon aria-hidden="true" icon={faPen} />
               </button>
-            )}
+              {!wishlist.isDefault && (
+                <button
+                  aria-label={`Delete ${wishlist.name}`}
+                  className="wishlist-card-action danger"
+                  disabled={deletingId !== null}
+                  onClick={() => removeWishlist(wishlist.id, wishlist.name)}
+                  title="Delete wishlist"
+                  type="button"
+                >
+                  <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
+                </button>
+              )}
+            </span>
           </article>
         ))}
       </div>
+
+      {renameModal}
 
       {showCreate && (
         <WishlistModal

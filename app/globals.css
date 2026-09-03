@@ -2772,6 +2772,18 @@ select {
     justify-content: space-between;
 }
 
+.wishlist-detail-actions {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+}
+
+.wishlist-detail-actions .text-button {
+    align-items: center;
+    display: inline-flex;
+    gap: 7px;
+}
+
 .wishlist-overview-head > p,
 .wishlist-detail-title p {
     margin: 0;
@@ -2815,7 +2827,7 @@ select {
     display: flex;
     gap: 8px;
     min-width: 0;
-    padding-right: 26px;
+    padding-right: 76px;
 }
 
 .wishlist-card-title strong {
@@ -2857,20 +2869,34 @@ select {
     font-style: normal;
 }
 
-.wishlist-card-delete {
+.wishlist-card-actions {
+    display: flex;
+    gap: 7px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+}
+
+.wishlist-card-action {
     align-items: center;
     background: #fff;
     border: 1px solid var(--line);
     border-radius: 999px;
-    color: #a33a2b;
+    color: var(--ink);
     cursor: pointer;
     display: inline-flex;
     height: 32px;
     justify-content: center;
-    position: absolute;
-    right: 12px;
-    top: 12px;
     width: 32px;
+}
+
+.wishlist-card-action.danger {
+    color: #a33a2b;
+}
+
+.wishlist-card-action:disabled {
+    cursor: wait;
+    opacity: 0.55;
 }
 
 .wishlist-detail-title h3 {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const readWishlists = vi.hoisted(() => vi.fn());
 const createWishlist = vi.hoisted(() => vi.fn());
+const renameWishlist = vi.hoisted(() => vi.fn());
 const deleteWishlist = vi.hoisted(() => vi.fn());
 const addWishlistItem = vi.hoisted(() => vi.fn());
 const removeWishlistItem = vi.hoisted(() => vi.fn());
@@ -9,6 +10,7 @@ const removeWishlistItem = vi.hoisted(() => vi.fn());
 vi.mock("../lib/ct/wishlist", () => ({
   readWishlists,
   createWishlist,
+  renameWishlist,
   deleteWishlist,
   addWishlistItem,
   removeWishlistItem,
@@ -22,7 +24,10 @@ vi.mock("../lib/ct/wishlist", () => ({
 }));
 
 import { GET, POST as create } from "../app/api/wishlists/route";
-import { DELETE as remove } from "../app/api/wishlists/[wishlistId]/route";
+import {
+  DELETE as remove,
+  PUT as rename,
+} from "../app/api/wishlists/[wishlistId]/route";
 import {
   DELETE as removeItem,
   POST as addItem,
@@ -40,6 +45,7 @@ describe("multiple wishlist routes", () => {
   beforeEach(() => {
     readWishlists.mockReset();
     createWishlist.mockReset();
+    renameWishlist.mockReset();
     deleteWishlist.mockReset();
     addWishlistItem.mockReset();
     removeWishlistItem.mockReset();
@@ -92,6 +98,44 @@ describe("multiple wishlist routes", () => {
     await expect(response.json()).resolves.toEqual({
       error: "The default wishlist cannot be deleted.",
     });
+  });
+
+  it("validates and renames the selected wishlist", async () => {
+    renameWishlist.mockResolvedValue({
+      ...defaultWishlist,
+      id: "list-room",
+      name: "Guest room",
+      isDefault: false,
+    });
+
+    const response = await rename(
+      new Request("http://localhost/api/wishlists/list-room", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "  Guest room  " }),
+      }),
+      { params: Promise.resolve({ wishlistId: "list-room" }) },
+    );
+
+    expect(response.status).toBe(200);
+    expect(renameWishlist).toHaveBeenCalledWith("list-room", "Guest room");
+    await expect(response.json()).resolves.toMatchObject({
+      wishlist: { id: "list-room", name: "Guest room" },
+    });
+  });
+
+  it("rejects an empty wishlist name", async () => {
+    const response = await rename(
+      new Request("http://localhost/api/wishlists/list-room", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "   " }),
+      }),
+      { params: Promise.resolve({ wishlistId: "list-room" }) },
+    );
+
+    expect(response.status).toBe(400);
+    expect(renameWishlist).not.toHaveBeenCalled();
   });
 
   it("targets the selected wishlist when adding and removing products", async () => {

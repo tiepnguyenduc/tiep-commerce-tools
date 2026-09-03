@@ -111,6 +111,17 @@ export async function createWishlist(name: string) {
   return upsertWishlist(data.wishlist);
 }
 
+export async function renameWishlist(id: string, name: string) {
+  const data = await readJson<{ wishlist: Wishlist }>(
+    await fetch(`/api/wishlists/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    }),
+  );
+  return upsertWishlist(data.wishlist);
+}
+
 export async function deleteWishlist(id: string) {
   const data = await readJson<{ deletedId: string }>(
     await fetch(`/api/wishlists/${encodeURIComponent(id)}`, {

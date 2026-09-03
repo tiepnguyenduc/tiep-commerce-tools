@@ -207,6 +207,39 @@ export async function createWishlist(name: string): Promise<Wishlist> {
   return mapWishlist(created, requireCommerceConfig().locale, false);
 }
 
+export async function renameWishlist(
+  id: string,
+  name: string,
+): Promise<Wishlist> {
+  const normalizedName = name.trim();
+  if (!normalizedName) throw new Error("Wishlist name is required.");
+
+  if (!getEnvReadiness().ready) {
+    const wishlist = readTrainingWishlists().find((entry) => entry.id === id);
+    if (!wishlist) throw new Error("Wishlist not found.");
+    return replaceTrainingWishlist({
+      ...wishlist,
+      version: wishlist.version + 1,
+      name: normalizedName,
+    });
+  }
+
+  const customerId = requireCustomerId();
+  const lists = await ensureLiveWishlists(customerId);
+  const list = await readOwnedLiveWishlist(id, customerId);
+  const updated = await updateLiveWishlist(list, [
+    {
+      action: "changeName",
+      name: { [requireCommerceConfig().locale]: normalizedName },
+    },
+  ]);
+  return mapWishlist(
+    updated,
+    requireCommerceConfig().locale,
+    list.id === lists[0].id,
+  );
+}
+
 export async function deleteWishlist(id: string): Promise<void> {
   if (!getEnvReadiness().ready) {
     const customerId = requireCustomerId();
