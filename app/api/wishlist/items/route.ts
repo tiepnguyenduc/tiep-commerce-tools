@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { addWishlistItem, removeWishlistItem } from "@/lib/ct/wishlist";
+import {
+  addWishlistItem,
+  removeWishlistItem,
+  wishlistErrorStatus,
+} from "@/lib/ct/wishlist";
 
 const addInput = z.object({
   productId: z.string(),
@@ -20,7 +24,7 @@ export async function POST(request: Request) {
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Wishlist update failed" },
-      { status: 401 },
+      { status: wishlistErrorStatus(e) },
     );
   }
 }
@@ -42,7 +46,7 @@ export async function DELETE(request: Request) {
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Wishlist remove failed" },
-      { status: 401 },
+      { status: wishlistErrorStatus(e) },
     );
   }
 }

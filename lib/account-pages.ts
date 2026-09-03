@@ -5,7 +5,7 @@ export const accountPages: { id: AccountPage; label: string; href: string }[] = 
   { id: "profile", label: "Profile", href: "/account/profile" },
   { id: "addresses", label: "Addresses", href: "/account/addresses" },
   { id: "orders", label: "My Orders", href: "/account/orders" },
-  { id: "wishlist", label: "My Wishlist", href: "/account/wishlist" },
+  { id: "wishlist", label: "My Wishlists", href: "/account/wishlists" },
 ];
 
 export function accountHref(page: AccountPage) {
@@ -14,4 +14,9 @@ export function accountHref(page: AccountPage) {
 
 export function isAccountPage(value: string): value is AccountPage {
   return accountPages.some((page) => page.id === value);
+}
+
+export function resolveAccountPage(value: string): AccountPage | null {
+  if (value === "wishlists") return "wishlist";
+  return isAccountPage(value) ? value : null;
 }

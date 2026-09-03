@@ -111,6 +111,7 @@ export type Wishlist = {
   id: string;
   version: number;
   name: string;
+  isDefault: boolean;
   lines: WishlistLine[];
 };
 export type CartLine = {

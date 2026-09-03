@@ -7,6 +7,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { LinkedAddressFields } from "@/components/LinkedAddressFields";
 import { OrderDetails } from "@/components/OrderDetails";
+import { WishlistsPage } from "@/components/WishlistsPage";
 import {
   accountHref,
   accountPages,
@@ -17,11 +18,11 @@ import type {
   CustomerOrderDetail,
   CustomerOrderSummary,
   CustomerProfile,
-  Wishlist,
 } from "@/lib/types";
 import {
   fetchCustomerOrders,
 } from "@/lib/account-orders-api";
+import { resetWishlists } from "@/lib/wishlist-api";
 
 type Action = "login" | "register";
 
@@ -528,74 +529,6 @@ function OrdersPage({
   );
 }
 
-function WishlistPage() {
-  const [wishlist, setWishlist] = useState<Wishlist | null>(null);
-  const [status, setStatus] = useState("Loading wishlist...");
-  const [removingLineId, setRemovingLineId] = useState<string | null>(null);
-  const showToast = useToast();
-
-  async function refreshWishlist() {
-    const data = await readJson<{ wishlist: Wishlist }>(await fetch("/api/wishlist"));
-    setWishlist(data.wishlist);
-    setStatus(data.wishlist.lines.length ? "" : "Your wishlist is empty.");
-  }
-
-  useEffect(() => {
-    refreshWishlist().catch((e) =>
-      setStatus(e instanceof Error ? e.message : "Wishlist read failed"),
-    );
-  }, []);
-
-  async function removeLine(lineItemId: string) {
-    if (removingLineId) return;
-    setRemovingLineId(lineItemId);
-    setStatus("Removing wishlist item...");
-    try {
-      const data = await readJson<{ wishlist: Wishlist }>(
-        await fetch(
-          `/api/wishlist/items?lineItemId=${encodeURIComponent(lineItemId)}`,
-          { method: "DELETE" },
-        ),
-      );
-      setWishlist(data.wishlist);
-      setStatus(data.wishlist.lines.length ? "" : "Your wishlist is empty.");
-      showToast("Item removed from your wishlist.", "success");
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Wishlist remove failed";
-      setStatus(message);
-      showToast(message, "error");
-    } finally {
-      setRemovingLineId(null);
-    }
-  }
-
-  if (!wishlist?.lines.length) return <p className="muted">{status}</p>;
-
-  return (
-    <div className="wishlist-list">
-      {wishlist.lines.map((line) => (
-        <article className="wishlist-row" key={line.id}>
-          <img src={line.image} alt={line.name} />
-          <div>
-            <h3>{line.name}</h3>
-            <p className="muted">
-              SKU: {line.sku} · Quantity: {line.quantity}
-            </p>
-          </div>
-          <button
-            className="text-button danger"
-            disabled={removingLineId !== null}
-            onClick={() => removeLine(line.id)}
-          >
-            {removingLineId === line.id ? "Removing…" : "Remove"}
-          </button>
-        </article>
-      ))}
-      {status && <p className="muted">{status}</p>}
-    </div>
-  );
-}
-
 export function AccountDashboard({
   customer,
   initialOrder,
@@ -640,7 +573,7 @@ export function AccountDashboard({
       );
     }
     if (activePage === "orders") return <OrdersPage initialOrder={initialOrder} />;
-    if (activePage === "wishlist") return <WishlistPage />;
+    if (activePage === "wishlist") return <WishlistsPage />;
     return <DashboardPage customer={currentCustomer} />;
   }
 
@@ -772,6 +705,7 @@ export function AccountAuth({
         showToast("Logout failed. Please try again.", "error");
         return;
       }
+      resetWishlists();
       setCustomer(null);
       setState("");
       router.replace("/account");

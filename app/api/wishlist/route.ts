@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
-import { readWishlist } from "@/lib/ct/wishlist";
+import {
+  readWishlists,
+  wishlistErrorStatus,
+} from "@/lib/ct/wishlist";
 
 export async function GET() {
   try {
-    return NextResponse.json({ wishlist: await readWishlist() });
+    const wishlists = await readWishlists();
+    return NextResponse.json({ wishlist: wishlists[0], wishlists });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Wishlist read failed" },
-      { status: 401 },
+      { status: wishlistErrorStatus(e) },
     );
   }
 }

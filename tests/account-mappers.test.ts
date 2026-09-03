@@ -188,11 +188,13 @@ describe("account mappers", () => {
         ],
       } as any,
       "en-US",
+      true,
     );
 
     expect(wishlist).toMatchObject({
       id: "list-1",
       version: 3,
+      isDefault: true,
       lines: [
         {
           id: "wish-line-1",

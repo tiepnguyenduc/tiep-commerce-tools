@@ -1,70 +1,36 @@
 "use client";
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+
+import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowLeft,
+  faCheck,
+  faHeart,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
+import { WishlistModal } from "@/components/WishlistModal";
+import {
+  addItemToWishlist,
+  createWishlist,
+  loadWishlists,
+  removeItemFromWishlist,
+  useWishlists,
+} from "@/lib/wishlist-api";
 import type { Wishlist } from "@/lib/types";
 
-type WishlistResponse = { wishlist?: Wishlist; error?: string };
-
-const listeners = new Set<() => void>();
-let wishlistLineIds: Map<string, string> | null = null;
-let wishlistRequest: Promise<void> | null = null;
-
-function publishWishlist(wishlist: Wishlist) {
-  wishlistLineIds = new Map();
-  for (const line of wishlist.lines) {
-    if (!wishlistLineIds.has(line.productId)) {
-      wishlistLineIds.set(line.productId, line.id);
-    }
-  }
-  listeners.forEach((listener) => listener());
-}
-
-function ensureWishlistLoaded() {
-  if (wishlistLineIds || wishlistRequest) return wishlistRequest;
-
-  wishlistRequest = fetch("/api/wishlist")
-    .then(async (response) => {
-      if (response.status === 401) {
-        wishlistLineIds = new Map();
-        return;
-      }
-
-      const data = (await response.json().catch(() => ({}))) as WishlistResponse;
-      if (response.ok && data.wishlist) {
-        publishWishlist(data.wishlist);
-      } else {
-        wishlistLineIds = new Map();
-      }
-    })
-    .catch(() => {
-      wishlistLineIds = new Map();
-    })
-    .finally(() => {
-      wishlistRequest = null;
-      listeners.forEach((listener) => listener());
-    });
-
-  return wishlistRequest;
-}
-
-function useWishlistLineIds() {
-  const [lineIds, setLineIds] = useState<Map<string, string> | null>(
-    wishlistLineIds,
+function matchingLine(
+  wishlist: Wishlist,
+  productId: string,
+  variantId?: number,
+) {
+  return wishlist.lines.find(
+    (line) =>
+      line.productId === productId &&
+      (variantId === undefined || line.variantId === variantId),
   );
-
-  useEffect(() => {
-    const refresh = () => setLineIds(wishlistLineIds);
-    listeners.add(refresh);
-    ensureWishlistLoaded();
-    return () => {
-      listeners.delete(refresh);
-    };
-  }, []);
-
-  return lineIds;
 }
 
 export function AddToWishlist({
@@ -76,120 +42,233 @@ export function AddToWishlist({
   variantId?: number;
   compact?: boolean;
 }) {
+  const { wishlists, status } = useWishlists();
+  const [isOpen, setIsOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const wishlistLineIds = useWishlistLineIds();
-  const lineItemId = wishlistLineIds?.get(productId);
-  const isSaved = saved || Boolean(lineItemId);
+  const [pendingWishlistId, setPendingWishlistId] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newWishlistName, setNewWishlistName] = useState("");
+  const [creatingWishlist, setCreatingWishlist] = useState(false);
+  const isSaved = wishlists.some((wishlist) =>
+    Boolean(matchingLine(wishlist, productId, variantId)),
+  );
   const router = useRouter();
   const showToast = useToast();
 
-  async function toggleWishlist() {
+  function closePicker() {
+    setIsOpen(false);
+    setShowCreateForm(false);
+    setNewWishlistName("");
+  }
+
+  async function openPicker() {
     if (busy) return;
-    if (isSaved) {
-      if (!lineItemId) {
-        setSaved(false);
-        showToast("Product removed from your wishlist.", "success");
-        return;
-      }
-
-      setBusy(true);
-      try {
-        const response = await fetch(
-          `/api/wishlist/items?lineItemId=${encodeURIComponent(lineItemId)}`,
-          { method: "DELETE" },
-        );
-
-        if (response.status === 401) {
-          showToast("Please log in to update your wishlist.", "info");
-          router.push("/account");
-          return;
-        }
-
-        const data = (await response
-          .json()
-          .catch(() => ({}))) as WishlistResponse;
-        if (!response.ok) {
-          showToast(
-            data.error || "Could not remove the product from your wishlist.",
-            "error",
-          );
-          return;
-        }
-
-        if (data.wishlist) publishWishlist(data.wishlist);
-        setSaved(false);
-        showToast("Product removed from your wishlist.", "success");
-        router.refresh();
-      } catch {
-        showToast(
-          "Network error - could not remove the product from your wishlist.",
-          "error",
-        );
-      } finally {
-        setBusy(false);
-      }
-      return;
-    }
-
     setBusy(true);
-    setSaved(false);
     try {
-      const response = await fetch("/api/wishlist/items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, variantId }),
-      });
-
-      if (response.status === 401) {
-        showToast("Please log in to save products to your wishlist.", "info");
+      await loadWishlists();
+      setShowCreateForm(false);
+      setIsOpen(true);
+    } catch (error) {
+      const responseStatus = (error as Error & { status?: number })?.status;
+      if (responseStatus === 401 || status === "unauthenticated") {
+        showToast("Please log in to save products to a wishlist.", "info");
         router.push("/account");
-        return;
-      }
-
-      const data = (await response
-        .json()
-        .catch(() => ({}))) as WishlistResponse;
-      if (!response.ok) {
+      } else {
         showToast(
-          data.error || "Could not save the product to your wishlist.",
+          error instanceof Error ? error.message : "Could not load wishlists.",
           "error",
         );
-        return;
       }
-
-      if (data.wishlist) publishWishlist(data.wishlist);
-      setSaved(true);
-      showToast("Product saved to your wishlist.", "success");
-      router.refresh();
-    } catch {
-      showToast(
-        "Network error - could not save the product to your wishlist.",
-        "error",
-      );
     } finally {
       setBusy(false);
     }
   }
 
-  return (
-    <button
-      aria-label={
-        isSaved
-          ? "Remove product from wishlist"
-          : busy
-            ? "Updating wishlist"
-            : "Add product to wishlist"
+  async function toggleList(wishlist: Wishlist) {
+    if (pendingWishlistId) return;
+    setPendingWishlistId(wishlist.id);
+    const line = matchingLine(wishlist, productId, variantId);
+    try {
+      if (line) {
+        await removeItemFromWishlist(wishlist.id, line.id);
+        showToast(`Removed from ${wishlist.name}.`, "success");
+      } else {
+        await addItemToWishlist(wishlist.id, { productId, variantId });
+        showToast(`Saved to ${wishlist.name}.`, "success");
       }
-      className={`wishlist-button${compact ? " compact" : ""}${
-        isSaved ? " saved" : ""
-      }`}
-      disabled={busy}
-      onClick={toggleWishlist}
-      title={isSaved ? "Remove from wishlist" : "Add to wishlist"}
-      type="button"
-    >
-      <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
-    </button>
+      setIsOpen(false);
+      router.refresh();
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Could not update the wishlist.",
+        "error",
+      );
+    } finally {
+      setPendingWishlistId(null);
+    }
+  }
+
+  async function createAndSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const name = newWishlistName.trim();
+    if (!name || creatingWishlist) return;
+
+    setCreatingWishlist(true);
+    let created: Wishlist | null = null;
+    try {
+      created = await createWishlist(name);
+      await addItemToWishlist(created.id, { productId, variantId });
+      showToast(`Created ${created.name} and saved the product.`, "success");
+      closePicker();
+      router.refresh();
+    } catch (error) {
+      if (created) {
+        setShowCreateForm(false);
+        setNewWishlistName("");
+        showToast(
+          `${created.name} was created, but the product could not be added. Select the list to try again.`,
+          "error",
+        );
+      } else {
+        showToast(
+          error instanceof Error
+            ? error.message
+            : "Could not create the wishlist.",
+          "error",
+        );
+      }
+    } finally {
+      setCreatingWishlist(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        aria-label={
+          isSaved
+            ? "Manage product wishlists"
+            : busy
+              ? "Loading wishlists"
+              : "Add product to wishlist"
+        }
+        aria-pressed={isSaved}
+        className={`wishlist-button${compact ? " compact" : ""}${
+          isSaved ? " saved" : ""
+        }`}
+        disabled={busy}
+        onClick={openPicker}
+        title={isSaved ? "Manage wishlists" : "Add to wishlist"}
+        type="button"
+      >
+        <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
+      </button>
+
+      {isOpen && (
+        <WishlistModal
+          onClose={closePicker}
+          title={showCreateForm ? "Create new wishlist" : "Add to wishlist"}
+        >
+          {showCreateForm ? (
+            <>
+              <button
+                className="text-button wishlist-picker-back"
+                disabled={creatingWishlist}
+                onClick={() => setShowCreateForm(false)}
+                type="button"
+              >
+                <FontAwesomeIcon aria-hidden="true" icon={faArrowLeft} />
+                Back to wishlists
+              </button>
+              <form className="wishlist-create-form" onSubmit={createAndSave}>
+                <label htmlFor={`new-wishlist-${productId}`}>Wishlist name</label>
+                <input
+                  autoFocus
+                  className="field"
+                  id={`new-wishlist-${productId}`}
+                  maxLength={100}
+                  onChange={(event) => setNewWishlistName(event.target.value)}
+                  placeholder="e.g. Living room"
+                  required
+                  value={newWishlistName}
+                />
+                <p className="muted wishlist-create-hint">
+                  The current product will be saved to the new wishlist.
+                </p>
+                <div className="wishlist-modal-actions">
+                  <button
+                    className="pill"
+                    disabled={creatingWishlist}
+                    onClick={() => setShowCreateForm(false)}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="button"
+                    disabled={creatingWishlist || !newWishlistName.trim()}
+                    type="submit"
+                  >
+                    {creatingWishlist ? "Creating…" : "Create and save"}
+                  </button>
+                </div>
+              </form>
+            </>
+          ) : (
+            <>
+              <div className="wishlist-picker-list">
+                {wishlists.map((wishlist) => {
+                  const saved = Boolean(
+                    matchingLine(wishlist, productId, variantId),
+                  );
+                  return (
+                    <button
+                      aria-pressed={saved}
+                      className={`wishlist-picker-option${saved ? " saved" : ""}`}
+                      disabled={pendingWishlistId !== null}
+                      key={wishlist.id}
+                      onClick={() => toggleList(wishlist)}
+                      type="button"
+                    >
+                      <span>
+                        <strong>{wishlist.name}</strong>
+                        {wishlist.isDefault && <small>Default</small>}
+                      </span>
+                      <span className="wishlist-picker-count">
+                        {pendingWishlistId === wishlist.id
+                          ? "Updating…"
+                          : `${wishlist.lines.length} item${
+                              wishlist.lines.length === 1 ? "" : "s"
+                            }`}
+                        {saved && (
+                          <FontAwesomeIcon aria-hidden="true" icon={faCheck} />
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="wishlist-picker-footer">
+                <button
+                  className="text-button wishlist-create-trigger"
+                  onClick={() => setShowCreateForm(true)}
+                  type="button"
+                >
+                  <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
+                  Create new wishlist
+                </button>
+                <Link
+                  className="wishlist-manage-link"
+                  href="/account/wishlists"
+                  onClick={closePicker}
+                >
+                  Manage wishlists
+                </Link>
+              </div>
+            </>
+          )}
+        </WishlistModal>
+      )}
+    </>
   );
 }

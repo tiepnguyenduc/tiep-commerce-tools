@@ -138,11 +138,16 @@ function mapWishlistLine(line: ShoppingListLineItem, locale: string): WishlistLi
   };
 }
 
-export function mapWishlist(list: ShoppingList, locale = "en-US"): Wishlist {
+export function mapWishlist(
+  list: ShoppingList,
+  locale = "en-US",
+  isDefault = false,
+): Wishlist {
   return {
     id: list.id,
     version: list.version,
     name: localized(list.name, locale, "My Wishlist"),
+    isDefault,
     lines: list.lineItems.map((line) => mapWishlistLine(line, locale)),
   };
 }

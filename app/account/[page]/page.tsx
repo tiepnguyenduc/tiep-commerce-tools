@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { accountPages, isAccountPage } from "@/lib/account-pages";
+import { accountPages, resolveAccountPage } from "@/lib/account-pages";
 import { AccountPageContent } from "../account-page-content";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export function generateStaticParams() {
   return accountPages
     .filter((page) => page.id !== "dashboard")
-    .map((page) => ({ page: page.id }));
+    .map((page) => ({ page: page.href.split("/").at(-1)! }));
 }
 
 export default async function Page({
@@ -16,7 +16,8 @@ export default async function Page({
   params: Promise<{ page: string }>;
 }) {
   const { page } = await params;
-  if (!isAccountPage(page) || page === "dashboard") notFound();
+  const accountPage = resolveAccountPage(page);
+  if (!accountPage || accountPage === "dashboard") notFound();
 
-  return await AccountPageContent({ initialPage: page });
+  return await AccountPageContent({ initialPage: accountPage });
 }

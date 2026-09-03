@@ -69,6 +69,18 @@ describe("account page", () => {
     expect(html).not.toContain("Contact Information");
   });
 
+  it("supports the plural wishlists account URL", async () => {
+    readCustomerProfile.mockResolvedValueOnce(customer);
+    const { default: Page } = await import("../app/account/[page]/page");
+
+    const html = renderToStaticMarkup(
+      await Page({ params: Promise.resolve({ page: "wishlists" }) }),
+    );
+
+    expect(html).toContain("My Wishlists");
+    expect(html).toContain("Loading wishlists");
+  });
+
   it("server-renders an order at /account/orders/[orderId]", async () => {
     readCustomerProfile.mockResolvedValueOnce(customer);
     readCustomerOrderDetail.mockResolvedValueOnce({

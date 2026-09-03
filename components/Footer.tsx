@@ -87,7 +87,7 @@ export function Footer() {
             <h3>Account</h3>
             <Link href="/account">Dashboard</Link>
             <Link href="/account/orders">Orders</Link>
-            <Link href="/account/wishlist">Wishlist</Link>
+            <Link href="/account/wishlists">Wishlists</Link>
             <Link href="/cart">Cart</Link>
           </div>
           <div>
