@@ -8,6 +8,7 @@ import { useToast } from "@/components/Toast";
 import { LinkedAddressFields } from "@/components/LinkedAddressFields";
 import { OrderDetails } from "@/components/OrderDetails";
 import { WishlistsPage } from "@/components/WishlistsPage";
+import { publishCustomerAuthChange } from "@/components/HeaderAccountLink";
 import {
   accountHref,
   accountPages,
@@ -35,6 +36,10 @@ function customerName(customer: CustomerProfile) {
     [customer.firstName, customer.lastName].filter(Boolean).join(" ") ||
     customer.email
   );
+}
+
+function normalizeCustomer(customer: CustomerProfile): CustomerProfile {
+  return { ...customer, addresses: customer.addresses ?? [] };
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -551,6 +556,11 @@ export function AccountDashboard({
     setCurrentCustomer(customer);
   }, [customer]);
 
+  function updateCurrentCustomer(nextCustomer: CustomerProfile) {
+    setCurrentCustomer(nextCustomer);
+    publishCustomerAuthChange(nextCustomer);
+  }
+
   useEffect(() => {
     setActivePage(initialPage);
   }, [initialPage]);
@@ -560,7 +570,7 @@ export function AccountDashboard({
       return (
         <ProfilePage
           customer={currentCustomer}
-          onCustomerChange={setCurrentCustomer}
+          onCustomerChange={updateCurrentCustomer}
         />
       );
     }
@@ -568,7 +578,7 @@ export function AccountDashboard({
       return (
         <AddressBookPage
           customer={currentCustomer}
-          onCustomerChange={setCurrentCustomer}
+          onCustomerChange={updateCurrentCustomer}
         />
       );
     }
@@ -642,7 +652,7 @@ export function AccountAuth({
       const data = await readJson<{ customer: CustomerProfile }>(
         await fetch("/api/customer/me"),
       );
-      setCustomer(data.customer);
+      setCustomer(normalizeCustomer(data.customer));
       if (!quiet) setState(`Live customer ready: ${data.customer.email}`);
     } catch {
       if (!quiet) setState("");
@@ -677,7 +687,9 @@ export function AccountAuth({
         customer: CustomerProfile;
       }>(response);
       await loadCustomer(true);
-      setCustomer({ ...data.customer, addresses: data.customer.addresses ?? [] });
+      const nextCustomer = normalizeCustomer(data.customer);
+      setCustomer(nextCustomer);
+      publishCustomerAuthChange(nextCustomer);
       setState(
         data.training
           ? `Training customer ready: ${data.customer.email}`
@@ -707,6 +719,7 @@ export function AccountAuth({
       }
       resetWishlists();
       setCustomer(null);
+      publishCustomerAuthChange(null);
       setState("");
       router.replace("/account");
       showToast("You are logged out.", "success");
