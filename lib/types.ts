@@ -1,4 +1,24 @@
 export type StoreMode = "b2c" | "b2b";
+export type ProductReview = {
+  id: string;
+  authorName: string;
+  title: string;
+  text: string;
+  rating?: number;
+  createdAt: string;
+};
+export type ProductReviewInput = {
+  authorName: string;
+  title: string;
+  text: string;
+  rating: number;
+};
+export type ProductReviewPage = {
+  reviews: ProductReview[];
+  total: number;
+  offset: number;
+  limit: number;
+};
 export type Money = {
   centAmount: number;
   currencyCode: string;

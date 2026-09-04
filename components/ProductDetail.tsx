@@ -16,8 +16,9 @@ import { AddToWishlist } from "@/components/AddToWishlist";
 import { AddToCompare } from "@/components/ProductCompare";
 import { productToCompareProduct } from "@/components/ProductCompareData";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
+import { ProductReviews } from "@/components/ProductReviews";
 import { productsToProductItems } from "@/components/ProductItemData";
-import type { Product, ProductSpecification, ProductVariant } from "@/lib/types";
+import type { Product, ProductReviewPage, ProductSpecification, ProductVariant } from "@/lib/types";
 
 type OptionGroup = {
   name: string;
@@ -117,9 +118,13 @@ function specificationRows(product: Product, variant: ProductVariant) {
 export function ProductDetail({
   product,
   relatedProducts = [],
+  initialReviews = null,
+  reviewsError,
 }: {
   product: Product;
   relatedProducts?: Product[];
+  initialReviews?: ProductReviewPage | null;
+  reviewsError?: string;
 }) {
   const variants = useMemo(
     () => (product.variants?.length ? product.variants : [fallbackVariant(product)]),
@@ -342,6 +347,7 @@ export function ProductDetail({
       <section className="product-detail-info">
         <span className="eyebrow">{product.category} collection</span>
         <h1>{product.name}</h1>
+        <a className="product-review-link" href="#product-reviews">Read &amp; write reviews</a>
         <p className="product-summary">{product.description}</p>
         <div className="product-price-block">
           <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
@@ -459,6 +465,7 @@ export function ProductDetail({
           </details>
         </div>
       </section>
+      <ProductReviews key={product.id} productId={product.id} initialReviews={initialReviews} initialError={reviewsError} />
       {relatedItems.length ? (
         <ProductItemSlider
           className="panel product-related"

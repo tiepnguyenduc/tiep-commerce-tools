@@ -37,6 +37,14 @@ Catalog pages are server components that call `lib/ct/catalog.ts`. Client-mutate
 
 `lib/ct/catalog.ts` uses `apiRoot.products().search()` (the Product Search API, not deprecated Product Projections Search), maps projections into the small app `Product` type, and falls back to sample data on missing configuration or an unavailable training project. `/products` demonstrates full-text query and category facet URL state. A production implementation should derive facets from Product Search facet results, add locale/store/channel projection parameters, and cache only public catalog reads—not user data.
 
+## Product reviews
+
+The PDP displays product reviews (newest first, five per page) and a public review form with a 1–5 star rating, display name, title, and review text. Guests can submit reviews; the author name is self-reported and reviews are not marked as verified purchases. The API validates lengths and ratings and maps only public review fields back to the browser.
+
+`GET /api/products/{productId}/reviews?offset=0` reads published reviews. `POST /api/products/{productId}/reviews` creates a commercetools Review targeting the published Product. Reviews excluded from rating statistics are omitted from the public list. Reviews are published immediately by this storefront; no approval state is assigned.
+
+The API client needs `view_products:{projectKey}` to read and `manage_products:{projectKey}` to create reviews (see the [commercetools Reviews API](https://docs.commercetools.com/api/projects/reviews)). In training mode, reviews are held in process memory per sample product, survive page reloads, and reset when the server restarts. Connected API errors are shown as retryable errors rather than falling back to demo reviews.
+
 ## B2C cart, customer and order mapping
 
 The cart supports add, remove, and quantity changes through `/api/cart`. When the core `CTP_*` env vars are present it creates/updates a real commercetools Cart through `lib/ct/cart.ts`; when env is missing it falls back to the deterministic local training cart.
