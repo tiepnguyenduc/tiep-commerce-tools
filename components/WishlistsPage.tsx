@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/launchpad-adapters/atoms/button";
 import { useMemo, useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -160,8 +161,8 @@ export function WishlistsPage() {
           >
             Cancel
           </button>
-          <button
-            className="button"
+          <Button
+            variant="primary"
             disabled={
               savingRename ||
               !renameName.trim() ||
@@ -170,7 +171,7 @@ export function WishlistsPage() {
             type="submit"
           >
             {savingRename ? "Saving…" : "Save name"}
-          </button>
+          </Button>
         </div>
       </form>
     </WishlistModal>
@@ -262,14 +263,14 @@ export function WishlistsPage() {
         <p className="muted">
           Organise saved products into separate lists for projects, rooms, or gifts.
         </p>
-        <button
-          className="button"
+        <Button
+          variant="primary"
           onClick={() => setShowCreate(true)}
           type="button"
         >
           <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
           Create new wishlist
-        </button>
+        </Button>
       </div>
 
       <div className="wishlist-card-grid">
@@ -354,13 +355,13 @@ export function WishlistsPage() {
               >
                 Cancel
               </button>
-              <button
-                className="button"
+              <Button
+                variant="primary"
                 disabled={creating || !newName.trim()}
                 type="submit"
               >
                 {creating ? "Creating…" : "Create wishlist"}
-              </button>
+              </Button>
             </div>
           </form>
         </WishlistModal>

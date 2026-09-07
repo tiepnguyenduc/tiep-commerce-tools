@@ -1,4 +1,5 @@
 "use client";
+import Button from "@/components/launchpad-adapters/atoms/button";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
@@ -57,8 +58,11 @@ export function AddToCart({
     }
   }
   return (
-    <button
-      className={compact ? "pill compact-add-to-cart" : "button accent"}
+    <Button
+      size={compact ? "xs" : "l"}
+      iconPosition="left"
+      loading={busy}
+      className="launchpad-add-to-cart"
       disabled={busy}
       onClick={addToCart}
       type="button"
@@ -76,6 +80,6 @@ export function AddToCart({
           <span>Add to cart</span>
         </>
       )}
-    </button>
+    </Button>
   );
 }

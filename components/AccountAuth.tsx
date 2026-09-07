@@ -1,4 +1,6 @@
 "use client";
+import Input from "@/components/launchpad-adapters/atoms/input";
+import Button from "@/components/launchpad-adapters/atoms/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
@@ -204,9 +206,9 @@ function ProfilePage({
               }
             />
           </div>
-          <button className="button accent" disabled={savingProfile} type="submit">
+          <Button variant="primary" disabled={savingProfile} type="submit">
             {savingProfile ? "Saving…" : "Save account"}
-          </button>
+          </Button>
         </form>
       </section>
 
@@ -242,9 +244,9 @@ function ProfilePage({
               }
             />
           </div>
-          <button className="button" disabled={savingPassword} type="submit">
+          <Button variant="primary" disabled={savingPassword} type="submit">
             {savingPassword ? "Changing…" : "Change password"}
-          </button>
+          </Button>
         </form>
       </section>
       {status && <p className="muted">{status}</p>}
@@ -455,9 +457,9 @@ function AddressBookPage({
               }
             />
           </div>
-          <button className="button accent" disabled={busy} type="submit">
+          <Button variant="primary" disabled={busy} type="submit">
             {savingAddress ? "Saving…" : "Save address"}
-          </button>
+          </Button>
         </form>
       </section>
       {status && <p className="muted">{status}</p>}
@@ -607,9 +609,9 @@ export function AccountDashboard({
             </Link>
           ))}
         </nav>
-        <button className="button" disabled={loggingOut} onClick={onLogout}>
+        <Button variant="primary" disabled={loggingOut} onClick={onLogout}>
           {loggingOut ? "Logging out…" : "Logout"}
-        </button>
+        </Button>
       </aside>
 
       <main className="account-main">
@@ -767,51 +769,56 @@ export function AccountAuth({
       </div>
       <form className="account-stack" onSubmit={submit}>
         <div className="form-grid">
-          <input
+          <Input
             autoComplete="email"
-            className="field wide"
+            containerClassName="wide"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            label="Email"
             placeholder="Email"
             required
             type="email"
           />
-          <input
+          <Input
             autoComplete={
               action === "login" ? "current-password" : "new-password"
             }
-            className="field wide"
+
+            containerClassName="wide"
             minLength={action === "register" ? 8 : 1}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            label="Password"
             placeholder="Password"
             required
             type="password"
           />
           {action === "register" && (
             <>
-              <input
+              <Input
                 autoComplete="given-name"
-                className="field"
+
                 maxLength={50}
                 value={firstName}
                 onChange={(event) => setFirstName(event.target.value)}
+                label="First name"
                 placeholder="First name"
                 required
               />
-              <input
+              <Input
                 autoComplete="family-name"
-                className="field"
+
                 maxLength={50}
                 value={lastName}
                 onChange={(event) => setLastName(event.target.value)}
+                label="Last name"
                 placeholder="Last name"
                 required
               />
             </>
           )}
         </div>
-        <button className="button accent" disabled={submitting} type="submit">
+        <Button variant="primary" disabled={submitting} type="submit">
           {submitting ? (
             action === "login" ? (
               "Logging in…"
@@ -826,7 +833,7 @@ export function AccountAuth({
               <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
             </>
           )}
-        </button>
+        </Button>
       </form>
       <p className="muted">{state}</p>
     </section>

@@ -1,3 +1,5 @@
+import Banner from "@/components/launchpad-adapters/molecules/banner";
+import styles from "./Home.module.css";
 import Link from "next/link";
 import { connection } from "next/server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,40 +15,44 @@ export async function Home({ mode }: { mode: StoreMode }) {
     listHeaderCategories(),
   ]);
   const b2b = mode === "b2b";
+  const firstCampaignProduct = products.find((product) => product.image);
+  const secondCampaignProduct = products.find((product) => product.image && product.image !== firstCampaignProduct?.image);
   return (
     <>
       <ModeBar mode={mode} />
       <main className="shell">
-        <section className="hero">
-          <div>
-            <span className="eyebrow">
-              {b2b
-                ? "Designed for teams that buy together"
-                : "The workday, beautifully considered"}
-            </span>
-            <h1>
-              {b2b ? "Procure with confidence." : "Make room for good work."}
-            </h1>
-            <p>
-              {b2b
-                ? "Contract-ready workplace essentials, business-unit purchasing, purchase orders, and visible approval paths."
-                : "A thoughtful edit of furniture, light, and objects for spaces where ideas become real."}
-            </p>
-            <p>
-              <Link className="button accent" href="/products">
-                <span>Explore the collection</span>
-                <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-              </Link>
-            </p>
+        <div className={styles.campaigns}>
+          <Banner
+            image={{ src: "/launchpad/category-banner.png", alt: "A considered interior from the Launchpad collection", position: "center" }}
+            title={b2b ? "Procure with confidence." : "Make room for good work."}
+            eyebrow={b2b ? "Spaces that bring teams together" : "The workday, beautifully considered"}
+            description={b2b ? "Bring your next workspace together, one considered piece at a time." : "Thoughtful furniture. Everyday comfort. A space that feels like you."}
+            buttonText="Explore the collection"
+            buttonLink="/products"
+            headingLevel="h1"
+            size="lg"
+            tone="dark"
+            priority
+          />
+          <div className={styles.promotions}>
+            <Banner
+              eyebrow="Find your favorite"
+              title="Small details. Better days."
+              description="Discover the pieces that make a space your own."
+              image={firstCampaignProduct ? { src: firstCampaignProduct.image, alt: firstCampaignProduct.name } : undefined}
+              buttonText="Shop the collection"
+              buttonLink="/products"
+            />
+            <Banner
+              eyebrow="Design worth knowing"
+              title="Good design starts here."
+              description="Explore our brands and find a new point of view."
+              image={secondCampaignProduct ? { src: secondCampaignProduct.image, alt: secondCampaignProduct.name } : undefined}
+              buttonText="Discover brands"
+              buttonLink="/shop-by-brand"
+            />
           </div>
-          <div className="hero-art">
-            <div className="float">
-              {b2b
-                ? "Volume tiers + approval-ready ordering"
-                : "Designed to last. Ready to ship."}
-            </div>
-          </div>
-        </section>
+        </div>
         <section className="section">
           <div className="section-head">
             <div>

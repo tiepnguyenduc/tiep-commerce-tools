@@ -1,4 +1,5 @@
 "use client";
+import Button from "@/components/launchpad-adapters/atoms/button";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { checkoutFlow, type Message } from "@commercetools/checkout-browser-sdk";
 import { useToast } from "@/components/Toast";
@@ -87,12 +88,12 @@ export function CheckoutDemo({ mode }: { mode: StoreMode }) {
       <h2>{startingSession ? "Opening checkout" : "Checkout status"}</h2>
       <p>{state}</p>
       {!startingSession && canRetry && (
-        <button
-          className="button accent"
+        <Button
+          variant="primary"
           onClick={() => void startCheckout(true)}
         >
           Try again
-        </button>
+        </Button>
       )}
     </div>
   );

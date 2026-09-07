@@ -3,6 +3,8 @@ import "@/lib/fontawesome";
 import "swiper/css";
 import "swiper/css/navigation";
 import "./globals.css";
+import "./launchpad.css";
+import "react-loading-skeleton/dist/skeleton.css";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body id="launchpad-storefront" data-theme="default">
         <ToastProvider>
           <MiniCartProvider>
             <Header />

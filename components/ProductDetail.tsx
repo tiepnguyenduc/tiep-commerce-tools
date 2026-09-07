@@ -1,5 +1,6 @@
 "use client";
 
+import QuantitySelector from "@/components/launchpad-adapters/atoms/quantity-selector";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -402,24 +403,7 @@ export function ProductDetail({
 
         <div className="quantity-control">
           <span>Quantity</span>
-          <div>
-            <button
-              aria-label="Decrease quantity"
-              disabled={quantity <= 1}
-              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-              type="button"
-            >
-              -
-            </button>
-            <output aria-live="polite">{quantity}</output>
-            <button
-              aria-label="Increase quantity"
-              onClick={() => setQuantity((value) => Math.min(99, value + 1))}
-              type="button"
-            >
-              +
-            </button>
-          </div>
+          <QuantitySelector value={quantity} minValue={1} maxValue={99} onChange={setQuantity} />
         </div>
 
         <div className="product-actions">

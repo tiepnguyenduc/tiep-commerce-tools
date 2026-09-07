@@ -106,3 +106,19 @@ Frontend Studio is a hosted composition and content-management product used by t
 - The app never requires external images or credentials to compile; image URLs are rendered unoptimized and may show browser placeholders if offline.
 - Sample state is intentionally deterministic and single-process. It is not a multi-user production session store.
 - A real B2B implementation additionally needs customer authentication, associate authorization, Business Unit/store context, and permission-gated endpoints.
+
+## Launchpad frontend components
+
+The complete 322-file commercetools UI library is available in
+`components/commercetools-ui`, with its supporting modules in `lib/launchpad`.
+Import individual components and wrap them in `LaunchpadUIProvider` when they
+need translations and library styles. See `components/commercetools-ui/README.md`
+for examples, component groups, source revision, and service requirements.
+
+The existing storefront uses its customized components in
+`components/launchpad-adapters`. Its three homepage banners, header, BFF, account,
+and checkout flows are preserved. Edit homepage campaigns in `components/Home.tsx`.
+
+Run `node scripts/verify-launchpad-ui.mjs` to verify source completeness and
+production local imports. The normal typecheck includes production library code;
+upstream Storybook/Jest examples are retained separately from the app's tests.

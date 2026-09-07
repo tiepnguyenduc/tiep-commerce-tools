@@ -121,7 +121,7 @@ export function HeaderCompareLink() {
   const { products } = useCompareProducts();
 
   return (
-    <Link className="header-compare-link" href="/compare">
+    <Link className="header-compare-link" href="/compare" aria-label={`Compare products${products.length ? ` (${products.length})` : ""}`}>
       <FontAwesomeIcon aria-hidden="true" icon={faCodeCompare} />
       <span>Compare</span>
       {products.length ? <strong>{products.length}</strong> : null}

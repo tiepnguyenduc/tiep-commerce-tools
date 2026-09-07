@@ -1,0 +1,32 @@
+@import 'swiper/css/bundle';
+@import 'react-loading-skeleton/dist/skeleton.css';
+@import './styles/components/slider.css';
+@import './styles/components/default-loader.css';
+@import './styles/components/quick-search.css';
+@import './styles/components/modal.css';
+
+/* The imported library assumes Tailwind preflight. Scope its element defaults
+   to opt-in library content so existing storefront elements keep their styles. */
+:where(.launchpad-ui) {
+  --font-inter: Arial, Helvetica, sans-serif;
+  --font-libre: Georgia, serif;
+  font-family: var(--font-inter);
+  color: rgb(var(--color-primary));
+}
+:where(.launchpad-ui, .launchpad-ui *, .launchpad-ui *::before, .launchpad-ui *::after) {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: rgb(var(--color-gray-300));
+}
+:where(.launchpad-ui) :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote) { margin: 0; }
+:where(.launchpad-ui) :where(h1, h2, h3, h4, h5, h6) { font-family: var(--font-libre); font-size: inherit; font-weight: inherit; }
+:where(.launchpad-ui) :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
+:where(.launchpad-ui) :where(button, input, select, textarea) { font: inherit; color: inherit; margin: 0; }
+:where(.launchpad-ui) :where(button) { background: transparent; cursor: pointer; }
+:where(.launchpad-ui) :where(button:disabled) { cursor: default; }
+:where(.launchpad-ui) :where(img, svg) { display: block; vertical-align: middle; }
+:where(.launchpad-ui) :where(img) { max-width: 100%; }
+:where(.launchpad-ui) .text-shadow { text-shadow: 0 1px 6px rgb(0 0 0 / 25%); }
+:where(.launchpad-ui) .scrollbar-hide { scrollbar-width: none; }
+:where(.launchpad-ui) .scrollbar-hide::-webkit-scrollbar { display: none; }

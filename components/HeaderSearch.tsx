@@ -16,9 +16,11 @@ const suggestionLimit = 5;
 export function HeaderSearch({
   categories,
   products,
+  inline = false,
 }: {
   categories: HeaderCategory[];
   products: Product[];
+  inline?: boolean;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -117,7 +119,7 @@ export function HeaderSearch({
 
   return (
     <div className={`header-search ${open ? "open" : ""}`} ref={rootRef}>
-      {!open ? (
+      {!open && !inline ? (
         <button
           aria-label="Open search"
           className="header-search-trigger"
@@ -142,6 +144,7 @@ export function HeaderSearch({
               autoComplete="off"
               id="header-search-input"
               name="q"
+              onFocus={() => setOpen(true)}
               onChange={(event) => {
                 setQuery(event.target.value);
                 setOpen(true);
@@ -170,7 +173,7 @@ export function HeaderSearch({
             </button>
           </form>
 
-          <div className="header-search-dropdown">
+          {open && <div className="header-search-dropdown">
             <div className="header-search-group">
               <h3>Categories</h3>
               {categoryMatches.length ? (
@@ -219,7 +222,7 @@ export function HeaderSearch({
             >
               View all results{trimmedQuery ? ` for "${trimmedQuery}"` : ""}
             </Link>
-          </div>
+          </div>}
         </>
       )}
     </div>

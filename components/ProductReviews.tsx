@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/launchpad-adapters/atoms/button";
 import { useState, type FormEvent } from "react";
 import type { ProductReviewPage } from "@/lib/types";
 import { loadProductReviews, submitProductReview } from "@/lib/reviews-api";
@@ -90,7 +91,7 @@ export function ProductReviews({
           {listError ? (
             <div role="alert" className="review-error">
               <p>{listError}</p>
-              <button className="button" type="button" disabled={loading || submitting} onClick={() => void loadPage(page?.offset ?? 0)}>Retry loading reviews</button>
+              <Button variant="primary" type="button" disabled={loading || submitting} onClick={() => void loadPage(page?.offset ?? 0)}>Retry loading reviews</Button>
             </div>
           ) : null}
           {page?.total === 0 && !listError ? (
@@ -114,9 +115,9 @@ export function ProductReviews({
           ))}
           {page && page.total > page.limit ? (
             <nav className="review-pagination" aria-label="Review pages">
-              <button className="button" type="button" disabled={loading || submitting || page.offset === 0} onClick={() => void loadPage(Math.max(0, page.offset - page.limit))}>Previous</button>
+              <Button variant="primary" type="button" disabled={loading || submitting || page.offset === 0} onClick={() => void loadPage(Math.max(0, page.offset - page.limit))}>Previous</Button>
               <span aria-live="polite">{loading ? "Loading…" : `${page.offset + 1}–${page.offset + page.reviews.length} of ${page.total}`}</span>
-              <button className="button" type="button" disabled={loading || submitting || page.offset + page.limit >= page.total || page.offset + page.limit > 10000} onClick={() => void loadPage(page.offset + page.limit)}>Next</button>
+              <Button variant="primary" type="button" disabled={loading || submitting || page.offset + page.limit >= page.total || page.offset + page.limit > 10000} onClick={() => void loadPage(page.offset + page.limit)}>Next</Button>
             </nav>
           ) : null}
         </div>
@@ -141,7 +142,7 @@ export function ProductReviews({
           <small>Your name and review will be visible to other shoppers.</small>
           {submitError ? <p role="alert" className="review-error">{submitError}</p> : null}
           {success ? <p role="status" className="review-success">{success}</p> : null}
-          <button className="button accent" type="submit" disabled={submitting || loading}>{submitting ? "Submitting…" : "Submit review"}</button>
+          <Button variant="primary" type="submit" disabled={submitting || loading}>{submitting ? "Submitting…" : "Submit review"}</Button>
         </form>
       </div>
     </section>
