@@ -111,13 +111,15 @@ Frontend Studio is a hosted composition and content-management product used by t
 
 The complete 322-file commercetools UI library is available in
 `components/commercetools-ui`, with its supporting modules in `lib/launchpad`.
-Import individual components and wrap them in `LaunchpadUIProvider` when they
-need translations and library styles. See `components/commercetools-ui/README.md`
-for examples, component groups, source revision, and service requirements.
+The root layout installs `LaunchpadUIProvider` for translations and supporting styles.
+The storefront now imports Button, Input, QuantitySelector, Skeleton, campaign
+banners, ProductTile and Footer directly from this library. Header search/actions,
+account forms, cart and wishlist controls use the shared primitives. The existing
+BFF supplies product data and handles account, cart and checkout operations.
 
-The existing storefront uses its customized components in
-`components/launchpad-adapters`. Its three homepage banners, header, BFF, account,
-and checkout flows are preserved. Edit homepage campaigns in `components/Home.tsx`.
+Edit homepage campaigns in `components/Home.tsx`. Compatibility exports remain in
+`components/launchpad-adapters`. See `components/commercetools-ui/README.md` for
+examples, source revision and configuration requirements of additional components.
 
 Run `node scripts/verify-launchpad-ui.mjs` to verify source completeness and
 production local imports. The normal typecheck includes production library code;

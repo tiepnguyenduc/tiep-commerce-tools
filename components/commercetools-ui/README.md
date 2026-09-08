@@ -27,9 +27,10 @@ export default function Example() {
 }
 ```
 
-The root layout already loads the default theme and Tailwind utilities. Wrap
-original library content in `LaunchpadUIProvider` for translations, scoped base
-styles, and supporting slider/modal styles. Its default locale is `en`; pass
+The root layout loads the theme, Tailwind utilities and `LaunchpadUIProvider` with
+`resetStyles={false}`. Descendants already receive translations and supporting
+slider/modal styles. Use a `launchpad-ui` wrapper around original library sections
+that need scoped base styles, or a nested provider with its default reset enabled. Its default locale is `en`; pass
 `locale` and matching `messages` to use another supported locale (German messages
 are in `lib/launchpad/messages/de.json`). The provider does not initialize SDKs,
 perform account requests, or alter the app's existing BFF session.
@@ -44,9 +45,23 @@ perform account requests, or alter the app's existing BFF session.
   order displays, content blocks and other full sections.
 - `lib/launchpad/`: transitive helpers, types, contexts, providers, SDK modules,
   translations and supporting styles.
-- `components/launchpad-adapters/`: the previously customized button, input,
-  quantity selector, hero and homepage banner. Existing storefront pages import
-  these adapters so the upstream copy does not overwrite their behavior.
+- `components/launchpad-adapters/`: compatibility exports for older imports.
+  Storefront pages import the canonical library directly.
+
+## Active storefront integration
+
+Buttons, inputs, quantity selectors and skeletons are shared across the header,
+account, catalog, cart and wishlist screens. `molecules/banner/campaign.tsx` is the
+app campaign variant; the original Studio banner API remains at `molecules/banner`.
+The root Footer uses the library Footer navigation and responsive accordions.
+
+`lib/mappers/launchpad-product.ts` maps BFF listing data to ProductTile, preserving
+SKU, currency, regular price and discounted price. ProductTile accepts an explicit
+`href` and `imageSuffix={false}` for existing catalog image URLs. Quick view loads
+lazily and is disabled here alongside Studio wishlist controls; app wishlist and
+compare actions continue to use the existing BFF. Unknown stock is not labeled
+out of stock. Inputs retain native props, unique label IDs and optional wrapper
+classes; quantity buttons have accessible names and do not submit enclosing forms.
 
 ## Configuration-dependent components
 

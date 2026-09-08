@@ -11,15 +11,17 @@ export default function LaunchpadUIProvider({
   locale = "en",
   messages = englishMessages,
   timeZone = "UTC",
+  resetStyles = true,
 }: {
   children: ReactNode;
   locale?: string;
   messages?: AbstractIntlMessages;
   timeZone?: string;
+  resetStyles?: boolean;
 }) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>
-      <div className="launchpad-ui" data-theme="default">{children}</div>
+      <div className={resetStyles ? "launchpad-ui" : undefined} data-theme="default">{children}</div>
     </NextIntlClientProvider>
   );
 }

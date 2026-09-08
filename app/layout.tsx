@@ -6,6 +6,7 @@ import "./globals.css";
 import "./launchpad.css";
 import "react-loading-skeleton/dist/skeleton.css";
 import type { Metadata } from "next";
+import LaunchpadUIProvider from "@/components/LaunchpadUIProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MiniCartProvider } from "@/components/MiniCart";
@@ -18,13 +19,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body id="launchpad-storefront" data-theme="default">
-        <ToastProvider>
-          <MiniCartProvider>
-            <Header />
-            {children}
-            <Footer />
-          </MiniCartProvider>
-        </ToastProvider>
+        <LaunchpadUIProvider resetStyles={false}>
+          <ToastProvider>
+            <MiniCartProvider>
+              <Header />
+              {children}
+              <Footer />
+            </MiniCartProvider>
+          </ToastProvider>
+        </LaunchpadUIProvider>
       </body>
     </html>
   );

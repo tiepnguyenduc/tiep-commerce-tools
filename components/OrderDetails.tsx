@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
@@ -134,18 +135,18 @@ export function OrderDetails({
           </p>
         </div>
         <div className="order-detail-actions">
-          <button
-            className="button accent"
+          <UIButton variant="primary"
+
             disabled={reordering || order.lines.length === 0}
             onClick={reorder}
             type="button"
           >
             <FontAwesomeIcon aria-hidden="true" icon={faRotateRight} />
             <span>{reordering ? "Reordering…" : "Reorder"}</span>
-          </button>
-          <button className="text-button" onClick={onClose} type="button">
+          </UIButton>
+          <UIButton variant="ghost" size="fit" className="text-button" onClick={onClose} type="button">
             Close
-          </button>
+          </UIButton>
         </div>
       </header>
 

@@ -1,4 +1,5 @@
 "use client";
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -209,14 +210,14 @@ export function CartView() {
           <div className="cart-panel-head">
             <h2>Cart items</h2>
             {cart.itemCount > 0 && (
-              <button
+              <UIButton variant="ghost" size="fit"
                 className="text-button danger"
                 disabled={clearingCart || pendingLineId !== null}
                 onClick={clearAllItems}
                 type="button"
               >
                 {clearingCart ? "Clearing…" : "Clear all"}
-              </button>
+              </UIButton>
             )}
           </div>
 
@@ -249,13 +250,13 @@ export function CartView() {
                         updateLineQuantity(event, l, l.quantity)
                       }
                     >
-                      <button
+                      <UIButton variant="ghost" size="fit"
                         disabled={pendingLineId !== null || clearingCart}
                         onClick={() => setQty(l, l.quantity - 1)}
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
-                      </button>
+                      </UIButton>
                       <label className="sr-only" htmlFor={`quantity-${l.id}`}>
                         Quantity for {l.name}
                       </label>
@@ -275,7 +276,7 @@ export function CartView() {
                         type="number"
                         value={quantityDrafts[l.id] ?? String(l.quantity)}
                       />
-                      <button
+                      <UIButton variant="ghost" size="fit"
                         disabled={
                           pendingLineId !== null ||
                           clearingCart ||
@@ -285,15 +286,15 @@ export function CartView() {
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
-                      </button>
-                      <button
+                      </UIButton>
+                      <UIButton variant="ghost" size="fit"
                         className="pill qty-update"
                         disabled={pendingLineId !== null || clearingCart}
                         type="submit"
                       >
                         {pendingLineId === l.id ? "Working…" : "Update"}
-                      </button>
-                      <button
+                      </UIButton>
+                      <UIButton variant="ghost" size="fit"
                         className="pill"
                         disabled={pendingLineId !== null || clearingCart}
                         onClick={() => setQty(l, 0)}
@@ -301,7 +302,7 @@ export function CartView() {
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
                         <span>Remove</span>
-                      </button>
+                      </UIButton>
                     </form>
                   </div>
                   <strong>{l.total.formatted}</strong>
@@ -356,12 +357,12 @@ export function CartView() {
                     placeholder="Enter code"
                     title="Enter a valid discount code."
                   />
-                  <button
+                  <UIButton variant="ghost" size="fit"
                     type="submit"
                     disabled={!discountCode.trim() || applyingDiscount}
                   >
                     {applyingDiscount ? "Applying…" : "Apply"}
-                  </button>
+                  </UIButton>
                 </div>
               </form>
               {cart.discountCodes.length > 0 && (
@@ -374,7 +375,7 @@ export function CartView() {
                           <small>{discount.state}</small>
                         )}
                       </span>
-                      <button
+                      <UIButton variant="ghost" size="fit"
                         type="button"
                         onClick={() => removeDiscount(discount.id)}
                         disabled={removingDiscountId !== null}
@@ -383,7 +384,7 @@ export function CartView() {
                         {removingDiscountId === discount.id
                           ? "Removing…"
                           : "Remove"}
-                      </button>
+                      </UIButton>
                     </div>
                   ))}
                 </div>
@@ -417,7 +418,7 @@ export function CartView() {
             const pendingProductLineId =
               existingLine?.id ?? `recent-${product.id}`;
             return (
-              <button
+              <UIButton variant="ghost" size="fit"
                 className="pill"
                 disabled={
                   pendingLineId !== null ||
@@ -428,7 +429,7 @@ export function CartView() {
                 type="button"
               >
                 {pendingLineId === pendingProductLineId ? "Adding…" : "Add"}
-              </button>
+              </UIButton>
             );
           }}
           title="Products you looked at"

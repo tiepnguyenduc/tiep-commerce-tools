@@ -1,5 +1,7 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
+import UIInput from "@/components/commercetools-ui/atoms/input";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -144,7 +146,7 @@ export function AddToWishlist({
 
   return (
     <>
-      <button
+      <UIButton variant="ghost" size="fit"
         aria-label={
           isSaved
             ? "Manage product wishlists"
@@ -162,7 +164,7 @@ export function AddToWishlist({
         type="button"
       >
         <FontAwesomeIcon aria-hidden="true" icon={faHeart} />
-      </button>
+      </UIButton>
 
       {isOpen && (
         <WishlistModal
@@ -171,7 +173,7 @@ export function AddToWishlist({
         >
           {showCreateForm ? (
             <>
-              <button
+              <UIButton variant="ghost" size="fit"
                 className="text-button wishlist-picker-back"
                 disabled={creatingWishlist}
                 onClick={() => setShowCreateForm(false)}
@@ -179,12 +181,12 @@ export function AddToWishlist({
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faArrowLeft} />
                 Back to wishlists
-              </button>
+              </UIButton>
               <form className="wishlist-create-form" onSubmit={createAndSave}>
                 <label htmlFor={`new-wishlist-${productId}`}>Wishlist name</label>
-                <input
+                <UIInput
                   autoFocus
-                  className="field"
+
                   id={`new-wishlist-${productId}`}
                   maxLength={100}
                   onChange={(event) => setNewWishlistName(event.target.value)}
@@ -196,21 +198,21 @@ export function AddToWishlist({
                   The current product will be saved to the new wishlist.
                 </p>
                 <div className="wishlist-modal-actions">
-                  <button
+                  <UIButton variant="ghost" size="fit"
                     className="pill"
                     disabled={creatingWishlist}
                     onClick={() => setShowCreateForm(false)}
                     type="button"
                   >
                     Cancel
-                  </button>
-                  <button
-                    className="button"
+                  </UIButton>
+                  <UIButton variant="primary"
+
                     disabled={creatingWishlist || !newWishlistName.trim()}
                     type="submit"
                   >
                     {creatingWishlist ? "Creating…" : "Create and save"}
-                  </button>
+                  </UIButton>
                 </div>
               </form>
             </>
@@ -222,7 +224,7 @@ export function AddToWishlist({
                     matchingLine(wishlist, productId, variantId),
                   );
                   return (
-                    <button
+                    <UIButton variant="ghost" size="fit"
                       aria-pressed={saved}
                       className={`wishlist-picker-option${saved ? " saved" : ""}`}
                       disabled={pendingWishlistId !== null}
@@ -244,19 +246,19 @@ export function AddToWishlist({
                           <FontAwesomeIcon aria-hidden="true" icon={faCheck} />
                         )}
                       </span>
-                    </button>
+                    </UIButton>
                   );
                 })}
               </div>
               <div className="wishlist-picker-footer">
-                <button
+                <UIButton variant="ghost" size="fit"
                   className="text-button wishlist-create-trigger"
                   onClick={() => setShowCreateForm(true)}
                   type="button"
                 >
                   <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
                   Create new wishlist
-                </button>
+                </UIButton>
                 <Link
                   className="wishlist-manage-link"
                   href="/account/wishlists"

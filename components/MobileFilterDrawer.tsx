@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSliders, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -26,14 +27,14 @@ export function MobileFilterDrawer({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <button
+      <UIButton variant="ghost" size="fit"
         className="mobile-filter-trigger"
         onClick={() => setOpen(true)}
         type="button"
       >
         <FontAwesomeIcon aria-hidden="true" icon={faSliders} />
         <span>Filter</span>
-      </button>
+      </UIButton>
 
       {open ? (
         <div className="mobile-filter-layer">
@@ -54,14 +55,14 @@ export function MobileFilterDrawer({ children }: { children: ReactNode }) {
                 <p className="eyebrow">Filters</p>
                 <h2>Refine results</h2>
               </div>
-              <button
+              <UIButton variant="ghost" size="fit"
                 aria-label="Close filters"
                 onClick={() => setOpen(false)}
                 ref={closeRef}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-              </button>
+              </UIButton>
             </div>
             {children}
           </aside>

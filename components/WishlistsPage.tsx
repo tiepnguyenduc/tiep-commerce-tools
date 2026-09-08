@@ -1,6 +1,7 @@
 "use client";
 
-import Button from "@/components/launchpad-adapters/atoms/button";
+import UIInput from "@/components/commercetools-ui/atoms/input";
+import Button from "@/components/commercetools-ui/atoms/button";
 import { useMemo, useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -143,9 +144,9 @@ export function WishlistsPage() {
     >
       <form className="wishlist-create-form" onSubmit={submitRename}>
         <label htmlFor="wishlist-rename">Wishlist name</label>
-        <input
+        <UIInput
           autoFocus
-          className="field"
+
           id="wishlist-rename"
           maxLength={100}
           onChange={(event) => setRenameName(event.target.value)}
@@ -153,14 +154,14 @@ export function WishlistsPage() {
           value={renameName}
         />
         <div className="wishlist-modal-actions">
-          <button
+          <Button variant="ghost" size="fit"
             className="pill"
             disabled={savingRename}
             onClick={() => setRenameTarget(null)}
             type="button"
           >
             Cancel
-          </button>
+          </Button>
           <Button
             variant="primary"
             disabled={
@@ -184,16 +185,16 @@ export function WishlistsPage() {
     return (
       <div className="account-stack">
         <div className="wishlist-detail-head">
-          <button
+          <Button variant="ghost" size="fit"
             className="text-button"
             onClick={() => setSelectedId(null)}
             type="button"
           >
             <FontAwesomeIcon aria-hidden="true" icon={faArrowLeft} />
             All wishlists
-          </button>
+          </Button>
           <div className="wishlist-detail-actions">
-            <button
+            <Button variant="ghost" size="fit"
               className="text-button"
               disabled={savingRename}
               onClick={() => openRename(selected.id, selected.name)}
@@ -201,9 +202,9 @@ export function WishlistsPage() {
             >
               <FontAwesomeIcon aria-hidden="true" icon={faPen} />
               Rename
-            </button>
+            </Button>
             {!selected.isDefault && (
-              <button
+              <Button variant="ghost" size="fit"
                 className="text-button danger"
                 disabled={deletingId !== null}
                 onClick={() => removeWishlist(selected.id, selected.name)}
@@ -211,7 +212,7 @@ export function WishlistsPage() {
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
                 {deletingId === selected.id ? "Deleting…" : "Delete wishlist"}
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -240,14 +241,14 @@ export function WishlistsPage() {
                     SKU: {line.sku} · Quantity: {line.quantity}
                   </p>
                 </div>
-                <button
+                <Button variant="ghost" size="fit"
                   className="text-button danger"
                   disabled={removingLineId !== null}
                   onClick={() => removeLine(selected.id, line.id)}
                   type="button"
                 >
                   {removingLineId === line.id ? "Removing…" : "Remove"}
-                </button>
+                </Button>
               </article>
             ))}
           </div>
@@ -276,7 +277,7 @@ export function WishlistsPage() {
       <div className="wishlist-card-grid">
         {wishlists.map((wishlist) => (
           <article className="wishlist-card" key={wishlist.id}>
-            <button
+            <Button variant="ghost" size="fit"
               className="wishlist-card-open"
               onClick={() => setSelectedId(wishlist.id)}
               type="button"
@@ -296,9 +297,9 @@ export function WishlistsPage() {
                 ))}
                 {wishlist.lines.length === 0 && <i>No saved items yet</i>}
               </span>
-            </button>
+            </Button>
             <span className="wishlist-card-actions">
-              <button
+              <Button variant="ghost" size="fit"
                 aria-label={`Rename ${wishlist.name}`}
                 className="wishlist-card-action"
                 disabled={savingRename}
@@ -307,9 +308,9 @@ export function WishlistsPage() {
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faPen} />
-              </button>
+              </Button>
               {!wishlist.isDefault && (
-                <button
+                <Button variant="ghost" size="fit"
                   aria-label={`Delete ${wishlist.name}`}
                   className="wishlist-card-action danger"
                   disabled={deletingId !== null}
@@ -318,7 +319,7 @@ export function WishlistsPage() {
                   type="button"
                 >
                   <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
-                </button>
+                </Button>
               )}
             </span>
           </article>
@@ -336,9 +337,9 @@ export function WishlistsPage() {
         >
           <form className="wishlist-create-form" onSubmit={submitNewWishlist}>
             <label htmlFor="wishlist-name">Wishlist name</label>
-            <input
+            <UIInput
               autoFocus
-              className="field"
+
               id="wishlist-name"
               maxLength={100}
               onChange={(event) => setNewName(event.target.value)}
@@ -347,14 +348,14 @@ export function WishlistsPage() {
               value={newName}
             />
             <div className="wishlist-modal-actions">
-              <button
+              <Button variant="ghost" size="fit"
                 className="pill"
                 disabled={creating}
                 onClick={() => setShowCreate(false)}
                 type="button"
               >
                 Cancel
-              </button>
+              </Button>
               <Button
                 variant="primary"
                 disabled={creating || !newName.trim()}

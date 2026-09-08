@@ -4100,3 +4100,8 @@ select {
         width: 100%;
     }
 }
+
+.launchpad-product-card { min-width: 0; position: relative; padding-bottom: 16px; }
+.launchpad-product-card .card-meta-row { margin-top: 16px; }
+.launchpad-product-description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 14px; line-height: 1.5; }
+.launchpad-product-card .card-actions { justify-content: flex-end; }

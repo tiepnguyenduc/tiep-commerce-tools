@@ -24,7 +24,7 @@ export interface SocialMedia {
 
 const Footer: React.FC<Props> = ({ columns, logo, socialMedia }) => {
   return (
-    <footer aria-labelledby="footer-heading" className="w-full bg-primary">
+    <footer aria-label="Footer navigation" className="w-full bg-primary">
       <div className="hidden w-full justify-between px-24 py-58 md:flex lg:px-20 xl:px-48">
         <div className="grid w-full grid-cols-4">
           {columns?.map((column, index) => (

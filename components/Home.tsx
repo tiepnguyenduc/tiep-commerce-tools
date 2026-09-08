@@ -1,4 +1,4 @@
-import Banner from "@/components/launchpad-adapters/molecules/banner";
+import Banner from "@/components/commercetools-ui/molecules/banner/campaign";
 import styles from "./Home.module.css";
 import Link from "next/link";
 import { connection } from "next/server";

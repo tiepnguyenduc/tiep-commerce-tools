@@ -1,6 +1,7 @@
 "use client";
 
-import QuantitySelector from "@/components/launchpad-adapters/atoms/quantity-selector";
+import UIButton from "@/components/commercetools-ui/atoms/button";
+import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -225,7 +226,7 @@ export function ProductDetail({
             const selected = variant.id === selectedVariant.id;
             const color = variantColor(variant);
             return (
-              <button
+              <UIButton variant="ghost" size="fit"
                 aria-pressed={selected}
                 className={selected ? "selected" : ""}
                 key={variant.id}
@@ -258,7 +259,7 @@ export function ProductDetail({
                   </em>
                   <small>{selected ? "Selected" : "Select"}</small>
                 </span>
-              </button>
+              </UIButton>
             );
           })}
         </div>
@@ -289,33 +290,33 @@ export function ProductDetail({
           >
             {gallery.map((image, index) => (
               <SwiperSlide key={`${image}-${index}`}>
-                <button
+                <UIButton variant="ghost" size="fit"
                   aria-label={`Open product image ${index + 1}`}
                   className="product-gallery-zoom"
                   onClick={() => openLightbox(index)}
                   type="button"
                 >
                   <img src={image} alt={product.name} />
-                </button>
+                </UIButton>
               </SwiperSlide>
             ))}
           </Swiper>
           {gallery.length > 1 ? (
             <div className="gallery-controls">
-              <button
+              <UIButton variant="ghost" size="fit"
                 aria-label="Previous product image"
                 onClick={() => mainSwiper?.slidePrev()}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
-              </button>
-              <button
+              </UIButton>
+              <UIButton variant="ghost" size="fit"
                 aria-label="Next product image"
                 onClick={() => mainSwiper?.slideNext()}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-              </button>
+              </UIButton>
             </div>
           ) : null}
         </div>
@@ -331,14 +332,14 @@ export function ProductDetail({
           >
             {gallery.map((image, index) => (
               <SwiperSlide key={`${image}-${index}`}>
-                <button
+                <UIButton variant="ghost" size="fit"
                   aria-label={`Show product image ${index + 1}`}
                   aria-current={index === activeImage}
                   onClick={() => selectImage(index)}
                   type="button"
                 >
                   <img src={image} alt="" />
-                </button>
+                </UIButton>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -373,7 +374,7 @@ export function ProductDetail({
                     const selected =
                       selectedAttributeValue(selectedVariant, group.name) === value;
                     return (
-                      <button
+                      <UIButton variant="ghost" size="fit"
                         aria-pressed={selected}
                         className={selected ? "selected" : ""}
                         key={value}
@@ -388,7 +389,7 @@ export function ProductDetail({
                           />
                         ) : null}
                         <span>{value}</span>
-                      </button>
+                      </UIButton>
                     );
                   })}
                 </div>
@@ -477,13 +478,13 @@ export function ProductDetail({
           <div className="product-lightbox-panel">
             <div className="product-lightbox-head">
               <strong>{product.name}</strong>
-              <button
+              <UIButton variant="ghost" size="fit"
                 aria-label="Close image preview"
                 onClick={() => setLightboxOpen(false)}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-              </button>
+              </UIButton>
             </div>
             <Swiper
               className="product-lightbox-swiper"
@@ -501,23 +502,23 @@ export function ProductDetail({
             </Swiper>
             {gallery.length > 1 ? (
               <div className="product-lightbox-controls">
-                <button
+                <UIButton variant="ghost" size="fit"
                   aria-label="Previous preview image"
                   onClick={() => lightboxSwiper?.slidePrev()}
                   type="button"
                 >
                   <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
-                </button>
+                </UIButton>
                 <span>
                   {activeImage + 1} / {gallery.length}
                 </span>
-                <button
+                <UIButton variant="ghost" size="fit"
                   aria-label="Next preview image"
                   onClick={() => lightboxSwiper?.slideNext()}
                   type="button"
                 >
                   <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-                </button>
+                </UIButton>
               </div>
             ) : null}
           </div>

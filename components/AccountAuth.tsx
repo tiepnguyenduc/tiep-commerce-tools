@@ -1,6 +1,6 @@
 "use client";
-import Input from "@/components/launchpad-adapters/atoms/input";
-import Button from "@/components/launchpad-adapters/atoms/button";
+import Input from "@/components/commercetools-ui/atoms/input";
+import Button from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
@@ -174,9 +174,9 @@ function ProfilePage({
         <h3>Account Information</h3>
         <form className="account-stack" onSubmit={saveProfile}>
           <div className="form-grid compact">
-            <input
+            <Input
               autoComplete="given-name"
-              className="field"
+
               maxLength={50}
               placeholder="First name"
               value={profile.firstName}
@@ -184,9 +184,9 @@ function ProfilePage({
                 setProfile({ ...profile, firstName: event.target.value })
               }
             />
-            <input
+            <Input
               autoComplete="family-name"
-              className="field"
+
               maxLength={50}
               placeholder="Last name"
               value={profile.lastName}
@@ -194,9 +194,9 @@ function ProfilePage({
                 setProfile({ ...profile, lastName: event.target.value })
               }
             />
-            <input
+            <Input
               autoComplete="email"
-              className="field wide"
+              containerClassName="wide"
               placeholder="Email"
               required
               type="email"
@@ -216,9 +216,9 @@ function ProfilePage({
         <h3>Change Password</h3>
         <form className="account-stack" onSubmit={savePassword}>
           <div className="form-grid compact">
-            <input
+            <Input
               autoComplete="current-password"
-              className="field"
+
               minLength={1}
               placeholder="Current password"
               required
@@ -231,9 +231,9 @@ function ProfilePage({
                 })
               }
             />
-            <input
+            <Input
               autoComplete="new-password"
-              className="field"
+
               minLength={8}
               placeholder="New password"
               required
@@ -370,17 +370,17 @@ function AddressBookPage({
                   {address.country}
                 </p>
                 <div className="inline-actions">
-                  <button className="text-button" onClick={() => setEditing(address)}>
+                  <Button variant="ghost" size="fit" className="text-button" onClick={() => setEditing(address)}>
                     Edit
-                  </button>
+                  </Button>
                   {address.id && (
-                    <button
+                    <Button variant="ghost" size="fit"
                       className="text-button danger"
                       disabled={busy}
                       onClick={() => removeAddress(address.id!)}
                     >
                       {removingAddressId === address.id ? "Deleting…" : "Delete"}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </article>
@@ -395,9 +395,9 @@ function AddressBookPage({
         <h3>{editing.id ? "Edit Address" : "Add New Address"}</h3>
         <form className="account-stack" onSubmit={saveAddress}>
           <div className="form-grid compact">
-            <input
+            <Input
               autoComplete="given-name"
-              className="field"
+
               maxLength={50}
               placeholder="First name"
               required
@@ -406,9 +406,9 @@ function AddressBookPage({
                 setEditing({ ...editing, firstName: event.target.value })
               }
             />
-            <input
+            <Input
               autoComplete="family-name"
-              className="field"
+
               maxLength={50}
               placeholder="Last name"
               required
@@ -417,9 +417,9 @@ function AddressBookPage({
                 setEditing({ ...editing, lastName: event.target.value })
               }
             />
-            <input
+            <Input
               autoComplete="address-line2"
-              className="field"
+
               maxLength={20}
               placeholder="Street number"
               value={editing.streetNumber ?? ""}
@@ -427,9 +427,9 @@ function AddressBookPage({
                 setEditing({ ...editing, streetNumber: event.target.value })
               }
             />
-            <input
+            <Input
               autoComplete="address-line1"
-              className="field"
+
               maxLength={120}
               placeholder="Street name"
               required
@@ -443,9 +443,9 @@ function AddressBookPage({
               disabled={busy}
               onChange={setEditing}
             />
-            <input
+            <Input
               autoComplete="tel"
-              className="field wide"
+              containerClassName="wide"
               maxLength={30}
               pattern="^[0-9+().\\-\\s]{7,30}$"
               placeholder="Phone"
@@ -750,22 +750,22 @@ export function AccountAuth({
       <span className="eyebrow">Customer API</span>
       <h2>Login / register</h2>
       <div className="steps">
-        <button
+        <Button variant="ghost" size="fit"
           className={`step ${action === "login" ? "on" : ""}`}
           disabled={submitting}
           onClick={() => setAction("login")}
           type="button"
         >
           Login
-        </button>
-        <button
+        </Button>
+        <Button variant="ghost" size="fit"
           className={`step ${action === "register" ? "on" : ""}`}
           disabled={submitting}
           onClick={() => setAction("register")}
           type="button"
         >
           Register
-        </button>
+        </Button>
       </div>
       <form className="account-stack" onSubmit={submit}>
         <div className="form-grid">

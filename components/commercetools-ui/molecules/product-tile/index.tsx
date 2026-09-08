@@ -4,7 +4,8 @@ import { useTranslations } from 'use-intl';
 import Image from '@/components/commercetools-ui/atoms/image/index';
 import Link from '@/components/commercetools-ui/atoms/link/index';
 import OutOfStock from '@/components/commercetools-ui/atoms/out-of-stock/index';
-import QuickView from '@/components/commercetools-ui/organisms/product/product-quick-view/index';
+import dynamic from 'next/dynamic';
+const QuickView = dynamic(() => import('@/components/commercetools-ui/organisms/product/product-quick-view/index'));
 import WishlistButton from '@/components/commercetools-ui/organisms/wishlist/components/wishlist-button';
 import useMediaQuery from '@/lib/launchpad/helpers/hooks/useMediaQuery/index';
 import useVariantWithDiscount from '@/lib/launchpad/helpers/hooks/useVariantWithDiscount/index';
@@ -18,6 +19,8 @@ import useTrack from '@/components/commercetools-ui/molecules/product-tile/useTr
 
 export interface ProductTileProps {
   product: Product;
+  href?: string;
+  imageSuffix?: string | false;
   isSearchResult?: boolean;
   disableQuickView?: boolean;
   disableWishlistButton?: boolean;
@@ -34,6 +37,8 @@ export interface ProductTileProps {
 
 const ProductTile: FC<ProductTileProps> = ({
   product,
+  href,
+  imageSuffix = "medium",
   isSearchResult = false,
   disableQuickView = false,
   disableWishlistButton = false,
@@ -87,12 +92,13 @@ const ProductTile: FC<ProductTileProps> = ({
   }, [product, selectedVariant]);
 
   const productUrl = useMemo(() => {
+    if (href) return href;
     if (!product._url) return `/${(product.name ?? '').toLowerCase().replace(/\s+/g, '-')}/p/${selectedVariant.sku}`;
 
     const name = product._url.split('/')[1];
 
     return `/${name}/p/${selectedVariant.sku}` + (isSearchResult ? '?sr=1' : '');
-  }, [product, selectedVariant, isSearchResult]);
+  }, [href, product, selectedVariant, isSearchResult]);
 
   const getVariantColorCode = (attributes: Record<string, any> | undefined) => {
     if (!attributes) return undefined;
@@ -120,7 +126,7 @@ const ProductTile: FC<ProductTileProps> = ({
               <div className="relative block w-[94%]" style={{ paddingBottom: '122%' }}>
                 <Image
                   src={selectedVariant.images?.[0]}
-                  suffix="medium"
+                  suffix={imageSuffix === false ? undefined : imageSuffix}
                   alt={product.name ?? ''}
                   style={{ objectFit: 'contain', objectPosition: 'center' }}
                   className="rounded-sm group-hover:opacity-75 md:p-16"
@@ -154,7 +160,7 @@ const ProductTile: FC<ProductTileProps> = ({
               </span>
             </div>
           )}
-          {!selectedVariant.isOnStock && (
+          {selectedVariant.isOnStock === false && (
             <div className="w-full text-center">
               <div className="mb-8 ml-8">
                 <OutOfStock />
@@ -162,7 +168,7 @@ const ProductTile: FC<ProductTileProps> = ({
             </div>
           )}
 
-          <QuickView
+          {!disableQuickView && <QuickView
             buttonIsEnabled={isDesktopSize && !disableQuickView}
             product={product}
             wishlist={wishlist}
@@ -173,7 +179,7 @@ const ProductTile: FC<ProductTileProps> = ({
             onAddToCart={async (variant, quantity: number) => {
               await onAddToCart?.(variant, quantity);
             }}
-          />
+          />}
         </div>
       </div>
 

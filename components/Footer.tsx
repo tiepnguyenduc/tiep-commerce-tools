@@ -1,4 +1,7 @@
 "use client";
+import UIButton from "@/components/commercetools-ui/atoms/button";
+import LibraryFooter, { type FooterColumn } from "@/components/commercetools-ui/organisms/footer";
+import UIInput from "@/components/commercetools-ui/atoms/input";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,6 +10,141 @@ import {
   faSwatchbook,
 } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
+
+const footerColumns: FooterColumn[] = [
+  {
+    "header": "Shop",
+    "links": [
+      {
+        "name": "All products",
+        "reference": {
+          "type": "link",
+          "link": "/products"
+        }
+      },
+      {
+        "name": "Workspace",
+        "reference": {
+          "type": "link",
+          "link": "/products?category=Workspace"
+        }
+      },
+      {
+        "name": "Lighting",
+        "reference": {
+          "type": "link",
+          "link": "/products?category=Lighting"
+        }
+      },
+      {
+        "name": "Storage",
+        "reference": {
+          "type": "link",
+          "link": "/products?category=Storage"
+        }
+      }
+    ]
+  },
+  {
+    "header": "Account",
+    "links": [
+      {
+        "name": "Dashboard",
+        "reference": {
+          "type": "link",
+          "link": "/account"
+        }
+      },
+      {
+        "name": "Orders",
+        "reference": {
+          "type": "link",
+          "link": "/account/orders"
+        }
+      },
+      {
+        "name": "Wishlists",
+        "reference": {
+          "type": "link",
+          "link": "/account/wishlists"
+        }
+      },
+      {
+        "name": "Cart",
+        "reference": {
+          "type": "link",
+          "link": "/cart"
+        }
+      }
+    ]
+  },
+  {
+    "header": "Support",
+    "links": [
+      {
+        "name": "Shipping",
+        "reference": {
+          "type": "link",
+          "link": "/products"
+        }
+      },
+      {
+        "name": "Returns",
+        "reference": {
+          "type": "link",
+          "link": "/products"
+        }
+      },
+      {
+        "name": "Care guides",
+        "reference": {
+          "type": "link",
+          "link": "/products"
+        }
+      },
+      {
+        "name": "Contact",
+        "reference": {
+          "type": "link",
+          "link": "/products"
+        }
+      }
+    ]
+  },
+  {
+    "header": "Business",
+    "links": [
+      {
+        "name": "B2B buying",
+        "reference": {
+          "type": "link",
+          "link": "/b2b"
+        }
+      },
+      {
+        "name": "Trade checkout",
+        "reference": {
+          "type": "link",
+          "link": "/checkout/b2b"
+        }
+      },
+      {
+        "name": "Consumer store",
+        "reference": {
+          "type": "link",
+          "link": "/b2c"
+        }
+      },
+      {
+        "name": "Project accounts",
+        "reference": {
+          "type": "link",
+          "link": "/account"
+        }
+      }
+    ]
+  }
+];
 
 export function Footer() {
   const showToast = useToast();
@@ -18,7 +156,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="footer">
+    <div className="footer">
       <div className="shell footer-inner">
         <section className="footer-newsletter" aria-label="Newsletter signup">
           <div>
@@ -33,14 +171,14 @@ export function Footer() {
           <form className="footer-signup" onSubmit={submitNewsletter}>
             <label htmlFor="footer-email">Join our trade notes</label>
             <div>
-              <input
+              <UIInput
                 autoComplete="email"
                 id="footer-email"
                 placeholder="Email address"
                 required
                 type="email"
               />
-              <button type="submit">Sign up</button>
+              <UIButton variant="ghost" size="fit" type="submit">Sign up</UIButton>
             </div>
           </form>
         </section>
@@ -75,42 +213,15 @@ export function Footer() {
           </div>
         </section>
 
-        <nav className="footer-links" aria-label="Footer navigation">
-          <div>
-            <h3>Shop</h3>
-            <Link href="/products">All products</Link>
-            <Link href="/products?category=Workspace">Workspace</Link>
-            <Link href="/products?category=Lighting">Lighting</Link>
-            <Link href="/products?category=Storage">Storage</Link>
-          </div>
-          <div>
-            <h3>Account</h3>
-            <Link href="/account">Dashboard</Link>
-            <Link href="/account/orders">Orders</Link>
-            <Link href="/account/wishlists">Wishlists</Link>
-            <Link href="/cart">Cart</Link>
-          </div>
-          <div>
-            <h3>Support</h3>
-            <Link href="/products">Shipping</Link>
-            <Link href="/products">Returns</Link>
-            <Link href="/products">Care guides</Link>
-            <Link href="/products">Contact</Link>
-          </div>
-          <div>
-            <h3>Business</h3>
-            <Link href="/b2b">B2B buying</Link>
-            <Link href="/checkout/b2b">Trade checkout</Link>
-            <Link href="/b2c">Consumer store</Link>
-            <Link href="/account">Project accounts</Link>
-          </div>
-        </nav>
+        <div className="launchpad-ui">
+          <LibraryFooter columns={footerColumns} />
+        </div>
 
         <div className="footer-bottom">
           <span>WORK/SHOP training storefront</span>
           <span>Next.js BFF · commercetools-ready · deterministic mock mode</span>
         </div>
       </div>
-    </footer>
+    </div>
   );
 }

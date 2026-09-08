@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/launchpad-adapters/atoms/button";
+import Button from "@/components/commercetools-ui/atoms/button";
 import { useState, type FormEvent } from "react";
 import type { ProductReviewPage } from "@/lib/types";
 import { loadProductReviews, submitProductReview } from "@/lib/reviews-api";

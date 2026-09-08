@@ -1,3 +1,4 @@
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { AutoSubmitFilterForm } from "@/components/AutoSubmitFilterForm";
 import { BrandFilterList } from "@/components/BrandFilterList";
@@ -316,10 +317,10 @@ export async function ProductListingPage({
               <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
               <input type="hidden" name="color" value={p.color ?? ""} />
               {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
-              <button className="button accent" type="submit">
+              <UIButton variant="primary"  type="submit">
                 <span>Search</span>
                 <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-              </button>
+              </UIButton>
             </form>
 
             <div className="search-quick-row" aria-label="Popular searches">

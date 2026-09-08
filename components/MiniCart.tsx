@@ -1,4 +1,5 @@
 "use client";
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import {
   createContext,
   useCallback,
@@ -153,7 +154,7 @@ export function HeaderCartButton() {
   const { itemCount, openCart } = useMiniCart();
 
   return (
-    <button
+    <UIButton variant="ghost" size="fit"
       aria-label={`Open cart with ${itemCount} item${itemCount === 1 ? "" : "s"}`}
       className="cart-icon-button"
       onClick={openCart}
@@ -162,7 +163,7 @@ export function HeaderCartButton() {
       <FontAwesomeIcon aria-hidden="true" icon={faCartShopping} />
       <span>Cart</span>
       <strong>{itemCount}</strong>
-    </button>
+    </UIButton>
   );
 }
 
@@ -206,9 +207,9 @@ function MiniCartDrawer({
               {cart?.itemCount ?? 0} item{cart?.itemCount === 1 ? "" : "s"}
             </h2>
           </div>
-          <button aria-label="Close mini cart" onClick={onClose} type="button">
+          <UIButton variant="ghost" size="fit" aria-label="Close mini cart" onClick={onClose} type="button">
             <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-          </button>
+          </UIButton>
         </header>
 
         {lines.length === 0 ? (
@@ -241,7 +242,7 @@ function MiniCartDrawer({
                       <CartLineVariant line={line} />
                       <div className="mini-cart-line-actions">
                         <div className="mini-cart-qty">
-                          <button
+                          <UIButton variant="ghost" size="fit"
                             disabled={pendingLineId !== null}
                             onClick={() =>
                               setLineQuantity(line, line.quantity - 1)
@@ -249,9 +250,9 @@ function MiniCartDrawer({
                             type="button"
                           >
                             <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
-                          </button>
+                          </UIButton>
                           <span>{line.quantity}</span>
-                          <button
+                          <UIButton variant="ghost" size="fit"
                             disabled={
                               pendingLineId !== null || line.quantity >= 99
                             }
@@ -261,9 +262,9 @@ function MiniCartDrawer({
                             type="button"
                           >
                             <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
-                          </button>
+                          </UIButton>
                         </div>
-                        <button
+                        <UIButton variant="ghost" size="fit"
                           className="text-button danger"
                           disabled={pendingLineId !== null}
                           onClick={() => setLineQuantity(line, 0)}
@@ -271,7 +272,7 @@ function MiniCartDrawer({
                         >
                           <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
                           <span>Remove</span>
-                        </button>
+                        </UIButton>
                       </div>
                     </div>
                     <strong>{line.total.formatted}</strong>

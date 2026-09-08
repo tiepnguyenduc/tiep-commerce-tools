@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -100,7 +101,7 @@ export function AddToCompare({
   }
 
   return (
-    <button
+    <UIButton variant="ghost" size="fit"
       aria-label={
         selected ? "Remove product from compare" : "Add product to compare"
       }
@@ -113,7 +114,7 @@ export function AddToCompare({
       type="button"
     >
       <FontAwesomeIcon aria-hidden="true" icon={faCodeCompare} />
-    </button>
+    </UIButton>
   );
 }
 
@@ -190,10 +191,10 @@ export function ComparePage() {
           </p>
         </div>
         {products.length ? (
-          <button className="text-button" onClick={clear} type="button">
+          <UIButton variant="ghost" size="fit" className="text-button" onClick={clear} type="button">
             <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
             <span>Clear all</span>
-          </button>
+          </UIButton>
         ) : null}
       </header>
 
@@ -220,13 +221,13 @@ export function ComparePage() {
                 {products.map((product) => (
                   <th key={product.id} scope="col">
                     <div className="compare-product-head">
-                      <button
+                      <UIButton variant="ghost" size="fit"
                         aria-label={`Remove ${product.name} from compare`}
                         onClick={() => remove(product.id)}
                         type="button"
                       >
                         <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-                      </button>
+                      </UIButton>
                       <Link href={`/products/${product.slug}`}>
                         <img src={product.image} alt={product.name} />
                         <span>{product.name}</span>

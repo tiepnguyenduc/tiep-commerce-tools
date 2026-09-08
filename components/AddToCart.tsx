@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/launchpad-adapters/atoms/button";
+import Button from "@/components/commercetools-ui/atoms/button";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";

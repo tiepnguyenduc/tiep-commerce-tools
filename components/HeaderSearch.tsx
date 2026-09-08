@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
@@ -120,14 +121,14 @@ export function HeaderSearch({
   return (
     <div className={`header-search ${open ? "open" : ""}`} ref={rootRef}>
       {!open && !inline ? (
-        <button
+        <UIButton variant="ghost" size="fit"
           aria-label="Open search"
           className="header-search-trigger"
           onClick={() => setOpen(true)}
           type="button"
         >
           <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
-        </button>
+        </UIButton>
       ) : (
         <>
           <form
@@ -155,22 +156,22 @@ export function HeaderSearch({
               value={query}
             />
             {query ? (
-              <button
+              <UIButton variant="ghost" size="fit"
                 aria-label="Clear search"
                 className="header-search-clear"
                 onClick={clearSearch}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-              </button>
+              </UIButton>
             ) : null}
-            <button
+            <UIButton variant="ghost" size="fit"
               aria-label="Search"
               className="header-search-submit"
               type="submit"
             >
               <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
-            </button>
+            </UIButton>
           </form>
 
           {open && <div className="header-search-dropdown">

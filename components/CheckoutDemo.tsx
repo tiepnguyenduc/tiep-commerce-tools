@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/launchpad-adapters/atoms/button";
+import Button from "@/components/commercetools-ui/atoms/button";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { checkoutFlow, type Message } from "@commercetools/checkout-browser-sdk";
 import { useToast } from "@/components/Toast";

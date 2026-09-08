@@ -1,8 +1,8 @@
 "use client";
 import React, { useCallback } from 'react';
-import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames/index';
-import useControllableState from '@/lib/launchpad/helpers/hooks/useControllable/index';
-import { QuantitySelectorProps } from '@/components/commercetools-ui/atoms/quantity-selector/types/index';
+import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames';
+import useControllableState from '@/lib/launchpad/helpers/hooks/useControllable';
+import { QuantitySelectorProps } from './types';
 
 const QuantitySelector = ({
   value: valueProp,
@@ -16,7 +16,7 @@ const QuantitySelector = ({
   const [value, setValue] = useControllableState(valueProp, defaultValue);
 
   const className = useClassNames([
-    'flex w-fit items-center gap-12 rounded-sm border border-neutral-400 transition hover:border-neutral-800',
+    'ct-ui flex w-fit items-center gap-12 rounded-sm border border-neutral-400 transition hover:border-neutral-800',
     disabled ? 'cursor-not-allowed bg-neutral-200 text-gray-400' : 'cursor-pointer bg-white text-gray-600',
     classNameProp,
   ]);
@@ -41,15 +41,19 @@ const QuantitySelector = ({
   return (
     <div className={className}>
       <button
-        disabled={value <= minValue}
+        type="button"
+        aria-label="Decrease quantity"
+        disabled={disabled || value <= minValue}
         onClick={() => handleChange(value - 1)}
         className="w-36 cursor-[inherit] self-stretch border-r border-neutral-200 px-12 py-3 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-gray-400"
       >
         {`-`}
       </button>
-      <span className="py-3 text-14">{value}</span>
+      <output aria-live="polite" className="py-3 text-14">{value}</output>
       <button
-        disabled={value >= maxValue}
+        type="button"
+        aria-label="Increase quantity"
+        disabled={disabled || value >= maxValue}
         onClick={() => handleChange(value + 1)}
         className="w-36 cursor-[inherit] self-stretch border-l border-neutral-200 px-12 py-3 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-gray-400"
       >

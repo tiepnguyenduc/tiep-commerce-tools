@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useEffect, useId, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -44,9 +45,9 @@ export function WishlistModal({
       >
         <header className="wishlist-modal-head">
           <h2 id={titleId}>{title}</h2>
-          <button aria-label="Close dialog" onClick={onClose} type="button">
+          <UIButton variant="ghost" size="fit" aria-label="Close dialog" onClick={onClose} type="button">
             <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-          </button>
+          </UIButton>
         </header>
         {children}
       </section>

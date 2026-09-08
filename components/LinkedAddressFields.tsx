@@ -1,5 +1,6 @@
 "use client";
 
+import UIInput from "@/components/commercetools-ui/atoms/input";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   findAddressLocationByPostalCode,
@@ -79,12 +80,12 @@ export function LinkedAddressFields({
       ))}
       <label className="select-field postal-code-field">
         <span>Postal code</span>
-        <input
+        <UIInput
           ref={postalInputRef}
           aria-describedby={postalMessageId}
           aria-invalid={showPostalCodeError}
           autoComplete="postal-code"
-          className="field"
+
           disabled={disabled}
           maxLength={16}
           name="postalCode"

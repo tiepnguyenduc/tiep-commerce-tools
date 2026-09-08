@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -66,22 +67,22 @@ export function ProductItemSlider({
         </div>
         {products.length > 1 ? (
           <div className="recent-slider-actions">
-            <button
+            <UIButton variant="ghost" size="fit"
               aria-label={`Show previous ${title.toLowerCase()}`}
               disabled={edges.isBeginning}
               onClick={() => swiper?.slidePrev()}
               type="button"
             >
               <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
-            </button>
-            <button
+            </UIButton>
+            <UIButton variant="ghost" size="fit"
               aria-label={`Show next ${title.toLowerCase()}`}
               disabled={edges.isEnd}
               onClick={() => swiper?.slideNext()}
               type="button"
             >
               <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-            </button>
+            </UIButton>
           </div>
         ) : null}
       </div>

@@ -1,10 +1,10 @@
 "use client";
-import React, { ComponentProps, FC, useMemo, useState } from 'react';
+import React, { ComponentProps, FC, useId, useMemo, useState } from 'react';
 import { CheckIcon } from '@heroicons/react/24/outline';
-import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames/index';
-import { StringHelpers } from '@/lib/launchpad/helpers/stringHelpers/index';
+import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames';
 
 export interface InputProps extends ComponentProps<'input'> {
+  containerClassName?: string;
   label?: string;
   labelDesc?: string;
   labelDescClassName?: string;
@@ -18,6 +18,7 @@ export interface InputProps extends ComponentProps<'input'> {
 }
 
 const Input: FC<InputProps> = ({
+  containerClassName = "",
   label,
   labelDesc,
   variant = 'primary',
@@ -26,6 +27,7 @@ const Input: FC<InputProps> = ({
   errorMessage,
   children,
   hideCheckIcon,
+  renderEndIcon,
   isDirty = false,
   onFocus,
   onBlur,
@@ -82,18 +84,19 @@ const Input: FC<InputProps> = ({
     className,
   ]);
 
-  const id = StringHelpers.convertToKebabCase(props.name);
+  const generatedId = useId();
+  const id = props.id ?? generatedId;
 
   return (
-    <div className="relative">
-      <div className={labelContainerClassName}>
+    <div className={`ct-ui relative ${containerClassName}`}>
+      {(label || labelDesc) && <div className={labelContainerClassName}>
         {label && (
           <label className={labelClassName} htmlFor={id}>
             {props.required ? `${label} *` : label}
           </label>
         )}
         {labelDesc && <label className={labelDescClassName || 'text-sm text-gray-500'}>{` (${labelDesc})`}</label>}
-      </div>
+      </div>}
       <div className="relative">
         <input
           className={inputClassName}
@@ -110,6 +113,7 @@ const Input: FC<InputProps> = ({
             className="absolute right-12 top-1/2 size-16 -translate-y-1/2 text-green-500"
           />
         )}
+        {renderEndIcon?.()}
         {children}
       </div>
       {error && (

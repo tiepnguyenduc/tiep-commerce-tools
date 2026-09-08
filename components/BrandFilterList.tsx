@@ -1,5 +1,6 @@
 "use client";
 
+import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useState } from "react";
 
 const visibleBrandCount = 6;
@@ -34,13 +35,13 @@ export function BrandFilterList({
         ))}
       </div>
       {canToggle ? (
-        <button
+        <UIButton variant="ghost" size="fit"
           className="filter-toggle-button"
           onClick={() => setExpanded((value) => !value)}
           type="button"
         >
           {expanded ? "Show less" : `Show more (${brands.length - visibleBrandCount})`}
-        </button>
+        </UIButton>
       ) : null}
     </fieldset>
   );
