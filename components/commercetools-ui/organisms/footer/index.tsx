@@ -12,6 +12,9 @@ export interface FooterColumn {
 }
 export interface Props {
   columns: FooterColumn[];
+  className?: string;
+  as?: 'footer' | 'nav';
+  showBottom?: boolean;
   logo?: ImageProps;
   socialMedia?: SocialMedia[];
 }
@@ -22,10 +25,10 @@ export interface SocialMedia {
   reference: Reference;
 }
 
-const Footer: React.FC<Props> = ({ columns, logo, socialMedia }) => {
+const Footer: React.FC<Props> = ({ columns, logo, socialMedia, className = '', as: Element = 'footer', showBottom = true }) => {
   return (
-    <footer aria-label="Footer navigation" className="w-full bg-primary">
-      <div className="hidden w-full justify-between px-24 py-58 md:flex lg:px-20 xl:px-48">
+    <Element aria-label="Footer navigation" className={`w-full bg-primary ${className}`}>
+      <div data-footer-desktop className="hidden w-full justify-between px-24 py-58 md:flex lg:px-20 xl:px-48">
         <div className="grid w-full grid-cols-4">
           {columns?.map((column, index) => (
             <div key={index}>
@@ -39,7 +42,7 @@ const Footer: React.FC<Props> = ({ columns, logo, socialMedia }) => {
         </div>
       </div>
 
-      <ul className="flex flex-col md:hidden">
+      <ul data-footer-mobile className="flex flex-col md:hidden">
         {columns?.map((column, index) => (
           <li key={index} className="border-b border-neutral-300">
             <Accordion
@@ -56,9 +59,11 @@ const Footer: React.FC<Props> = ({ columns, logo, socialMedia }) => {
           </li>
         ))}
       </ul>
-      <div className="w-full sm:border-t-accent" />
-      <FooterBottom socialMedia={socialMedia} logo={logo} />
-    </footer>
+      {showBottom && <>
+        <div className="w-full sm:border-t-accent" />
+        <FooterBottom socialMedia={socialMedia} logo={logo} />
+      </>}
+    </Element>
   );
 };
 

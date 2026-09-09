@@ -17,7 +17,7 @@ const Modal: FC<ModalProps> = ({ children, style, preventScroll, closeButton, cl
 
   const modalStyle: ReactModalProps['style'] = {
     overlay: {
-      zIndex: 51,
+      zIndex: 1200,
       backgroundColor: 'rgba(127 ,127, 127, .3)',
       ...style?.overlay,
     },
@@ -36,12 +36,11 @@ const Modal: FC<ModalProps> = ({ children, style, preventScroll, closeButton, cl
   };
 
   useEffect(() => {
-    if (preventScroll) document.body.style.overflow = props.isOpen ? 'hidden' : 'auto';
+    if (!preventScroll || !props.isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previous; };
   }, [props.isOpen, preventScroll]);
-  /*
-  useEffect(() => {
-    blockScroll(props.isOpen);
-  }, [props.isOpen, blockScroll]);*/
 
   return (
     <ReactModal
@@ -53,7 +52,7 @@ const Modal: FC<ModalProps> = ({ children, style, preventScroll, closeButton, cl
       parentSelector={() => document.getElementById('react-modal-custom-portal') ?? document.body}
     >
       {closeButton && (
-        <button onClick={props.onRequestClose} className="absolute right-20 top-20 focus:ring-1">
+        <button type="button" aria-label="Close dialog" onClick={props.onRequestClose} className="absolute right-20 top-20 focus:ring-1">
           <CloseIcon className="size-24 text-gray-600" />
         </button>
       )}

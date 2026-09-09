@@ -1,5 +1,8 @@
 "use client";
 
+import CTRadio from "@/components/commercetools-ui/atoms/radio";
+import CTInput from "@/components/commercetools-ui/atoms/input";
+import CTTextarea from "@/components/commercetools-ui/atoms/textarea";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useState, type FormEvent } from "react";
 import type { ProductReviewPage } from "@/lib/types";
@@ -129,16 +132,16 @@ export function ProductReviews({
             <div className="review-rating-options">
               {[1, 2, 3, 4, 5].map((value) => (
                 <label key={value}>
-                  <input type="radio" name="rating" value={value} required checked={rating === value} onChange={() => setRating(value)} aria-label={`${value} ${value === 1 ? "star" : "stars"}`} />
+                  <CTRadio type="radio" name="rating" value={value} required checked={rating === value} onChange={() => setRating(value)} aria-label={`${value} ${value === 1 ? "star" : "stars"}`} />
                   <span aria-hidden="true" className={value <= rating ? "selected" : ""}>★</span>
                 </label>
               ))}
               <span className="review-rating-value">{rating ? `${rating} / 5` : "Select a rating"}</span>
             </div>
           </fieldset>
-          <label>Your name<input name="authorName" autoComplete="name" required maxLength={80} disabled={submitting} placeholder="Name shown with your review" /></label>
-          <label>Review title<input name="title" required maxLength={120} disabled={submitting} placeholder="Sum up your experience" /></label>
-          <label>Your review<textarea name="text" required maxLength={2000} rows={5} disabled={submitting} placeholder="What did you like? What could be better?" /></label>
+          <label>Your name<CTInput name="authorName" autoComplete="name" required maxLength={80} disabled={submitting} placeholder="Name shown with your review" /></label>
+          <label>Review title<CTInput name="title" required maxLength={120} disabled={submitting} placeholder="Sum up your experience" /></label>
+          <label>Your review<CTTextarea name="text" required maxLength={2000} rows={5} disabled={submitting} placeholder="What did you like? What could be better?" /></label>
           <small>Your name and review will be visible to other shoppers.</small>
           {submitError ? <p role="alert" className="review-error">{submitError}</p> : null}
           {success ? <p role="status" className="review-success">{success}</p> : null}

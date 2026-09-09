@@ -1,52 +1,12 @@
 "use client";
 import React from 'react';
-import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames/index';
-import useControllableState from '@/lib/launchpad/helpers/hooks/useControllable/index';
-
-interface Props extends Omit<React.ComponentProps<'input'>, 'key'> {
-  className?: string;
+interface Props extends React.ComponentProps<'input'> {
   inputClassName?: string;
   onChecked?: () => void;
 }
-
-const Radio: React.FC<Props> = ({
-  className = '',
-  inputClassName = '',
-  onChecked,
-  children,
-  checked: checkedProp,
-  defaultChecked = false,
-  onChange,
-  ...props
-}) => {
-  const [checked, setChecked] = useControllableState(checkedProp, defaultChecked);
-
-  const labelClassName = useClassNames([
-    'grid place-content-center w-20 h-20 border border-gray-600 rounded-full',
-    className,
-  ]);
-
-  const inputClassNames = useClassNames(['h-12 w-12 border-0 text-gray-600', inputClassName]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange?.(e);
-    onChecked?.();
-    setChecked(true);
-  };
-
-  return (
-    <label className={labelClassName} htmlFor={props.id}>
-      <input
-        style={{ background: checked ? '#494949' : 'white' }}
-        className={inputClassNames}
-        type="radio"
-        checked={checked}
-        onChange={(e) => handleChange(e)}
-        {...props}
-      />
-      {children}
-    </label>
-  );
+const Radio = ({className = '', inputClassName = '', onChecked, onChange, children, ...props}: Props) => {
+  const input = <input {...props} type="radio" className={`ct-ui h-20 w-20 rounded-full border border-gray-600 accent-gray-600 ${inputClassName} ${children ? '' : className}`}
+    onChange={(event) => { onChange?.(event); onChecked?.(); }} />;
+  return children ? <label className={`inline-flex items-center gap-12 ${className}`}>{input}{children}</label> : input;
 };
-
 export default Radio;

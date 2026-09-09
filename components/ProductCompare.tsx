@@ -1,20 +1,14 @@
 "use client";
 
+import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCodeCompare,
-  faTrashCan,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCodeCompare, faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { AddToCart } from "@/components/AddToCart";
 import { useToast } from "@/components/Toast";
-import {
-  isCompareProductData,
-  type CompareProductData,
-} from "@/components/ProductCompareData";
+import { isCompareProductData, type CompareProductData } from "@/components/ProductCompareData";
 
 const storageKey = "launchpad-compare-products";
 
@@ -205,9 +199,9 @@ export function ComparePage() {
             Add products from catalog pages, product detail pages, or product
             sliders.
           </p>
-          <Link className="button accent" href="/products">
+          <ButtonLink variant="primary" href="/products">
             Browse products
-          </Link>
+          </ButtonLink>
         </section>
       ) : (
         <section

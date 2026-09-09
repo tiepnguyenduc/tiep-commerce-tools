@@ -111,3 +111,31 @@ npm run typecheck
 npm test
 npm run build
 ```
+
+## Storefront-wide rollout
+
+The app composes Launchpad presentation components with its BFF data and callbacks:
+
+| Surface | Shared UI |
+| --- | --- |
+| Homepage and product lists | CampaignBanner, ProductTile, Skeleton, ButtonLink |
+| Header and search | Button, Input, Drawer; catalog hierarchy and session data |
+| Cart and minicart | CartItem, QuantitySelector, Drawer, ButtonLink |
+| Account and checkout | Input, Dropdown, Button, linked address forms |
+| Wishlists | WishlistItem, Modal, Input, Button |
+| Catalog filters | Dropdown, Checkbox, Radio, Input, Drawer |
+| Product reviews and image preview | Radio, Input, Textarea, Modal, Button |
+| Compare, orders, notifications | Shared buttons/inputs inside app-specific layouts |
+
+All visible native button/input/select/textarea controls in the top-level app
+components now use library controls. Hidden form inputs remain native. App-specific
+layouts and BFF orchestration remain local; Studio-dependent account/checkout
+organisms are not mounted against incompatible APIs.
+
+Drawer uses Headless UI Dialog for focus containment, Escape/backdrop dismissal,
+scroll locking and focus restoration. Modal is shared by wishlist dialogs and the
+product image preview. CartItem supports BFF variant details and unmodified image
+URLs; both cart surfaces preserve unit prices and authoritative line totals.
+QuantitySelector optionally allows direct numeric entry (commit on blur or Enter).
+Checkbox/Radio retain native form submission and disabled behavior. Dropdown also
+accepts native option children; Textarea and ButtonLink extend the shared controls.

@@ -23,6 +23,7 @@ const serverSnapshot: WishlistState = {
   error: "",
 };
 let state: WishlistState = { wishlists: [], status: "idle", error: "" };
+let generation = 0;
 let pendingLoad: Promise<Wishlist[]> | null = null;
 
 function emit(next: WishlistState) {
@@ -72,19 +73,20 @@ export function loadWishlists(force = false): Promise<Wishlist[]> {
   }
   if (pendingLoad) return pendingLoad;
 
+  const currentGeneration = generation;
   emit({ ...state, status: "loading", error: "" });
   pendingLoad = fetch("/api/wishlists")
     .then((response) => readJson<{ wishlists: Wishlist[] }>(response))
     .then(({ wishlists }) => {
-      emit({ wishlists, status: "ready", error: "" });
+      if (currentGeneration === generation) emit({ wishlists, status: "ready", error: "" });
       return wishlists;
     })
     .catch((error) => {
-      setFailure(error);
+      if (currentGeneration === generation) setFailure(error);
       throw error;
     })
     .finally(() => {
-      pendingLoad = null;
+      if (currentGeneration === generation) pendingLoad = null;
     });
   return pendingLoad;
 }
@@ -168,6 +170,7 @@ export async function removeItemFromWishlist(
 }
 
 export function resetWishlists() {
+  generation += 1;
   pendingLoad = null;
   emit({ wishlists: [], status: "idle", error: "" });
 }

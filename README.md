@@ -124,3 +124,12 @@ examples, source revision and configuration requirements of additional component
 Run `node scripts/verify-launchpad-ui.mjs` to verify source completeness and
 production local imports. The normal typecheck includes production library code;
 upstream Storybook/Jest examples are retained separately from the app's tests.
+
+### Header data
+
+Navigation uses the demo catalog category hierarchy from the BFF, including nested
+categories on desktop and mobile. Account and wishlist disclosures use the current
+customer session; wishlist previews show saved list names, counts and images.
+The mini cart reloads when opened and when authentication changes, with loading,
+error and retry states. Wishlist requests from a previous session cannot overwrite
+the current session after a reset.

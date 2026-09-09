@@ -1,3 +1,7 @@
+import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
+import CTSelect from "@/components/commercetools-ui/atoms/dropdown/default-dropdown";
+import CTRadio from "@/components/commercetools-ui/atoms/radio";
+import CTInput from "@/components/commercetools-ui/atoms/input";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { AutoSubmitFilterForm } from "@/components/AutoSubmitFilterForm";
@@ -6,13 +10,7 @@ import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import { ProductCard } from "@/components/ProductCard";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faChevronRight,
-  faMagnifyingGlass,
-  faSliders,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faChevronRight, faMagnifyingGlass, faSliders, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 export type ProductSearchParams = {
   q?: string;
@@ -215,19 +213,19 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Sort by</span>
-          <select className="field" name="sort" defaultValue={p.sort ?? ""}>
+          <CTSelect className="field" name="sort" defaultValue={p.sort ?? ""}>
             <option value="">Newest</option>
             <option value="price-asc">Price: Low to high</option>
             <option value="price-desc">Price: High to low</option>
             <option value="name-asc">Name A-Z</option>
-          </select>
+          </CTSelect>
         </label>
 
         <fieldset className="filter-group">
           <legend className="filter-label">Price</legend>
           {priceRanges.map((range) => (
             <label className="check-row" key={range.value}>
-              <input
+              <CTRadio
                 type="radio"
                 name="price"
                 value={range.value}
@@ -240,7 +238,7 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Category</span>
-          <select
+          <CTSelect
             className="field"
             name="categoryId"
             defaultValue={p.categoryId ?? ""}
@@ -251,7 +249,7 @@ export async function ProductListingPage({
                 {category.name}
               </option>
             ))}
-          </select>
+          </CTSelect>
         </label>
 
         <BrandFilterList
@@ -262,12 +260,12 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Color</span>
-          <select className="field" name="color" defaultValue={p.color ?? ""}>
+          <CTSelect className="field" name="color" defaultValue={p.color ?? ""}>
             <option value="">All colors</option>
             {result.facets.colors.map((x) => (
               <option key={x}>{x}</option>
             ))}
-          </select>
+          </CTSelect>
         </label>
 
         <Link className="clear-filters" href={basePath}>
@@ -301,7 +299,7 @@ export async function ProductListingPage({
                 Search products
               </label>
               <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
-              <input
+              <CTInput
                 autoComplete="off"
                 id={`${variant}-search-input`}
                 name="q"
@@ -459,9 +457,9 @@ export async function ProductListingPage({
             <section className="panel empty-state">
               <h2>No products found</h2>
               <p className="muted">Try clearing filters or changing search.</p>
-              <Link className="button" href={basePath}>
+              <ButtonLink variant="secondary" href={basePath}>
                 Clear all filters
-              </Link>
+              </ButtonLink>
             </section>
           )}
         </section>

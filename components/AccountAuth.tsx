@@ -11,20 +11,9 @@ import { LinkedAddressFields } from "@/components/LinkedAddressFields";
 import { OrderDetails } from "@/components/OrderDetails";
 import { WishlistsPage } from "@/components/WishlistsPage";
 import { publishCustomerAuthChange } from "@/components/HeaderAccountLink";
-import {
-  accountHref,
-  accountPages,
-  type AccountPage,
-} from "@/lib/account-pages";
-import type {
-  CustomerAddress,
-  CustomerOrderDetail,
-  CustomerOrderSummary,
-  CustomerProfile,
-} from "@/lib/types";
-import {
-  fetchCustomerOrders,
-} from "@/lib/account-orders-api";
+import { accountHref, accountPages, type AccountPage } from "@/lib/account-pages";
+import type { CustomerAddress, CustomerOrderDetail, CustomerOrderSummary, CustomerProfile } from "@/lib/types";
+import { fetchCustomerOrders } from "@/lib/account-orders-api";
 import { resetWishlists } from "@/lib/wishlist-api";
 
 type Action = "login" | "register";

@@ -6,12 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import { useMiniCart } from "@/components/MiniCart";
 import { useToast } from "@/components/Toast";
-import type {
-  Cart,
-  CustomerAddress,
-  CustomerOrderDetail,
-  StoreMode,
-} from "@/lib/types";
+import type { Cart, CustomerAddress, CustomerOrderDetail, StoreMode } from "@/lib/types";
 
 const REORDER_MODE: StoreMode = "b2c";
 

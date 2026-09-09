@@ -67,6 +67,7 @@ export type ProductBrandSummary = {
 };
 export type HeaderCategory = {
   id: string;
+  parentId?: string;
   name: string;
   slug: string;
 };

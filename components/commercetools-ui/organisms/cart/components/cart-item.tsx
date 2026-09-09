@@ -19,10 +19,13 @@ interface Props {
   classNames?: ClassNames;
   onRemoveItem(): Promise<void>;
   onUpdateItem(quantity: number): Promise<void>;
-  OnMoveToWishlist(): Promise<void>;
+  OnMoveToWishlist?(): Promise<void>;
+  disabled?: boolean;
+  details?: React.ReactNode;
+  imageSuffix?: string | false;
 }
 
-const CartItem: React.FC<Props> = ({ item, onRemoveItem, onUpdateItem, OnMoveToWishlist, classNames = {} }) => {
+const CartItem: React.FC<Props> = ({ item, onRemoveItem, onUpdateItem, OnMoveToWishlist, classNames = {}, disabled = false, details, imageSuffix = "small" }) => {
   const translate = useTranslations();
 
   const [processing, setProcessing] = useState(false);
@@ -37,38 +40,34 @@ const CartItem: React.FC<Props> = ({ item, onRemoveItem, onUpdateItem, OnMoveToW
 
   const handleUpdateItem = useCallback(
     async (quantity: number) => {
-      if (processing) return;
+      if (processing || disabled) return;
 
       setProcessing(true);
 
-      await (quantity < 1 ? onRemoveItem() : onUpdateItem(quantity));
-
-      setProcessing(false);
+      try { await (quantity < 1 ? onRemoveItem() : onUpdateItem(quantity)); } finally { setProcessing(false); }
     },
-    [onUpdateItem, onRemoveItem, processing],
+    [onUpdateItem, onRemoveItem, processing, disabled],
   );
 
   const handleRemoveItem = useCallback(async () => {
-    if (processing) return;
+    if (processing || disabled) return;
 
     setProcessing(true);
-    await onRemoveItem();
-    setProcessing(false);
+    try { await onRemoveItem(); } finally { setProcessing(false); }
   }, [onRemoveItem, processing]);
 
   const handleMoveToWishlist = useCallback(async () => {
-    if (processing) return;
+    if (processing || disabled) return;
 
     setProcessing(true);
-    await OnMoveToWishlist();
-    setProcessing(false);
+    try { await OnMoveToWishlist?.(); } finally { setProcessing(false); }
   }, [OnMoveToWishlist, processing]);
 
   return (
     <div className="flex max-w-full items-stretch justify-start gap-10 py-18 md:gap-15">
       <div className="w-125 shrink-0 bg-white p-12">
         <Link title={item.name} className="relative block size-full rounded-sm" link={item._url}>
-          <Image alt={item.name} src={item.variant?.images?.[0]} suffix="small" style={{ objectFit: 'contain' }} fill />
+          <Image alt={item.name} src={item.variant?.images?.[0]} suffix={imageSuffix === false ? undefined : imageSuffix} style={{ objectFit: 'contain' }} fill />
         </Link>
       </div>
       <div className="max-w-full grow overflow-hidden">
@@ -84,13 +83,13 @@ const CartItem: React.FC<Props> = ({ item, onRemoveItem, onUpdateItem, OnMoveToW
             data-testid="remove-button"
             onClick={handleRemoveItem}
             className={deleteButtonClassName}
-            disabled={processing}
+            disabled={processing || disabled}
             aria-label={translate('common.delete')}
           >
             <TrashIcon stroke="#494949" className="w-20" />
           </button>
         </div>
-        {!item.variant?.isOnStock && (
+        {item.variant?.isOnStock === false && (
           <div className="mt-8">
             <OutOfStock />
           </div>
@@ -100,19 +99,22 @@ const CartItem: React.FC<Props> = ({ item, onRemoveItem, onUpdateItem, OnMoveToW
         </div>
         <div className="mt-16">
           <QuantitySelector
+            editable
+            label={`Quantity for ${item.name}`}
             value={item.count}
             defaultValue={1}
             minValue={0}
-            maxValue={item.variant?.availableQuantity}
-            disabled={processing}
+            maxValue={item.variant?.availableQuantity ?? 99}
+            disabled={processing || disabled}
             onChange={handleUpdateItem}
           />
         </div>
-        <div className="mt-16 text-12">
-          <p className={wishlistButtonClassName} onClick={handleMoveToWishlist}>
+        {details}
+        {OnMoveToWishlist && <div className="mt-16 text-12">
+          <button type="button" disabled={processing || disabled} className={wishlistButtonClassName} onClick={handleMoveToWishlist}>
             {translate('cart.move-to-wishlist')}
-          </p>
-        </div>
+          </button>
+        </div>}
       </div>
     </div>
   );

@@ -61,7 +61,7 @@ export async function listCatalogCategories(): Promise<HeaderCategory[]> {
     const seenNames = new Set<string>();
 
     return body.results
-      .map((category) => mapCategoryResourceToHeaderCategory(category))
+      .map((category) => ({ ...mapCategoryResourceToHeaderCategory(category), parentId: category.parent?.id }))
       .filter((category) => {
         if (!category.name || seenNames.has(category.name)) return false;
         seenNames.add(category.name);

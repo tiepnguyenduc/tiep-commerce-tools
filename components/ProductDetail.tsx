@@ -1,15 +1,12 @@
 "use client";
+import Modal from "@/components/commercetools-ui/organisms/modal";
 
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import type { Swiper as SwiperClass } from "swiper";
 import { A11y, FreeMode, Keyboard, Thumbs } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -165,20 +162,6 @@ export function ProductDetail({
     if (!lightboxOpen) return;
     lightboxSwiper?.slideTo(activeImage, 0);
   }, [activeImage, lightboxOpen, lightboxSwiper]);
-
-  useEffect(() => {
-    if (!lightboxOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setLightboxOpen(false);
-    }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => {
-      window.removeEventListener("keydown", closeOnEscape);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [lightboxOpen]);
 
   function selectVariantOption(name: string, value: string) {
     const nextSelections = new Map(
@@ -463,19 +446,7 @@ export function ProductDetail({
         />
       ) : null}
       {lightboxOpen ? (
-        <div
-          aria-label={`${product.name} image preview`}
-          aria-modal="true"
-          className="product-lightbox"
-          role="dialog"
-        >
-          <button
-            aria-label="Close image preview"
-            className="product-lightbox-backdrop"
-            onClick={() => setLightboxOpen(false)}
-            type="button"
-          />
-          <div className="product-lightbox-panel">
+        <Modal isOpen preventScroll onRequestClose={() => setLightboxOpen(false)} contentLabel={`${product.name} image preview`} className="product-lightbox-panel" style={{content: {width: 'min(1100px, 95vw)', maxWidth: '95vw'}, overlay: {backgroundColor: 'rgba(0,0,0,.8)'}}}>
             <div className="product-lightbox-head">
               <strong>{product.name}</strong>
               <UIButton variant="ghost" size="fit"
@@ -521,8 +492,7 @@ export function ProductDetail({
                 </UIButton>
               </div>
             ) : null}
-          </div>
-        </div>
+        </Modal>
       ) : null}
     </main>
   );

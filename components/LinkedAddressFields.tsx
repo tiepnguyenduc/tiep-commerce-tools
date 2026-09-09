@@ -1,16 +1,9 @@
 "use client";
 
+import CTSelect from "@/components/commercetools-ui/atoms/dropdown/default-dropdown";
 import UIInput from "@/components/commercetools-ui/atoms/input";
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  findAddressLocationByPostalCode,
-  getLinkedAddressOptions,
-  hasPostalCodePrefix,
-  isKnownPostalCode,
-  syncPostalCode,
-  syncLinkedAddressField,
-  type LinkedAddressField,
-} from "@/lib/address-directory";
+import { findAddressLocationByPostalCode, getLinkedAddressOptions, hasPostalCodePrefix, isKnownPostalCode, syncPostalCode, syncLinkedAddressField, type LinkedAddressField } from "@/lib/address-directory";
 import type { CustomerAddress } from "@/lib/types";
 
 const fields: readonly {
@@ -57,7 +50,7 @@ export function LinkedAddressFields({
       {fields.map(({ autoComplete, field, placeholder }) => (
         <label className="select-field" key={field}>
           <span>{placeholder}</span>
-          <select
+          <CTSelect
             aria-label={placeholder}
             autoComplete={autoComplete}
             className="field"
@@ -75,7 +68,7 @@ export function LinkedAddressFields({
                 {option.label}
               </option>
             ))}
-          </select>
+          </CTSelect>
         </label>
       ))}
       <label className="select-field postal-code-field">

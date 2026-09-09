@@ -1,24 +1,14 @@
 "use client";
+import WishlistItem from "@/components/commercetools-ui/molecules/wishlist-item";
 
 import UIInput from "@/components/commercetools-ui/atoms/input";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useMemo, useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faPen,
-  faPlus,
-  faTrashCan,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { WishlistModal } from "@/components/WishlistModal";
-import {
-  createWishlist,
-  deleteWishlist,
-  removeItemFromWishlist,
-  renameWishlist,
-  useWishlists,
-} from "@/lib/wishlist-api";
+import { createWishlist, deleteWishlist, removeItemFromWishlist, renameWishlist, useWishlists } from "@/lib/wishlist-api";
 
 export function WishlistsPage() {
   const { wishlists, isLoading, error } = useWishlists();
@@ -233,22 +223,11 @@ export function WishlistsPage() {
         ) : (
           <div className="wishlist-list">
             {selected.lines.map((line) => (
-              <article className="wishlist-row" key={line.id}>
-                <img src={line.image} alt={line.name} />
-                <div>
-                  <h3>{line.name}</h3>
-                  <p className="muted">
-                    SKU: {line.sku} · Quantity: {line.quantity}
-                  </p>
-                </div>
-                <Button variant="ghost" size="fit"
-                  className="text-button danger"
-                  disabled={removingLineId !== null}
-                  onClick={() => removeLine(selected.id, line.id)}
-                  type="button"
-                >
-                  {removingLineId === line.id ? "Removing…" : "Remove"}
-                </Button>
+              <article className="launchpad-ui" key={line.id}>
+                <WishlistItem item={{ lineItemId: line.id, productId: line.productId, name: line.name, count: line.quantity, variant: { sku: line.sku, images: [line.image] } }}
+                  imageSuffix={false} disabled={removingLineId !== null}
+                  onRemove={() => removeLine(selected.id, line.id)}
+                  details={<p className="storefront-line-details">SKU: {line.sku} · Quantity: {line.quantity}</p>} />
               </article>
             ))}
           </div>

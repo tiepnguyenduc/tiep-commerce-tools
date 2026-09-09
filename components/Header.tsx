@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { HeaderDataMenu } from "./HeaderDataMenu";
+import type { HeaderCategory } from "@/lib/types";
 import { HeaderMobileMenu } from "./HeaderMobileMenu";
 import styles from "./Header.module.css";
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import { connection } from "next/server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
+import { listCatalogCategories, listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import { readCustomerProfile } from "@/lib/ct/account";
 import { HeaderAccountLink } from "@/components/HeaderAccountLink";
 import { HeaderCartButton } from "@/components/MiniCart";
@@ -13,22 +15,31 @@ import { HeaderSearch } from "@/components/HeaderSearch";
 import { HeaderCompareLink } from "@/components/ProductCompare";
 import { HeaderWishlistLink } from "@/components/HeaderWishlistLink";
 
+const loadNavigationCategories = cache(listCatalogCategories);
+
 async function HeaderCategoryLinks() {
   await connection();
-  const categories = await listHeaderCategories();
+  const categories = await loadNavigationCategories();
 
   if (categories.length === 0) return null;
 
+  const href = (category: HeaderCategory) => `/products?categoryId=${encodeURIComponent(category.id)}&category=${encodeURIComponent(category.name)}`;
+  const roots = categories.filter((category) => !category.parentId || !categories.some((parent) => parent.id === category.parentId));
+  function childrenOf(parent: HeaderCategory, visited = new Set<string>()): React.ReactNode {
+    if (visited.has(parent.id)) return null;
+    const seen = new Set(visited).add(parent.id);
+    return categories.filter((category) => category.parentId === parent.id).map((category) => (
+      <div key={category.id}><Link href={href(category)}>{category.name}</Link>{childrenOf(category, seen)}</div>
+    ));
+  }
   return (
     <nav className="category-nav" aria-label="Product categories">
-      {categories.map((category) => (
-        <Link
-          key={category.id}
-          href={`/products?categoryId=${encodeURIComponent(category.id)}&category=${encodeURIComponent(category.name)}`}
-        >
-          {category.name}
-        </Link>
-      ))}
+      {roots.map((category) => categories.some((child) => child.parentId === category.id) ? (
+        <HeaderDataMenu key={category.id} className="header-category-menu">
+          <summary>{category.name}</summary>
+          <div className="header-data-panel"><Link href={href(category)}>Shop all {category.name}</Link>{childrenOf(category)}</div>
+        </HeaderDataMenu>
+      ) : <Link key={category.id} href={href(category)}>{category.name}</Link>)}
     </nav>
   );
 }

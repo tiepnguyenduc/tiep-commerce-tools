@@ -9,7 +9,7 @@ export interface DropdownProps extends ComponentProps<'select'> {
   className?: string;
   containerClassName?: string;
   labelClassName?: string;
-  items: Array<{ label: string; value: string }>;
+  items?: Array<{ label: string; value: string }>;
   label?: string;
   value?: string;
   defaultValue?: string;
@@ -21,14 +21,16 @@ const DefaultDropdown: FC<DropdownProps> = ({
   containerClassName = '',
   labelClassName,
   label,
-  items,
+  items = [],
+  children,
+  defaultValue,
   onChange,
   value,
   error,
   ...props
 }) => {
-  const [selectedValue, setSelectedValue] = useControllableState(value);
-  const translate = useTranslations();
+  const [selectedValue, setSelectedValue] = useControllableState(value, defaultValue);
+
 
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -36,10 +38,10 @@ const DefaultDropdown: FC<DropdownProps> = ({
     onChange?.(e);
   };
 
-  const containerClassNames = useClassNames(['grid', containerClassName]);
+  const containerClassNames = useClassNames(['ct-ui grid', containerClassName]);
 
   const selectClassName = useClassNames([
-    'absolute font-body z-[1] h-40 text-14 border border-neutral-500 focus:ring-0 rounded-md w-full focus:border-gray-500 bg-transparent disabled:bg-neutral-200 bg-none font-regular leading-loose pl-12 pr-0 py-0',
+    'appearance-none absolute font-body z-[1] h-40 text-14 border border-neutral-500 focus:ring-0 rounded-md w-full focus:border-gray-500 bg-transparent disabled:bg-neutral-200 bg-none font-regular leading-loose pl-12 pr-0 py-0',
     className,
     {
       'border-red-500': error,
@@ -56,6 +58,7 @@ const DefaultDropdown: FC<DropdownProps> = ({
 
       <div className="relative h-40 min-w-64 overflow-hidden">
         <select id={props.name} className={selectClassName} value={selectedValue} onChange={handleChange} {...props}>
+          {children}
           {items.map(({ label, value }, index) => (
             <option key={index} value={value}>
               {label}
@@ -68,9 +71,13 @@ const DefaultDropdown: FC<DropdownProps> = ({
           className="absolute right-5 top-1/2 z-0 h-20 w-30 -translate-y-1/2 stroke-1 text-gray-600"
         />
       </div>
-      <p className="mt-2 text-12 font-medium text-red-500">{error && translate('common.fieldIsRequired')}</p>
+      {error && <DropdownError />}
     </div>
   );
 };
 
+function DropdownError() {
+  const translate = useTranslations();
+  return <p role="alert" className="mt-2 text-12 font-medium text-red-500">{translate('common.fieldIsRequired')}</p>;
+}
 export default DefaultDropdown;

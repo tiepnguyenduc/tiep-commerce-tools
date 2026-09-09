@@ -10,11 +10,14 @@ import { CurrencyHelpers } from '@/lib/launchpad/helpers/currencyHelpers/index';
 
 export interface WishlistItemProps {
   item: LineItem;
+  imageSuffix?: string | false;
+  disabled?: boolean;
+  details?: React.ReactNode;
   onRemove?: () => Promise<void>;
   onMoveToCart?: () => Promise<void>;
 }
 
-const WishlistItem: FC<WishlistItemProps> = ({ item, onRemove, onMoveToCart }) => {
+const WishlistItem: FC<WishlistItemProps> = ({ item, onRemove, onMoveToCart, imageSuffix = "small", disabled = false, details }) => {
   const locale = useLocale();
 
   const translate = useTranslations();
@@ -25,7 +28,7 @@ const WishlistItem: FC<WishlistItemProps> = ({ item, onRemove, onMoveToCart }) =
         <div className="relative size-full">
           <Image
             src={item.variant?.images?.[0]}
-            suffix="small"
+            suffix={imageSuffix === false ? undefined : imageSuffix}
             style={{ objectFit: 'contain' }}
             alt={item.name ?? ''}
             fill
@@ -37,11 +40,11 @@ const WishlistItem: FC<WishlistItemProps> = ({ item, onRemove, onMoveToCart }) =
           <p className="max-w-150 overflow-hidden text-ellipsis whitespace-pre text-14 uppercase leading-loose">
             {item.name}
           </p>
-          <i onClick={onRemove} className="block cursor-pointer" data-testid="remove-button">
+          {onRemove && <Button type="button" variant="ghost" size="fit" onClick={onRemove} disabled={disabled} aria-label={`Remove ${item.name}`} data-testid="remove-button">
             <TrashIcon stroke="#494949" className="w-20" />
-          </i>
+          </Button>}
         </div>
-        <div className="mt-12">
+        {item.variant?.price && <div className="mt-12">
           {item.variant?.discountedPrice ? (
             <div className="flex items-center gap-5">
               <span className="text-14 font-medium leading-loose text-red-500">
@@ -57,11 +60,13 @@ const WishlistItem: FC<WishlistItemProps> = ({ item, onRemove, onMoveToCart }) =
             </span>
           )}
         </div>
-        <div className="mt-16 leading-normal">
-          <Button variant="primary" onClick={onMoveToCart} disabled={!item.variant?.isOnStock} className="py-8 text-14">
+        }
+        {details}
+        {onMoveToCart && <div className="mt-16 leading-normal">
+          <Button variant="primary" onClick={onMoveToCart} disabled={disabled || item.variant?.isOnStock === false} className="py-8 text-14">
             {translate('wishlist.wishlist-add-to-cart')}
           </Button>
-        </div>
+        </div>}
       </div>
     </div>
   );

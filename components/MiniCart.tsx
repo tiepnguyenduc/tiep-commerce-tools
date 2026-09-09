@@ -1,23 +1,15 @@
 "use client";
+import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
+import dynamic from "next/dynamic";
+const StorefrontCartItem = dynamic(() => import("./StorefrontCartItem").then((module) => module.StorefrontCartItem));
+import Drawer from "@/components/commercetools-ui/atoms/drawer";
 import UIButton from "@/components/commercetools-ui/atoms/button";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import Link from "next/link";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCartShopping,
-  faMinus,
-  faPlus,
-  faTrashCan,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { CartLineVariant } from "@/components/CartLineVariant";
+import { faCartShopping, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { customerAuthChangeEvent } from "@/components/HeaderAccountLink";
+
 import { useToast } from "@/components/Toast";
 import type { Cart, CartLine } from "@/lib/types";
 
@@ -52,41 +44,41 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingLineId, setPendingLineId] = useState<string | null>(null);
   const showToast = useToast();
+  const requestVersion = useRef(0);
+  const [loadError, setLoadError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const syncCart = useCallback((nextCart: Cart | null) => {
+    requestVersion.current += 1;
+    setLoading(false);
+    setLoadError("");
     setCart(nextCart);
   }, []);
 
   const loadCart = useCallback(async () => {
+    const version = ++requestVersion.current;
+    setLoading(true);
+    setLoadError("");
     try {
-      const response = await fetch("/api/cart");
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) return null;
-      setCart(data);
-      return data as Cart;
+      const response = await fetch("/api/cart", { cache: "no-store" });
+      if (!response.ok) throw new Error("Could not load your cart.");
+      const data = await response.json() as Cart;
+      if (version === requestVersion.current) setCart(data);
+      return data;
     } catch {
+      if (version === requestVersion.current) setLoadError("Could not load your cart. Please try again.");
       return null;
+    } finally {
+      if (version === requestVersion.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     void loadCart();
+    const onAuthChange = () => { setCart(null); void loadCart(); };
+    window.addEventListener(customerAuthChangeEvent, onAuthChange);
+    return () => { requestVersion.current += 1; window.removeEventListener(customerAuthChangeEvent, onAuthChange); };
   }, [loadCart]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [isOpen]);
 
   const setLineQuantity = useCallback(
     async (line: CartLine, quantity: number) => {
@@ -108,7 +100,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
           showToast(data.error || "Could not update the cart.", "error");
           return;
         }
-        setCart(data);
+        syncCart(data);
         showToast(
           quantity === 0 ? "Item removed from your cart." : "Cart updated.",
           "success",
@@ -119,7 +111,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
         setPendingLineId(null);
       }
     },
-    [cart, pendingLineId, showToast],
+    [cart, pendingLineId, showToast, syncCart],
   );
 
   const value = useMemo(
@@ -129,7 +121,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
       isOpen,
       closeCart: () => setIsOpen(false),
       loadCart,
-      openCart: () => setIsOpen(true),
+      openCart: () => { setIsOpen(true); void loadCart(); },
       setLineQuantity,
       syncCart,
     }),
@@ -141,6 +133,9 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
       {children}
       <MiniCartDrawer
         cart={cart}
+        loading={loading}
+        loadError={loadError}
+        onRetry={() => void loadCart()}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         pendingLineId={pendingLineId}
@@ -168,12 +163,16 @@ export function HeaderCartButton() {
 }
 
 function MiniCartDrawer({
+  loading, loadError, onRetry,
   cart,
   isOpen,
   onClose,
   pendingLineId,
   setLineQuantity,
 }: {
+  loading: boolean;
+  loadError: string;
+  onRetry: () => void;
   cart: Cart | null;
   isOpen: boolean;
   onClose: () => void;
@@ -182,24 +181,8 @@ function MiniCartDrawer({
 }) {
   const lines = cart?.lines ?? [];
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="mini-cart-layer open"
-    >
-      <button
-        aria-label="Close mini cart"
-        className="mini-cart-backdrop"
-        onClick={onClose}
-        type="button"
-      />
-      <aside
-        aria-label="Mini cart"
-        aria-modal="true"
-        className="mini-cart-drawer"
-        role="dialog"
-      >
+    <Drawer isOpen={isOpen} onClose={onClose} aria-label="Mini cart" className="storefront-mini-cart">
         <header className="mini-cart-head">
           <div>
             <span className="eyebrow">Shopping cart</span>
@@ -212,73 +195,18 @@ function MiniCartDrawer({
           </UIButton>
         </header>
 
-        {lines.length === 0 ? (
+        {loadError ? <div className="mini-cart-empty"><p role="alert">{loadError}</p><UIButton type="button" onClick={onRetry}>Try again</UIButton></div> : loading && !cart ? <p role="status" className="mini-cart-empty">Loading your cart…</p> : lines.length === 0 ? (
           <div className="mini-cart-empty">
             <h3>Your cart is empty.</h3>
             <p className="muted">Browse the catalog and add products here.</p>
-            <Link className="button accent" href="/products" onClick={onClose}>
+            <ButtonLink variant="primary" href="/products" onClick={onClose}>
               Browse catalog
-            </Link>
+            </ButtonLink>
           </div>
         ) : (
           <>
             <div className="mini-cart-lines">
-              {lines.map((line) => {
-                const productHref = `/products/${line.slug || line.productId}`;
-                return (
-                  <article className="mini-cart-line" key={line.id}>
-                    <Link href={productHref} onClick={onClose}>
-                      <img src={line.image} alt={line.name} />
-                    </Link>
-                    <div>
-                      <h3>
-                        <Link href={productHref} onClick={onClose}>
-                          {line.name}
-                        </Link>
-                      </h3>
-                      <p className="muted">
-                        {line.sku} · {line.unitPrice.formatted}
-                      </p>
-                      <CartLineVariant line={line} />
-                      <div className="mini-cart-line-actions">
-                        <div className="mini-cart-qty">
-                          <UIButton variant="ghost" size="fit"
-                            disabled={pendingLineId !== null}
-                            onClick={() =>
-                              setLineQuantity(line, line.quantity - 1)
-                            }
-                            type="button"
-                          >
-                            <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
-                          </UIButton>
-                          <span>{line.quantity}</span>
-                          <UIButton variant="ghost" size="fit"
-                            disabled={
-                              pendingLineId !== null || line.quantity >= 99
-                            }
-                            onClick={() =>
-                              setLineQuantity(line, line.quantity + 1)
-                            }
-                            type="button"
-                          >
-                            <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
-                          </UIButton>
-                        </div>
-                        <UIButton variant="ghost" size="fit"
-                          className="text-button danger"
-                          disabled={pendingLineId !== null}
-                          onClick={() => setLineQuantity(line, 0)}
-                          type="button"
-                        >
-                          <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
-                          <span>Remove</span>
-                        </UIButton>
-                      </div>
-                    </div>
-                    <strong>{line.total.formatted}</strong>
-                  </article>
-                );
-              })}
+              {lines.map((line) => <StorefrontCartItem key={line.id} onNavigate={onClose} line={line} disabled={pendingLineId !== null} onQuantityChange={(quantity) => setLineQuantity(line, quantity)} />)}
             </div>
 
             <footer className="mini-cart-summary">
@@ -299,21 +227,20 @@ function MiniCartDrawer({
                 <strong>{cart?.total.formatted}</strong>
               </div>
               <div className="mini-cart-cta">
-                <Link className="button" href="/cart" onClick={onClose}>
+                <ButtonLink variant="secondary" href="/cart" onClick={onClose}>
                   View cart
-                </Link>
-                <Link
-                  className="button accent"
+                </ButtonLink>
+                <ButtonLink
+                  variant="primary"
                   href={`/checkout/${cart?.mode ?? "b2c"}`}
                   onClick={onClose}
                 >
                   Checkout
-                </Link>
+                </ButtonLink>
               </div>
             </footer>
           </>
         )}
-      </aside>
-    </div>
+    </Drawer>
   );
 }

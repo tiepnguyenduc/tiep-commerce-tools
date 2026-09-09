@@ -4,11 +4,8 @@ import LibraryFooter, { type FooterColumn } from "@/components/commercetools-ui/
 import UIInput from "@/components/commercetools-ui/atoms/input";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBriefcase,
-  faPalette,
-  faSwatchbook,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBriefcase, faPalette, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import styles from "./Footer.module.css";
 import { useToast } from "@/components/Toast";
 
 const footerColumns: FooterColumn[] = [
@@ -156,72 +153,57 @@ export function Footer() {
   }
 
   return (
-    <div className="footer">
-      <div className="shell footer-inner">
-        <section className="footer-newsletter" aria-label="Newsletter signup">
-          <div>
-            <Link className="brand footer-brand" href="/">
-              WORK<i>/</i>SHOP
+    <footer className={styles.footer} aria-label="WORK/SHOP footer">
+      <div className={styles.inner}>
+        <section className={styles.newsletter} aria-label="Newsletter signup">
+          <div className={styles.identity}>
+            <Link className={styles.wordmark} href="/" aria-label="WORK/SHOP home">
+              WORK<span>/</span>SHOP
             </Link>
-            <p>
-              Furniture, lighting, and storage for focused rooms and modern
-              teams.
-            </p>
+            <p>Considered spaces.<br />Better everyday living.</p>
           </div>
-          <form className="footer-signup" onSubmit={submitNewsletter}>
-            <label htmlFor="footer-email">Join our trade notes</label>
-            <div>
+          <form className={styles.signup} onSubmit={submitNewsletter}>
+            <label htmlFor="footer-email">A little inspiration, delivered.</label>
+            <p>New collections, thoughtful spaces, and notes from the studio.</p>
+            <div className={styles.signupRow}>
               <UIInput
+                containerClassName={styles.emailField}
                 autoComplete="email"
                 id="footer-email"
-                placeholder="Email address"
+                name="email"
+                placeholder="Your email address"
                 required
                 type="email"
               />
-              <UIButton variant="ghost" size="fit" type="submit">Sign up</UIButton>
+              <UIButton className={styles.signupButton} variant="ghost" size="fit" type="submit">Sign up <span aria-hidden="true">↗</span></UIButton>
             </div>
           </form>
         </section>
 
-        <section className="footer-service-row" aria-label="Store services">
+        <section className={styles.services} aria-label="Store services">
           <div>
-            <FontAwesomeIcon
-              aria-hidden="true"
-              className="footer-service-icon"
-              icon={faPalette}
-            />
-            <strong>Free design consults</strong>
-            <span>Room planning for home and office projects.</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faPalette} />
+            <div><strong>Free design consults</strong><span>A fresh perspective for your space.</span></div>
           </div>
           <div>
-            <FontAwesomeIcon
-              aria-hidden="true"
-              className="footer-service-icon"
-              icon={faBriefcase}
-            />
-            <strong>Trade-ready checkout</strong>
-            <span>B2C and B2B purchasing paths in one storefront.</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faBriefcase} />
+            <div><strong>Made for home & work</strong><span>Thoughtful pieces for every project.</span></div>
           </div>
           <div>
-            <FontAwesomeIcon
-              aria-hidden="true"
-              className="footer-service-icon"
-              icon={faSwatchbook}
-            />
-            <strong>Fast sample support</strong>
-            <span>Material and finish guidance before you order.</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faSwatchbook} />
+            <div><strong>Help with the details</strong><span>Materials, finishes, and expert guidance.</span></div>
           </div>
         </section>
 
-        <div className="launchpad-ui">
-          <LibraryFooter columns={footerColumns} />
+        <div className={`launchpad-ui ${styles.navigation}`}>
+          <LibraryFooter columns={footerColumns} as="nav" showBottom={false} />
         </div>
 
-        <div className="footer-bottom">
-          <span>WORK/SHOP training storefront</span>
-          <span>Next.js BFF · commercetools-ready · deterministic mock mode</span>
+        <div className={styles.bottom}>
+          <span>© {new Date().getFullYear()} WORK/SHOP</span>
+          <span>Powered by <strong>commercetools</strong></span>
         </div>
       </div>
-    </div>
+    </footer>
   );
 }

@@ -6,21 +6,10 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faCheck,
-  faHeart,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCheck, faHeart, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { WishlistModal } from "@/components/WishlistModal";
-import {
-  addItemToWishlist,
-  createWishlist,
-  loadWishlists,
-  removeItemFromWishlist,
-  useWishlists,
-} from "@/lib/wishlist-api";
+import { addItemToWishlist, createWishlist, loadWishlists, removeItemFromWishlist, useWishlists } from "@/lib/wishlist-api";
 import type { Wishlist } from "@/lib/types";
 
 function matchingLine(

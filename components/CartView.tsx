@@ -1,29 +1,21 @@
 "use client";
+import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
+import CTInput from "@/components/commercetools-ui/atoms/input";
+import { StorefrontCartItem } from "./StorefrontCartItem";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faMinus,
-  faPlus,
-  faTrashCan,
-} from "@fortawesome/free-solid-svg-icons";
-import { CartLineVariant } from "@/components/CartLineVariant";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+
 import { useMiniCart } from "@/components/MiniCart";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
-import {
-  type RecentlyViewedProduct,
-  useRecentlyViewedProducts,
-} from "@/components/RecentlyViewedProducts";
+import { type RecentlyViewedProduct, useRecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
 import { useToast } from "@/components/Toast";
 import type { Cart, CartLine } from "@/lib/types";
 
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
-  const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>(
-    {},
-  );
   const [discountCode, setDiscountCode] = useState("");
   const [discountError, setDiscountError] = useState("");
   const [applyingDiscount, setApplyingDiscount] = useState(false);
@@ -43,11 +35,6 @@ export function CartView() {
   function receiveCart(nextCart: Cart | null) {
     setCart(nextCart);
     syncCart(nextCart);
-    setQuantityDrafts(
-      Object.fromEntries(
-        nextCart?.lines.map((line) => [line.id, String(line.quantity)]) ?? [],
-      ),
-    );
   }
 
   async function load() {
@@ -92,21 +79,6 @@ export function CartView() {
     } finally {
       setPendingLineId(null);
     }
-  }
-
-  async function updateLineQuantity(
-    event: React.FormEvent<HTMLFormElement>,
-    line: CartLine,
-    currentQuantity: number,
-  ) {
-    event.preventDefault();
-    const quantity = Number.parseInt(quantityDrafts[line.id] ?? "", 10);
-    if (!Number.isInteger(quantity) || quantity < 0 || quantity > 99) {
-      showToast("Enter a quantity from 0 to 99.", "error");
-      return;
-    }
-    if (quantity === currentQuantity) return;
-    await setQty(line, quantity);
   }
 
   async function addRecentlyViewedProduct(product: RecentlyViewedProduct) {
@@ -229,86 +201,7 @@ export function CartView() {
               </p>
             </div>
           ) : (
-            cart.lines.map((l) => {
-              const productHref = `/products/${l.slug || l.productId}`;
-              return (
-                <div className="cart-line" key={l.id}>
-                  <Link href={productHref}>
-                    <img src={l.image} alt={l.name} />
-                  </Link>
-                  <div>
-                    <b>
-                      <Link href={productHref}>{l.name}</Link>
-                    </b>
-                    <p className="muted">
-                      {l.sku} · {l.unitPrice.formatted}
-                    </p>
-                    <CartLineVariant line={l} />
-                    <form
-                      className="qty"
-                      onSubmit={(event) =>
-                        updateLineQuantity(event, l, l.quantity)
-                      }
-                    >
-                      <UIButton variant="ghost" size="fit"
-                        disabled={pendingLineId !== null || clearingCart}
-                        onClick={() => setQty(l, l.quantity - 1)}
-                        type="button"
-                      >
-                        <FontAwesomeIcon aria-hidden="true" icon={faMinus} />
-                      </UIButton>
-                      <label className="sr-only" htmlFor={`quantity-${l.id}`}>
-                        Quantity for {l.name}
-                      </label>
-                      <input
-                        id={`quantity-${l.id}`}
-                        inputMode="numeric"
-                        max={99}
-                        min={0}
-                        onChange={(event) =>
-                          setQuantityDrafts((drafts) => ({
-                            ...drafts,
-                            [l.id]: event.target.value,
-                          }))
-                        }
-                        required
-                        step={1}
-                        type="number"
-                        value={quantityDrafts[l.id] ?? String(l.quantity)}
-                      />
-                      <UIButton variant="ghost" size="fit"
-                        disabled={
-                          pendingLineId !== null ||
-                          clearingCart ||
-                          l.quantity >= 99
-                        }
-                        onClick={() => setQty(l, l.quantity + 1)}
-                        type="button"
-                      >
-                        <FontAwesomeIcon aria-hidden="true" icon={faPlus} />
-                      </UIButton>
-                      <UIButton variant="ghost" size="fit"
-                        className="pill qty-update"
-                        disabled={pendingLineId !== null || clearingCart}
-                        type="submit"
-                      >
-                        {pendingLineId === l.id ? "Working…" : "Update"}
-                      </UIButton>
-                      <UIButton variant="ghost" size="fit"
-                        className="pill"
-                        disabled={pendingLineId !== null || clearingCart}
-                        onClick={() => setQty(l, 0)}
-                        type="button"
-                      >
-                        <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
-                        <span>Remove</span>
-                      </UIButton>
-                    </form>
-                  </div>
-                  <strong>{l.total.formatted}</strong>
-                </div>
-              );
-            })
+            cart.lines.map((line) => <StorefrontCartItem key={line.id} line={line} disabled={pendingLineId !== null || clearingCart} onQuantityChange={(quantity) => setQty(line, quantity)} />)
           )}
         </div>
 
@@ -342,7 +235,7 @@ export function CartView() {
               <form className="discount-form" onSubmit={applyDiscount}>
                 <label htmlFor="discount-code">Discount code</label>
                 <div className="discount-form-controls">
-                  <input
+                  <CTInput
                     autoComplete="off"
                     id="discount-code"
                     maxLength={32}
@@ -398,10 +291,10 @@ export function CartView() {
           )}
           <p className="muted">Shipping is calculated during checkout.</p>
           {cart.itemCount > 0 && (
-            <Link className="button accent" href={`/checkout/${cart.mode}`}>
+            <ButtonLink variant="primary" href={`/checkout/${cart.mode}`}>
               <span>Checkout as {cart.mode.toUpperCase()}</span>
               <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-            </Link>
+            </ButtonLink>
           )}
         </aside>
       </div>

@@ -22,7 +22,7 @@ const useButtonClassNames: UseButtonClassNames = ({
     l: 'py-12 px-48',
     fit: 'p-0',
     full: 'py-12 w-full',
-    icon: 'w-40 h-40 grid items-center justify-center',
+    icon: 'w-40 h-40',
   };
 
   const primaryClassName = useClassNames([
@@ -64,9 +64,9 @@ const useButtonClassNames: UseButtonClassNames = ({
   return useClassNames([
     sizeClassNames[size as ButtonSize],
     { 'rounded-md': variant !== 'ghost' },
-    { 'flex gap-10 items-center': includesIcon },
+    { 'gap-10': includesIcon },
     { 'cursor-not-allowed': !!loading },
-    'ct-ui relative text-14 leading-4 transition overflow-hidden font-medium',
+    'ct-ui inline-flex items-center justify-center text-center align-middle relative text-14 leading-4 transition overflow-hidden font-medium',
     asSkeleton ? 'relative' : (variantClassNames[variant as ButtonVariant] as string),
     className,
   ]);

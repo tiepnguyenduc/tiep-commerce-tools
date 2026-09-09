@@ -1,111 +1,19 @@
 "use client";
-import React, { useCallback, useRef, useState } from 'react';
-import { CheckIcon } from '@heroicons/react/24/outline';
-import useClassNames from '@/lib/launchpad/helpers/hooks/useClassNames/index';
-import useControllableState from '@/lib/launchpad/helpers/hooks/useControllable/index';
-import useMediaQuery from '@/lib/launchpad/helpers/hooks/useMediaQuery/index';
-import { desktop } from '@/lib/launchpad/helpers/utils/screensizes/index';
-
-export interface CheckboxProps extends Omit<React.ComponentProps<'input'>, 'onChange' | 'key'> {
+import React from 'react';
+export interface CheckboxProps extends Omit<React.ComponentProps<'input'>, 'onChange'> {
   label?: string;
   labelPosition?: 'on-left' | 'on-right';
   containerClassName?: string;
   onChange?: (props: { name: string; checked: boolean }) => void;
+  onNativeChange?: React.ChangeEventHandler<HTMLInputElement>;
   disableBackground?: boolean;
 }
-
-const Checkbox: React.FC<CheckboxProps> = ({
-  className = '',
-  checked,
-  onChange,
-  onMouseOver,
-  onMouseLeave,
-  containerClassName,
-  label,
-  defaultChecked = false,
-  labelPosition = 'on-right',
-  disableBackground = false,
-  ...props
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isChecked, setIsChecked] = useControllableState(checked, defaultChecked);
-
-  const [isDesktopSize] = useMediaQuery(desktop);
-
-  const checkboxRef = useRef<HTMLInputElement>(null);
-
-  const handleContainerClick = () => {
-    if (!isDesktopSize) {
-      toggleIsChecked();
-    }
-  };
-
-  const toggleIsChecked = useCallback(() => {
-    onChange?.({ name: props.name ?? '', checked: !isChecked });
-
-    setIsChecked(!isChecked);
-  }, [isChecked, onChange, props.name, setIsChecked]);
-
-  const handleMouseOver = (e: React.MouseEvent<HTMLInputElement>) => {
-    setIsHovered(isDesktopSize);
-    onMouseOver?.(e);
-  };
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLInputElement>) => {
-    setIsHovered(false);
-    onMouseLeave?.(e);
-  };
-
-  const containerClassNames = useClassNames(['flex items-center gap-12', containerClassName]);
-  const buttonClassName = useClassNames([
-    'h-20 w-20 min-w-[20px] rounded-sm relative cursor-pointer ',
-    isHovered ? 'outline-gray-600' : 'outline-neutral-400',
-  ]);
-
-  const inputClassName = useClassNames([
-    'absolute w-full h-full z-[2] checked:bg-none bg-transparent focus:border-gray-600 rounded-sm text-transparent border-neutral-400',
-    className,
-  ]);
-
-  const iconClassName = useClassNames([
-    'absolute top-[50%] z-[1] left-[50%] h-16 w-16 translate-y-[-50%] translate-x-[-50%] stroke-[2px]',
-    isChecked || isHovered ? 'block' : 'hidden',
-    isChecked && !disableBackground ? 'text-white' : 'text-gray-600',
-  ]);
-
-  const backgroundClassName = useClassNames(['absolute z-0 h-20 w-20 rounded-sm', { 'bg-gray-600': !!isChecked }]);
-
-  const LabelElement = (
-    <label id="input-label" className="text-14 text-gray-600">
-      {label}
-    </label>
-  );
-
-  return (
-    <div className={containerClassNames} onClick={handleContainerClick}>
-      {label && labelPosition === 'on-left' && LabelElement}
-
-      <div className={buttonClassName}>
-        <input
-          ref={checkboxRef}
-          type="checkbox"
-          aria-labelledby="input-label"
-          checked={isChecked}
-          className={inputClassName}
-          onMouseOver={handleMouseOver}
-          onMouseLeave={handleMouseLeave}
-          onChange={toggleIsChecked}
-          {...props}
-        />
-
-        <CheckIcon className={iconClassName} />
-
-        {!disableBackground && <div className={backgroundClassName} />}
-      </div>
-
-      {label && labelPosition === 'on-right' && LabelElement}
-    </div>
-  );
+const Checkbox = ({label, labelPosition = 'on-right', containerClassName = '', className = '',
+  onChange, onNativeChange, disableBackground, ...props}: CheckboxProps) => {
+  const input = <input {...props} type="checkbox" className={`ct-ui h-20 w-20 rounded-sm border border-neutral-400 accent-gray-600 ${className}`}
+    onChange={(event) => { onNativeChange?.(event); onChange?.({name:event.target.name, checked:event.target.checked}); }} />;
+  return label ? <label className={`inline-flex items-center gap-12 ${containerClassName}`}>
+    {labelPosition === 'on-left' && label}{input}{labelPosition === 'on-right' && label}
+  </label> : input;
 };
-
 export default Checkbox;

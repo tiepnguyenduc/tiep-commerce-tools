@@ -1,15 +1,12 @@
 "use client";
 
+import CTInput from "@/components/commercetools-ui/atoms/input";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faMagnifyingGlass,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
 import type { HeaderCategory, Product, SearchResult } from "@/lib/types";
 
 const suggestionLimit = 5;
@@ -141,7 +138,7 @@ export function HeaderSearch({
             <label className="sr-only" htmlFor="header-search-input">
               Search products and categories
             </label>
-            <input
+            <CTInput className="!border-0 !bg-transparent"
               autoComplete="off"
               id="header-search-input"
               name="q"

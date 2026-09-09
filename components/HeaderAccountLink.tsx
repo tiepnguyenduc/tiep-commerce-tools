@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HeaderDataMenu } from "./HeaderDataMenu";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -78,14 +79,21 @@ export function HeaderAccountLink({
   const label = customerDisplayName(customer);
 
   return (
-    <Link
-      aria-label={customer ? `Account for ${label}` : label}
-      className="header-account-link"
-      href="/account"
-      title={label}
-    >
-      <FontAwesomeIcon aria-hidden="true" icon={faUser} />
-      <span>{label}</span>
-    </Link>
+    <HeaderDataMenu>
+      <summary aria-label={customer ? `Account for ${label}` : label} className="header-account-link" title={label}>
+        <FontAwesomeIcon aria-hidden="true" icon={faUser} />
+        <span>{label}</span>
+      </summary>
+      <div className="header-data-panel">
+        <strong>{customer ? `Hello, ${label}` : "Welcome to WORK/SHOP"}</strong>
+        {customer && <p className="muted">{customer.email}</p>}
+        <Link href="/account">{customer ? "My account" : "Login / Register"}</Link>
+        {customer && <>
+          <Link href="/account/orders">My orders</Link>
+          <Link href="/account/addresses">My addresses</Link>
+          <Link href="/account/wishlists">My wishlists</Link>
+        </>}
+      </div>
+    </HeaderDataMenu>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import CTCheckbox from "@/components/commercetools-ui/atoms/checkbox";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import { useState } from "react";
 
@@ -24,7 +25,7 @@ export function BrandFilterList({
       <div className="brand-filter-list">
         {visibleBrands.map((brand) => (
           <label className="check-row" key={brand}>
-            <input
+            <CTCheckbox
               defaultChecked={selectedBrandSet.has(brand)}
               name="brand"
               type="checkbox"
