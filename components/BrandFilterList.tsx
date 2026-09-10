@@ -36,7 +36,7 @@ export function BrandFilterList({
         ))}
       </div>
       {canToggle ? (
-        <UIButton variant="ghost" size="fit"
+        <UIButton variant="secondary" size="s"
           className="filter-toggle-button"
           onClick={() => setExpanded((value) => !value)}
           type="button"

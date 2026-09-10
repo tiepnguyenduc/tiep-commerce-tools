@@ -38,10 +38,10 @@ const DefaultDropdown: FC<DropdownProps> = ({
     onChange?.(e);
   };
 
-  const containerClassNames = useClassNames(['ct-ui grid', containerClassName]);
+  const containerClassNames = useClassNames(['ct-ui grid grid-cols-1 gap-0 min-w-0 w-full', containerClassName]);
 
   const selectClassName = useClassNames([
-    'appearance-none absolute font-body z-[1] h-40 text-14 border border-neutral-500 focus:ring-0 rounded-md w-full focus:border-gray-500 bg-transparent disabled:bg-neutral-200 bg-none font-regular leading-loose pl-12 pr-0 py-0',
+    'appearance-none absolute font-body z-[1] h-40 text-14 border border-neutral-500 focus:ring-0 rounded-md w-full focus:border-gray-500 bg-transparent disabled:bg-neutral-200 bg-none font-regular leading-loose pl-12 pr-36 py-0',
     className,
     {
       'border-red-500': error,

@@ -209,9 +209,9 @@ export function ProductDetail({
             const selected = variant.id === selectedVariant.id;
             const color = variantColor(variant);
             return (
-              <UIButton variant="ghost" size="fit"
+              <UIButton variant={selected ? "primary" : "secondary"} size="xs"
                 aria-pressed={selected}
-                className={selected ? "selected" : ""}
+                className={`!grid gap-12 !text-left ${selected ? "selected" : ""}`}
                 key={variant.id}
                 onClick={() => setVariantId(variant.id)}
                 type="button"
@@ -286,14 +286,14 @@ export function ProductDetail({
           </Swiper>
           {gallery.length > 1 ? (
             <div className="gallery-controls">
-              <UIButton variant="ghost" size="fit"
+              <UIButton variant="secondary" size="icon"
                 aria-label="Previous product image"
                 onClick={() => mainSwiper?.slidePrev()}
                 type="button"
               >
                 <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
               </UIButton>
-              <UIButton variant="ghost" size="fit"
+              <UIButton variant="secondary" size="icon"
                 aria-label="Next product image"
                 onClick={() => mainSwiper?.slideNext()}
                 type="button"
@@ -357,9 +357,9 @@ export function ProductDetail({
                     const selected =
                       selectedAttributeValue(selectedVariant, group.name) === value;
                     return (
-                      <UIButton variant="ghost" size="fit"
+                      <UIButton variant={selected ? "primary" : "secondary"} size="s"
                         aria-pressed={selected}
-                        className={selected ? "selected" : ""}
+                        className={`gap-8 ${selected ? "selected" : ""}`}
                         key={value}
                         onClick={() => selectVariantOption(group.name, value)}
                         type="button"

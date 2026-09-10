@@ -2630,7 +2630,7 @@ select {
 .account-layout {
     display: grid;
     gap: 28px;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 280px minmax(0, 1fr);
 }
 
 .account-sidebar,
@@ -2675,6 +2675,7 @@ select {
 }
 
 .account-main {
+    min-width: 0;
     padding: 28px;
 }
 
@@ -2778,6 +2779,8 @@ select {
 }
 
 .account-table-wrap {
+    min-width: 0;
+    max-width: 100%;
     overflow-x: auto;
 }
 
@@ -4143,3 +4146,54 @@ select {
 .storefront-navigation-drawer .category-nav a { display: block; padding: 12px 0; white-space: normal; }
 .storefront-filter-drawer { padding: 20px; }
 .storefront-filter-drawer .filter-form { border: 0; padding: 0; background: transparent; }
+
+/* Keep account content inside its grid track, including long order identifiers. */
+.account-stack, .account-sidebar, .order-detail-panel { min-width: 0; }
+.account-sidebar-head p, .order-detail-head h3 { overflow-wrap: anywhere; }
+.account-table td:first-child { overflow-wrap: anywhere; min-width: 130px; }
+.account-table td:not(:first-child) { white-space: nowrap; }
+.wishlist-card-images { min-width: 0; overflow: hidden; }
+.wishlist-card-images img { flex: 0 0 62px; }
+@media (max-width: 760px) {
+  .account-main { padding: 18px; }
+  .order-detail-head { flex-wrap: wrap; }
+}
+#launchpad-storefront .wishlist-card-open {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch !important;
+  justify-items: stretch;
+  align-items: start !important;
+  text-align: left !important;
+  padding: 18px !important;
+}
+
+/* Address content must stay readable within the account layout. */
+.account-addresses .address-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.account-addresses .address-card .muted {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    line-height: 1.6;
+}
+.account-addresses .inline-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.account-addresses .form-grid > * { min-width: 0; }
+#launchpad-storefront .account-addresses .select-field > .ct-ui,
+#launchpad-storefront .account-addresses .select-field select {
+    width: 100%;
+    min-width: 0;
+}
+#launchpad-storefront .account-addresses .select-field select {
+    height: 40px;
+    padding-right: 36px;
+}
+@media (max-width: 760px) {
+    .account-addresses .account-box { padding: 16px; }
+    .account-addresses .address-form-actions > button { flex: 1; }
+}

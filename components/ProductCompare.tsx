@@ -95,7 +95,7 @@ export function AddToCompare({
   }
 
   return (
-    <UIButton variant="ghost" size="fit"
+    <UIButton variant="secondary" size="icon"
       aria-label={
         selected ? "Remove product from compare" : "Add product to compare"
       }

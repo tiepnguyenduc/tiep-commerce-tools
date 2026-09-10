@@ -67,7 +67,7 @@ export function ProductItemSlider({
         </div>
         {products.length > 1 ? (
           <div className="recent-slider-actions">
-            <UIButton variant="ghost" size="fit"
+            <UIButton variant="secondary" size="icon"
               aria-label={`Show previous ${title.toLowerCase()}`}
               disabled={edges.isBeginning}
               onClick={() => swiper?.slidePrev()}
@@ -75,7 +75,7 @@ export function ProductItemSlider({
             >
               <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
             </UIButton>
-            <UIButton variant="ghost" size="fit"
+            <UIButton variant="secondary" size="icon"
               aria-label={`Show next ${title.toLowerCase()}`}
               disabled={edges.isEnd}
               onClick={() => swiper?.slideNext()}

@@ -315,7 +315,7 @@ export async function ProductListingPage({
               <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
               <input type="hidden" name="color" value={p.color ?? ""} />
               {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
-              <UIButton variant="primary"  type="submit">
+              <UIButton variant="primary" className="gap-10" type="submit">
                 <span>Search</span>
                 <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
               </UIButton>

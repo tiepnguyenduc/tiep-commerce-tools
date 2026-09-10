@@ -135,7 +135,7 @@ export function AddToWishlist({
 
   return (
     <>
-      <UIButton variant="ghost" size="fit"
+      <UIButton variant="secondary" size="icon"
         aria-label={
           isSaved
             ? "Manage product wishlists"
@@ -187,8 +187,7 @@ export function AddToWishlist({
                   The current product will be saved to the new wishlist.
                 </p>
                 <div className="wishlist-modal-actions">
-                  <UIButton variant="ghost" size="fit"
-                    className="pill"
+                  <UIButton variant="secondary" size="s"
                     disabled={creatingWishlist}
                     onClick={() => setShowCreateForm(false)}
                     type="button"
@@ -213,7 +212,7 @@ export function AddToWishlist({
                     matchingLine(wishlist, productId, variantId),
                   );
                   return (
-                    <UIButton variant="ghost" size="fit"
+                    <UIButton variant={saved ? "primary" : "secondary"} size="s"
                       aria-pressed={saved}
                       className={`wishlist-picker-option${saved ? " saved" : ""}`}
                       disabled={pendingWishlistId !== null}

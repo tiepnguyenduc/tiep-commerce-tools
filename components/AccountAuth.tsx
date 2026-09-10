@@ -336,9 +336,9 @@ function AddressBookPage({
   }
 
   return (
-    <div className="account-stack">
+    <div className="account-stack account-addresses">
       <section className="account-box">
-        <h3>Default Addresses</h3>
+        <h3>Saved Addresses</h3>
         {addresses.length ? (
           <div className="address-list">
             {addresses.map((address) => (
@@ -359,12 +359,11 @@ function AddressBookPage({
                   {address.country}
                 </p>
                 <div className="inline-actions">
-                  <Button variant="ghost" size="fit" className="text-button" onClick={() => setEditing(address)}>
+                  <Button variant="secondary" size="s" type="button" disabled={busy} onClick={() => setEditing(address)}>
                     Edit
                   </Button>
                   {address.id && (
-                    <Button variant="ghost" size="fit"
-                      className="text-button danger"
+                    <Button variant="secondary" size="s" type="button"
                       disabled={busy}
                       onClick={() => removeAddress(address.id!)}
                     >
@@ -388,6 +387,8 @@ function AddressBookPage({
               autoComplete="given-name"
 
               maxLength={50}
+              label="First name"
+              disabled={busy}
               placeholder="First name"
               required
               value={editing.firstName ?? ""}
@@ -399,6 +400,8 @@ function AddressBookPage({
               autoComplete="family-name"
 
               maxLength={50}
+              label="Last name"
+              disabled={busy}
               placeholder="Last name"
               required
               value={editing.lastName ?? ""}
@@ -410,6 +413,8 @@ function AddressBookPage({
               autoComplete="address-line2"
 
               maxLength={20}
+              label="Street number"
+              disabled={busy}
               placeholder="Street number"
               value={editing.streetNumber ?? ""}
               onChange={(event) =>
@@ -420,6 +425,8 @@ function AddressBookPage({
               autoComplete="address-line1"
 
               maxLength={120}
+              label="Street name"
+              disabled={busy}
               placeholder="Street name"
               required
               value={editing.streetName ?? ""}
@@ -437,6 +444,8 @@ function AddressBookPage({
               containerClassName="wide"
               maxLength={30}
               pattern="^[0-9+().\\-\\s]{7,30}$"
+              label="Phone"
+              disabled={busy}
               placeholder="Phone"
               title="Use 7 to 30 digits, spaces, or phone symbols."
               type="tel"
@@ -446,9 +455,16 @@ function AddressBookPage({
               }
             />
           </div>
-          <Button variant="primary" disabled={busy} type="submit">
-            {savingAddress ? "Saving…" : "Save address"}
-          </Button>
+          <div className="inline-actions address-form-actions">
+            <Button variant="primary" size="s" disabled={busy} type="submit">
+              {savingAddress ? "Saving…" : "Save address"}
+            </Button>
+            {editing.id && (
+              <Button variant="secondary" size="s" disabled={busy} type="button" onClick={() => setEditing(emptyAddress)}>
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </section>
       {status && <p className="muted">{status}</p>}
@@ -603,14 +619,14 @@ export function AccountDashboard({
         </Button>
       </aside>
 
-      <main className="account-main">
+      <section className="account-main" aria-label="Account content">
         <div className="account-main-head">
           <span className="eyebrow">My account</span>
           <h2>{accountPages.find((page) => page.id === activePage)?.label}</h2>
         </div>
         {renderPage()}
         {status && <p className="muted account-status">{status}</p>}
-      </main>
+      </section>
     </section>
   );
 }
@@ -738,17 +754,17 @@ export function AccountAuth({
     <section className="panel account-auth-panel">
       <span className="eyebrow">Customer API</span>
       <h2>Login / register</h2>
-      <div className="steps">
-        <Button variant="ghost" size="fit"
-          className={`step ${action === "login" ? "on" : ""}`}
+      <div className="ct-ui mb-24 grid grid-cols-2 gap-8" role="group" aria-label="Login or register">
+        <Button variant={action === "login" ? "primary" : "secondary"} size="full"
+          aria-pressed={action === "login"}
           disabled={submitting}
           onClick={() => setAction("login")}
           type="button"
         >
           Login
         </Button>
-        <Button variant="ghost" size="fit"
-          className={`step ${action === "register" ? "on" : ""}`}
+        <Button variant={action === "register" ? "primary" : "secondary"} size="full"
+          aria-pressed={action === "register"}
           disabled={submitting}
           onClick={() => setAction("register")}
           type="button"
@@ -807,7 +823,7 @@ export function AccountAuth({
             </>
           )}
         </div>
-        <Button variant="primary" disabled={submitting} type="submit">
+        <Button variant="primary" className="gap-10" disabled={submitting} type="submit">
           {submitting ? (
             action === "login" ? (
               "Logging in…"

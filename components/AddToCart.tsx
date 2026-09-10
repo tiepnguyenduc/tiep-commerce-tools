@@ -62,7 +62,7 @@ export function AddToCart({
       size={compact ? "xs" : "l"}
       iconPosition="left"
       loading={busy}
-      className="launchpad-add-to-cart"
+      className="launchpad-add-to-cart gap-10"
       disabled={busy}
       onClick={addToCart}
       type="button"

@@ -245,6 +245,7 @@ export function WishlistsPage() {
         </p>
         <Button
           variant="primary"
+          className="gap-10"
           onClick={() => setShowCreate(true)}
           type="button"
         >
