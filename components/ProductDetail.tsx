@@ -1,4 +1,5 @@
 "use client";
+import styles from "./StorefrontCatalog.module.css";
 import Modal from "@/components/commercetools-ui/organisms/modal";
 
 import UIButton from "@/components/commercetools-ui/atoms/button";
@@ -211,7 +212,7 @@ export function ProductDetail({
             return (
               <UIButton variant={selected ? "primary" : "secondary"} size="xs"
                 aria-pressed={selected}
-                className={`!grid gap-12 !text-left ${selected ? "selected" : ""}`}
+                className={`${styles.variantCard} ${selected ? "selected" : ""}`}
                 key={variant.id}
                 onClick={() => setVariantId(variant.id)}
                 type="button"
@@ -251,7 +252,8 @@ export function ProductDetail({
   }
 
   return (
-    <main className="shell detail product-detail">
+    <main className={`shell detail product-detail ${styles.detail}`}>
+      <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">All products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
       <section className="product-gallery" aria-label={`${product.name} gallery`}>
         <div className="product-gallery-main">
           {product.brand ? (
@@ -333,7 +335,7 @@ export function ProductDetail({
         <span className="eyebrow">{product.category} collection</span>
         <h1>{product.name}</h1>
         <a className="product-review-link" href="#product-reviews">Read &amp; write reviews</a>
-        <p className="product-summary">{product.description}</p>
+        <p className="product-summary">{product.description.length > 240 ? `${product.description.slice(0, 237).replace(/\s+\S*$/, "")}…` : product.description}</p>
         <div className="product-price-block">
           <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
             {selectedVariant.originalPrice ? (
@@ -449,7 +451,7 @@ export function ProductDetail({
         <Modal isOpen preventScroll onRequestClose={() => setLightboxOpen(false)} contentLabel={`${product.name} image preview`} className="product-lightbox-panel" style={{content: {width: 'min(1100px, 95vw)', maxWidth: '95vw'}, overlay: {backgroundColor: 'rgba(0,0,0,.8)'}}}>
             <div className="product-lightbox-head">
               <strong>{product.name}</strong>
-              <UIButton variant="ghost" size="fit"
+              <UIButton variant="secondary" size="icon"
                 aria-label="Close image preview"
                 onClick={() => setLightboxOpen(false)}
                 type="button"
@@ -473,7 +475,7 @@ export function ProductDetail({
             </Swiper>
             {gallery.length > 1 ? (
               <div className="product-lightbox-controls">
-                <UIButton variant="ghost" size="fit"
+                <UIButton variant="secondary" size="icon"
                   aria-label="Previous preview image"
                   onClick={() => lightboxSwiper?.slidePrev()}
                   type="button"
@@ -483,7 +485,7 @@ export function ProductDetail({
                 <span>
                   {activeImage + 1} / {gallery.length}
                 </span>
-                <UIButton variant="ghost" size="fit"
+                <UIButton variant="secondary" size="icon"
                   aria-label="Next preview image"
                   onClick={() => lightboxSwiper?.slideNext()}
                   type="button"

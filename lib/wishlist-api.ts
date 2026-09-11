@@ -75,7 +75,7 @@ export function loadWishlists(force = false): Promise<Wishlist[]> {
 
   const currentGeneration = generation;
   emit({ ...state, status: "loading", error: "" });
-  pendingLoad = fetch("/api/wishlists")
+  pendingLoad = fetch("/api/wishlists", { cache: "no-store" })
     .then((response) => readJson<{ wishlists: Wishlist[] }>(response))
     .then(({ wishlists }) => {
       if (currentGeneration === generation) emit({ wishlists, status: "ready", error: "" });

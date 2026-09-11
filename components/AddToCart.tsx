@@ -22,6 +22,7 @@ export function AddToCart({
   const [busy, setBusy] = useState(false);
   const { cart, loadCart, openCart, syncCart } = useMiniCart();
   const showToast = useToast();
+  const inCart = cart?.mode === mode ? cart.lines.filter(line => sku ? line.sku === sku : line.productId === productId).reduce((count, line) => count + line.quantity, 0) : 0;
   async function addToCart() {
     if (busy) return;
     setBusy(true);
@@ -62,7 +63,8 @@ export function AddToCart({
       size={compact ? "xs" : "l"}
       iconPosition="left"
       loading={busy}
-      className="launchpad-add-to-cart gap-10"
+      className={`launchpad-add-to-cart gap-10${inCart ? " in-cart" : ""}`}
+      aria-label={inCart ? `Add more to cart (${inCart} in cart)` : undefined}
       disabled={busy}
       onClick={addToCart}
       type="button"
@@ -72,12 +74,12 @@ export function AddToCart({
       ) : compact ? (
         <>
           <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />
-          <span>Add</span>
+          <span>{inCart ? `In cart (${inCart}) +` : "Add"}</span>
         </>
       ) : (
         <>
           <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />
-          <span>Add to cart</span>
+          <span>{inCart ? `Add more · ${inCart} in cart` : "Add to cart"}</span>
         </>
       )}
     </Button>

@@ -1,3 +1,4 @@
+import styles from "./StorefrontCatalog.module.css";
 import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
 import CTSelect from "@/components/commercetools-ui/atoms/dropdown/default-dropdown";
 import CTRadio from "@/components/commercetools-ui/atoms/radio";
@@ -134,8 +135,26 @@ export async function ProductListingPage({
     sort: p.sort,
     sale: saleOnly ? "true" : undefined,
   };
+  const currencyCode = result.products[0]?.price.currencyCode ?? "EUR";
+  const formatPrice = (value: string) =>
+    new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: currencyCode,
+      maximumFractionDigits: 0,
+    }).format(Number(value));
+  const localizedPriceRanges = priceRanges.map((range) => {
+    const [min, max] = range.value.split("-");
+    return {
+      ...range,
+      label: !min
+        ? `Under ${formatPrice(max)}`
+        : !max
+          ? `Over ${formatPrice(min)}`
+          : `${formatPrice(min)} - ${formatPrice(max)}`,
+    };
+  });
   const selectedPriceLabel =
-    priceRanges.find((range) => range.value === p.price)?.label ?? "";
+    localizedPriceRanges.find((range) => range.value === p.price)?.label ?? "";
   const activeFilters = [
     p.q
       ? {
@@ -205,7 +224,7 @@ export async function ProductListingPage({
     ? Math.min(result.pagination.page * result.pagination.perPage, result.total)
     : 0;
 
-  function FilterForm() {
+  function FilterForm({ location }: { location: "desktop" | "mobile" }) {
     return (
       <AutoSubmitFilterForm action={basePath}>
         <input type="hidden" name="q" value={p.q ?? ""} />
@@ -213,7 +232,7 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Sort by</span>
-          <CTSelect className="field" name="sort" defaultValue={p.sort ?? ""}>
+          <CTSelect className="field" id={`${location}-sort`} name="sort" defaultValue={p.sort ?? ""}>
             <option value="">Newest</option>
             <option value="price-asc">Price: Low to high</option>
             <option value="price-desc">Price: High to low</option>
@@ -223,7 +242,7 @@ export async function ProductListingPage({
 
         <fieldset className="filter-group">
           <legend className="filter-label">Price</legend>
-          {priceRanges.map((range) => (
+          {localizedPriceRanges.map((range) => (
             <label className="check-row" key={range.value}>
               <CTRadio
                 type="radio"
@@ -240,6 +259,7 @@ export async function ProductListingPage({
           <span className="filter-label">Category</span>
           <CTSelect
             className="field"
+            id={`${location}-category`}
             name="categoryId"
             defaultValue={p.categoryId ?? ""}
           >
@@ -260,7 +280,7 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Color</span>
-          <CTSelect className="field" name="color" defaultValue={p.color ?? ""}>
+          <CTSelect className="field" id={`${location}-color`} name="color" defaultValue={p.color ?? ""}>
             <option value="">All colors</option>
             {result.facets.colors.map((x) => (
               <option key={x}>{x}</option>
@@ -276,132 +296,121 @@ export async function ProductListingPage({
   }
 
   return (
-    <main className={`shell listing-page ${isSearch ? "search-results-page" : ""}`}>
+    <main className={`shell listing-page ${styles.listing}`}>
       <header className="page-head search-page-head">
         <div>
           <p className="eyebrow">
             {isSearch ? "Search keyword" : "Product catalog"}
           </p>
           <h1>{title}</h1>
-          {!isSearch ? (
-            <p className="muted">
-              {saleOnly
-                ? "Products with a special price, discounted from their original list price."
-                : "Browse products from the live catalog with filters for category, price, color, and sort order."}
-            </p>
-          ) : null}
+          <p className="muted">
+            {saleOnly
+              ? "Products with a special price, discounted from their original list price."
+              : "Thoughtful pieces for the spaces you live and work in. Find your everyday favourites."}
+          </p>
         </div>
 
-        {!isSearch ? (
-          <>
-            <form action={basePath} className="catalog-search-hero" method="get">
-              <label className="sr-only" htmlFor={`${variant}-search-input`}>
-                Search products
-              </label>
-              <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
-              <CTInput
-                autoComplete="off"
-                id={`${variant}-search-input`}
-                name="q"
-                defaultValue={p.q}
-                placeholder="Search products, categories, SKU..."
-                type="search"
-              />
-              <input type="hidden" name="sort" value={p.sort ?? ""} />
-              <input type="hidden" name="price" value={p.price ?? ""} />
-              {selectedBrands.map((brand) => (
-                <input key={brand} type="hidden" name="brand" value={brand} />
-              ))}
-              <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
-              <input type="hidden" name="color" value={p.color ?? ""} />
-              {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
-              <UIButton variant="primary" className="gap-10" type="submit">
-                <span>Search</span>
-                <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-              </UIButton>
-            </form>
+        <form action={basePath} className={`catalog-search-hero ${styles.searchForm}`} method="get">
+          <label className="sr-only" htmlFor={`${variant}-search-input`}>
+            Search products
+          </label>
+          <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
+          <CTInput
+            containerClassName={styles.searchInput}
+            autoComplete="off"
+            id={`${variant}-search-input`}
+            name="q"
+            defaultValue={p.q}
+            placeholder="Search products, categories, SKU..."
+            type="search"
+          />
+          <input type="hidden" name="sort" value={p.sort ?? ""} />
+          <input type="hidden" name="price" value={p.price ?? ""} />
+          {selectedBrands.map((brand) => (
+            <input key={brand} type="hidden" name="brand" value={brand} />
+          ))}
+          <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
+          <input type="hidden" name="color" value={p.color ?? ""} />
+          {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
+          <UIButton variant="primary" className={styles.searchButton} size="s" type="submit">
+            <span>Search</span>
+            <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+          </UIButton>
+        </form>
 
-            <div className="search-quick-row" aria-label="Popular searches">
-              <span>Popular:</span>
-              {popularSearches.map((term) => (
-                <Link
-                  href={`${basePath}?q=${encodeURIComponent(term)}`}
-                  key={term}
-                >
-                  {term}
-                </Link>
-              ))}
-            </div>
-          </>
-        ) : null}
+        <div className="search-quick-row" aria-label="Popular searches">
+          <span>Popular:</span>
+          {popularSearches.map((term) => (
+            <Link
+              href={`${basePath}?q=${encodeURIComponent(term)}`}
+              key={term}
+            >
+              {term}
+            </Link>
+          ))}
+        </div>
       </header>
 
-      {!isSearch ? (
-        <section className="results-meta-panel" aria-label="Search result summary">
-          <div>
-            <strong>{result.total} products</strong>
-            <span>
-              Showing {resultStart}-{resultEnd} · Page {result.pagination.page}{" "}
-              of {result.pagination.totalPages}
-            </span>
-          </div>
-          <div className="active-filter-list" aria-label="Active filters">
-            {activeFilters.length ? (
-              activeFilters.map((filter) => (
-                <Link
-                  className="active-filter-chip"
-                  href={filter.href}
-                  key={`${filter.label}-${filter.value}`}
-                >
-                  <span>
-                    {filter.label}: {filter.value}
-                  </span>
-                  <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-                </Link>
-              ))
-            ) : (
-              <span className="empty-filter-chip">No filters applied</span>
-            )}
-          </div>
-        </section>
-      ) : null}
+      <section className="results-meta-panel" aria-label="Search result summary">
+        <div>
+          <strong>{result.total} products</strong>
+          <span>
+            Showing {resultStart}-{resultEnd} · Page {result.pagination.page}{" "}
+            of {result.pagination.totalPages}
+          </span>
+        </div>
+        <div className="active-filter-list" aria-label="Active filters">
+          {activeFilters.length ? (
+            activeFilters.map((filter) => (
+              <Link
+                className="active-filter-chip"
+                href={filter.href}
+                key={`${filter.label}-${filter.value}`}
+              >
+                <span>
+                  {filter.label}: {filter.value}
+                </span>
+                <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
+              </Link>
+            ))
+          ) : (
+            <span className="empty-filter-chip">No filters applied</span>
+          )}
+        </div>
+      </section>
 
       <MobileFilterDrawer>
-        <FilterForm />
+        <FilterForm location="mobile" />
       </MobileFilterDrawer>
 
       <div className="catalog-layout">
         <aside className="filter-panel" aria-label="Product filters">
-          {!isSearch ? (
-            <div className="filter-panel-head">
-              <FontAwesomeIcon aria-hidden="true" icon={faSliders} />
-              <strong>Refine results</strong>
-            </div>
-          ) : null}
-          <FilterForm />
+          <div className="filter-panel-head">
+            <FontAwesomeIcon aria-hidden="true" icon={faSliders} />
+            <strong>Refine results</strong>
+          </div>
+          <FilterForm location="desktop" />
         </aside>
 
         <section className="catalog-results">
-          {!isSearch ? (
-            <div className="results-toolbar">
-              <div>
-                <strong>Results</strong>
-                <span>
-                  {activeFilters.length
-                    ? `${activeFilters.length} active filter${activeFilters.length > 1 ? "s" : ""}`
-                    : "All catalog items"}
-                </span>
-              </div>
-              <Link className="toolbar-link" href={basePath}>
-                <span>Reset search</span>
-                <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-              </Link>
+          <div className="results-toolbar">
+            <div>
+              <strong>Results</strong>
+              <span>
+                {activeFilters.length
+                  ? `${activeFilters.length} active filter${activeFilters.length > 1 ? "s" : ""}`
+                  : "All catalog items"}
+              </span>
             </div>
-          ) : null}
+            <Link className="toolbar-link" href={basePath}>
+              <span>Reset search</span>
+              <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
+            </Link>
+          </div>
 
           {result.products.length ? (
             <>
-              <div className="grid">
+              <div className={styles.productGrid}>
                 {result.products.map((x) => (
                   <ProductCard key={x.id} product={x} />
                 ))}

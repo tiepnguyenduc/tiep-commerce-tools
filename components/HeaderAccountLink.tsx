@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { setCompareCustomer } from "@/lib/compare-storage";
+import { resetWishlists, loadWishlists } from "@/lib/wishlist-api";
 import { HeaderDataMenu } from "./HeaderDataMenu";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +23,9 @@ export function customerDisplayName(customer: CustomerProfile | null) {
 export function publishCustomerAuthChange(customer: CustomerProfile | null) {
   if (typeof window === "undefined") return;
 
+  setCompareCustomer(customer?.id ?? null);
+  resetWishlists();
+  void loadWishlists().catch(() => undefined);
   window.dispatchEvent(
     new CustomEvent<CustomerProfile | null>(customerAuthChangeEvent, {
       detail: customer,
@@ -59,7 +64,7 @@ export function HeaderAccountLink({
         return data.customer ?? null;
       })
       .then((nextCustomer) => {
-        if (!authEventReceived) setCustomer(nextCustomer);
+        if (!authEventReceived) publishCustomerAuthChange(nextCustomer);
       })
       .catch((error: unknown) => {
         if (

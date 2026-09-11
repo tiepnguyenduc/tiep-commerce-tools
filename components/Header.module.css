@@ -14,7 +14,7 @@
 .actions :global(.header-account-link span), .actions :global(.header-wishlist-link > span), .actions :global(.header-compare-link > span), .actions :global(.cart-icon-button > span) { display: none; }
 .actions :global(.cart-icon-button) { color: #202620; border: 0; background: transparent; padding: 8px 4px; }
 .navigation { border-top: 1px solid #ededE7; }
-.navigationInner { display: flex; gap: 36px; align-items: center; }
+.navigationInner { position: relative; display: flex; gap: 36px; align-items: center; }
 .primaryLinks { display: flex; flex: 0 0 auto; gap: 26px; align-items: center; padding: 17px 30px 17px 0; border-right: 1px solid #ededE7; font-size: 13px; font-weight: 600; }
 .sale { color: #a43f22; }
 .categoryLinks { overflow: visible; min-width: 0; }

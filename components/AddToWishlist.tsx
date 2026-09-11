@@ -206,6 +206,7 @@ export function AddToWishlist({
             </>
           ) : (
             <>
+              <p className="wishlist-picker-intro">Choose a list to save this product. Select a saved list to remove it.</p>
               <div className="wishlist-picker-list">
                 {wishlists.map((wishlist) => {
                   const saved = Boolean(
@@ -239,8 +240,8 @@ export function AddToWishlist({
                 })}
               </div>
               <div className="wishlist-picker-footer">
-                <UIButton variant="ghost" size="fit"
-                  className="text-button wishlist-create-trigger"
+                <UIButton variant="secondary" size="s"
+                  className="wishlist-create-trigger"
                   onClick={() => setShowCreateForm(true)}
                   type="button"
                 >

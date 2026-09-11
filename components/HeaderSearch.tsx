@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./StorefrontCatalog.module.css";
 import CTInput from "@/components/commercetools-ui/atoms/input";
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
@@ -25,6 +26,7 @@ export function HeaderSearch({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestedProducts, setSuggestedProducts] = useState(products);
+  const [searchState, setSearchState] = useState<"ready" | "loading" | "error">("ready");
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const trimmedQuery = query.trim();
@@ -70,9 +72,11 @@ export function HeaderSearch({
   useEffect(() => {
     if (!trimmedQuery) {
       setSuggestedProducts(products);
+      setSearchState("ready");
       return;
     }
 
+    setSearchState("loading");
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       try {
@@ -83,12 +87,14 @@ export function HeaderSearch({
         const response = await fetch(`/api/products?${params.toString()}`, {
           signal: controller.signal,
         });
-        if (!response.ok) return;
+        if (!response.ok) throw new Error("Search unavailable");
         const result = (await response.json()) as SearchResult;
         setSuggestedProducts(result.products);
+        setSearchState("ready");
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
-          setSuggestedProducts(products);
+          setSuggestedProducts([]);
+          setSearchState("error");
         }
       }
     }, 180);
@@ -116,7 +122,7 @@ export function HeaderSearch({
   }
 
   return (
-    <div className={`header-search ${open ? "open" : ""}`} ref={rootRef}>
+    <div className={`header-search ${styles.headerSearch} ${open ? "open" : ""}`} ref={rootRef}>
       {!open && !inline ? (
         <UIButton variant="ghost" size="fit"
           aria-label="Open search"
@@ -138,7 +144,7 @@ export function HeaderSearch({
             <label className="sr-only" htmlFor="header-search-input">
               Search products and categories
             </label>
-            <CTInput className="!border-0 !bg-transparent"
+            <CTInput containerClassName={styles.headerInput} className={styles.headerInputControl}
               autoComplete="off"
               id="header-search-input"
               name="q"
@@ -155,7 +161,7 @@ export function HeaderSearch({
             {query ? (
               <UIButton variant="ghost" size="fit"
                 aria-label="Clear search"
-                className="header-search-clear"
+                className={`header-search-clear ${styles.headerClear}`}
                 onClick={clearSearch}
                 type="button"
               >
@@ -164,7 +170,7 @@ export function HeaderSearch({
             ) : null}
             <UIButton variant="ghost" size="fit"
               aria-label="Search"
-              className="header-search-submit"
+              className={`header-search-submit ${styles.headerSubmit}`}
               type="submit"
             >
               <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
@@ -193,7 +199,9 @@ export function HeaderSearch({
 
             <div className="header-search-group">
               <h3>Products</h3>
-              {productsToShow.length ? (
+              {searchState !== "ready" ? (
+                <p className="search-empty" role="status">{searchState === "loading" ? "Finding products…" : "Suggestions are unavailable. Try viewing all results."}</p>
+              ) : productsToShow.length ? (
                 productsToShow.map((product) => (
                   <Link
                     className="header-search-row product-result"

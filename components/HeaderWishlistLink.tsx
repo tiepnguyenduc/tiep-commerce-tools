@@ -4,16 +4,10 @@ import Link from "next/link";
 import { HeaderDataMenu } from "./HeaderDataMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import { useEffect } from "react";
-import { customerAuthChangeEvent } from "./HeaderAccountLink";
-import { resetWishlists, useWishlists } from "@/lib/wishlist-api";
+import { useWishlists } from "@/lib/wishlist-api";
 
 export function HeaderWishlistLink() {
   const { wishlists, status } = useWishlists();
-  useEffect(() => {
-    window.addEventListener(customerAuthChangeEvent, resetWishlists);
-    return () => window.removeEventListener(customerAuthChangeEvent, resetWishlists);
-  }, []);
   const itemCount = wishlists.reduce(
     (count, wishlist) => count + wishlist.lines.length,
     0,

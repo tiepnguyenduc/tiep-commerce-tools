@@ -1,3 +1,4 @@
+import { ProductCartStatus } from "./ProductCartStatus";
 import Link from "next/link";
 import ProductTile from "@/components/commercetools-ui/molecules/product-tile";
 import { toLaunchpadTileProduct } from "@/lib/mappers/launchpad-product";
@@ -24,7 +25,8 @@ export function ProductCard({ product }: { product: Product }) {
         {product.brand && <Link className="tag brand-tag" href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}>{product.brand}</Link>}
       </div>
       <p className="muted launchpad-product-description">{product.description}</p>
-      <div className="card-actions">
+      <ProductCartStatus productId={product.id} />
+      <div className="product-image-actions">
         <AddToWishlist compact productId={product.id} />
         <AddToCompare compact product={productToCompareProduct(product)} />
       </div>

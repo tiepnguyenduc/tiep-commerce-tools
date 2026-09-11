@@ -1,4 +1,5 @@
 "use client";
+import { ProductCartStatus } from "./ProductCartStatus";
 
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import type { ReactNode } from "react";
@@ -106,12 +107,19 @@ export function ProductItemSlider({
         {products.map((product) => (
           <SwiperSlide className="recent-slide" key={product.id}>
             <article className="recent-product">
-              <Link
-                className="recent-product-media"
-                href={`/products/${product.slug}`}
-              >
-                <img src={product.image} alt={product.name} />
-              </Link>
+              <div className="product-image-frame">
+                <ProductCartStatus productId={product.id} />
+                <Link
+                  className="recent-product-media"
+                  href={`/products/${product.slug}`}
+                >
+                  <img src={product.image} alt={product.name} />
+                </Link>
+                <div className="product-image-actions">
+                  <AddToWishlist compact productId={product.id} />
+                  <AddToCompare compact product={itemToCompareProduct(product)} />
+                </div>
+              </div>
               <div className="recent-product-body">
                 <div className="card-meta-row recent-product-meta">
                   <span className="tag">{product.category}</span>
@@ -132,11 +140,6 @@ export function ProductItemSlider({
                   <strong>{product.price.formatted}</strong>
                   <div className="recent-product-actions">
                     {renderAction?.(product)}
-                    <AddToWishlist compact productId={product.id} />
-                    <AddToCompare
-                      compact
-                      product={itemToCompareProduct(product)}
-                    />
                   </div>
                 </div>
               </div>

@@ -14,7 +14,6 @@ import { publishCustomerAuthChange } from "@/components/HeaderAccountLink";
 import { accountHref, accountPages, type AccountPage } from "@/lib/account-pages";
 import type { CustomerAddress, CustomerOrderDetail, CustomerOrderSummary, CustomerProfile } from "@/lib/types";
 import { fetchCustomerOrders } from "@/lib/account-orders-api";
-import { resetWishlists } from "@/lib/wishlist-api";
 
 type Action = "login" | "register";
 
@@ -693,10 +692,10 @@ export function AccountAuth({
         training?: boolean;
         customer: CustomerProfile;
       }>(response);
-      await loadCustomer(true);
       const nextCustomer = normalizeCustomer(data.customer);
       setCustomer(nextCustomer);
       publishCustomerAuthChange(nextCustomer);
+      router.refresh();
       setState(
         data.training
           ? `Training customer ready: ${data.customer.email}`
@@ -724,7 +723,6 @@ export function AccountAuth({
         showToast("Logout failed. Please try again.", "error");
         return;
       }
-      resetWishlists();
       setCustomer(null);
       publishCustomerAuthChange(null);
       setState("");

@@ -29,7 +29,7 @@ function mapCustomerResult(result: {
     firstName: result.customer.firstName,
     lastName: result.customer.lastName,
   });
-  if (result.cart?.id) setCartId("b2c", result.cart.id);
+  setCartId("b2c", result.cart?.id);
 
   return {
     id: result.customer.id,

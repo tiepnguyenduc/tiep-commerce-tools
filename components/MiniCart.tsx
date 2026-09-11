@@ -64,7 +64,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) throw new Error("Could not load your cart.");
       const data = await response.json() as Cart;
       if (version === requestVersion.current) setCart(data);
-      return data;
+      return version === requestVersion.current ? data : null;
     } catch {
       if (version === requestVersion.current) setLoadError("Could not load your cart. Please try again.");
       return null;

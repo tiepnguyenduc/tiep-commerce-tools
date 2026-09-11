@@ -8,25 +8,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCodeCompare, faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { AddToCart } from "@/components/AddToCart";
 import { useToast } from "@/components/Toast";
-import { isCompareProductData, type CompareProductData } from "@/components/ProductCompareData";
+import { type CompareProductData } from "@/components/ProductCompareData";
 
-const storageKey = "launchpad-compare-products";
-
-function readCompareProducts() {
-  if (typeof window === "undefined") return [];
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(storageKey) ?? "[]");
-    return Array.isArray(parsed) ? parsed.filter(isCompareProductData) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCompareProducts(products: CompareProductData[]) {
-  window.localStorage.setItem(storageKey, JSON.stringify(products));
-  window.dispatchEvent(new Event(storageKey));
-}
+import { compareChangeEvent as storageKey, readCompareProducts, writeCompareProducts } from "@/lib/compare-storage";
 
 export function useCompareProducts() {
   const [products, setProducts] = useState<CompareProductData[]>([]);
