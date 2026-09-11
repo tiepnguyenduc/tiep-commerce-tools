@@ -55,7 +55,7 @@ const QuantitySelector = ({
       >
         {`-`}
       </button>
-      {editable ? <input type="number" aria-label={label} min={Number.isFinite(minValue) ? minValue : undefined} max={Number.isFinite(maxValue) ? maxValue : undefined} step={1} disabled={disabled} value={draft}
+      {editable ? <input type="text" aria-label={label} min={Number.isFinite(minValue) ? minValue : undefined} max={Number.isFinite(maxValue) ? maxValue : undefined} step={1} disabled={disabled} value={draft}
         className="w-48 border-0 bg-transparent p-0 text-center text-14"
         onChange={(event) => setDraft(event.target.value)}
         onBlur={() => { const next = Number(draft); if (draft.trim() && Number.isInteger(next)) { const normalized = normalizeValue(next); setDraft(String(normalized)); handleChange(normalized); } else setDraft(String(value)); }}
