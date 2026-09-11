@@ -19,6 +19,7 @@ import {
 } from "./account-mappers";
 import {
   clearCustomerSession,
+  setCartId,
   readCommerceSession,
   setCustomerSession,
 } from "./session";
@@ -242,4 +243,6 @@ export async function readCustomerOrderDetail(
 
 export function logoutCustomer() {
   clearCustomerSession();
+  setCartId("b2c", undefined);
+  setCartId("b2b", undefined);
 }
