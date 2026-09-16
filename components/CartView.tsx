@@ -1,21 +1,34 @@
 "use client";
 import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
 import CTInput from "@/components/commercetools-ui/atoms/input";
-import { StorefrontCartItem } from "./StorefrontCartItem";
+import { CartLineVariant } from "./CartLineVariant";
+import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
+import Image from "@/components/commercetools-ui/atoms/image";
+import Link from "next/link";
+import styles from "./CartView.module.css";
 import UIButton from "@/components/commercetools-ui/atoms/button";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faArrowLeft,
+  faBagShopping,
+  faTrashCan,
+  faCartPlus,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { useMiniCart } from "@/components/MiniCart";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
-import { type RecentlyViewedProduct, useRecentlyViewedProducts } from "@/components/RecentlyViewedProducts";
+import {
+  type RecentlyViewedProduct,
+  useRecentlyViewedProducts,
+} from "@/components/RecentlyViewedProducts";
 import { useToast } from "@/components/Toast";
 import type { Cart, CartLine } from "@/lib/types";
 
 export function CartView() {
-  const [cart, setCart] = useState<Cart | null>(null);
+  const summaryRef = useRef<HTMLElement>(null);
   const [discountCode, setDiscountCode] = useState("");
   const [discountError, setDiscountError] = useState("");
   const [applyingDiscount, setApplyingDiscount] = useState(false);
@@ -25,33 +38,49 @@ export function CartView() {
     null,
   );
   const recentlyViewedProducts = useRecentlyViewedProducts();
-  const { syncCart } = useMiniCart();
+  const { cart, syncCart, loading, loadError, loadCart } = useMiniCart();
+  const busy =
+    pendingLineId !== null ||
+    clearingCart ||
+    applyingDiscount ||
+    removingDiscountId !== null;
   const showToast = useToast();
   const suggestedProducts = useMemo(
     () => recentlyViewedProducts.slice(0, 8),
     [recentlyViewedProducts],
   );
 
+  useEffect(() => {
+    const summary = summaryRef.current;
+    const header = document.querySelector("header.header");
+    if (!summary || !header) return;
+    const updatePosition = () => {
+      const offset = header.getBoundingClientRect().height + 24;
+      summary.style.setProperty("--cart-summary-offset", `${offset}px`);
+      summary.dataset.sticky = String(
+        window.innerHeight >= offset + summary.offsetHeight + 24,
+      );
+    };
+    const observer = new ResizeObserver(updatePosition);
+    observer.observe(header);
+    observer.observe(summary);
+    window.addEventListener("resize", updatePosition);
+    updatePosition();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [cart?.lines.length]);
+
   function receiveCart(nextCart: Cart | null) {
-    setCart(nextCart);
     syncCart(nextCart);
   }
-
-  async function load() {
-    const response = await fetch("/api/cart");
-    const data = await response.json();
-    receiveCart(response.ok ? data : null);
-  }
-
-  useEffect(() => {
-    void load();
-  }, []);
 
   async function setQty(
     line: Pick<CartLine, "id" | "productId" | "sku">,
     quantity: number,
   ) {
-    if (!cart || pendingLineId || clearingCart) return;
+    if (!cart || busy) return;
     setPendingLineId(line.id);
     try {
       const r = await fetch("/api/cart", {
@@ -83,9 +112,7 @@ export function CartView() {
 
   async function addRecentlyViewedProduct(product: RecentlyViewedProduct) {
     if (!cart) return;
-    const existing = cart.lines.find(
-      (line) => line.sku === product.sku || line.productId === product.id,
-    );
+    const existing = cart.lines.find((line) => line.sku === product.sku);
     await setQty(
       existing ?? {
         id: `recent-${product.id}`,
@@ -97,7 +124,7 @@ export function CartView() {
   }
 
   async function clearAllItems() {
-    if (!cart || clearingCart || pendingLineId || cart.itemCount === 0) return;
+    if (!cart || busy || cart.itemCount === 0) return;
     setClearingCart(true);
     try {
       const response = await fetch("/api/cart", {
@@ -106,14 +133,15 @@ export function CartView() {
         body: JSON.stringify({ mode: cart.mode }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        showToast(data.error || "Could not clear the cart.", "error");
-        return;
-      }
+      if (!response.ok)
+        throw new Error(data.error || "Could not clear the cart.");
       receiveCart(data);
       showToast("Cart cleared.", "success");
-    } catch {
-      showToast("Network error — could not clear the cart.", "error");
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Could not clear the cart.",
+        "error",
+      );
     } finally {
       setClearingCart(false);
     }
@@ -130,16 +158,14 @@ export function CartView() {
       body: JSON.stringify({ ...body, mode: cart.mode }),
     });
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || "Discount update failed.");
-    }
+    if (!response.ok) throw new Error(data.error || "Discount update failed.");
     receiveCart(data);
   }
 
   async function applyDiscount(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const code = discountCode.trim();
-    if (!code || applyingDiscount) return;
+    if (!code || busy) return;
     setApplyingDiscount(true);
     setDiscountError("");
     try {
@@ -157,7 +183,7 @@ export function CartView() {
   }
 
   async function removeDiscount(discountCodeId: string) {
-    if (removingDiscountId) return;
+    if (busy) return;
     setRemovingDiscountId(discountCodeId);
     setDiscountError("");
     try {
@@ -173,161 +199,322 @@ export function CartView() {
     }
   }
 
-  if (!cart) return <p>Loading training cart…</p>;
-
   return (
-    <>
-      <div className="cart-layout">
-        <div className="panel">
-          <div className="cart-panel-head">
-            <h2>Cart items</h2>
-            {cart.itemCount > 0 && (
-              <UIButton variant="ghost" size="fit"
-                className="text-button danger"
-                disabled={clearingCart || pendingLineId !== null}
-                onClick={clearAllItems}
-                type="button"
-              >
-                {clearingCart ? "Clearing…" : "Clear all"}
-              </UIButton>
-            )}
-          </div>
-
-          {cart.lines.length === 0 ? (
-            <div>
-              <h2>Your project starts here.</h2>
-              <p className="muted">
-                Add a product to demonstrate the BFF-backed cart flow.
-              </p>
-            </div>
-          ) : (
-            cart.lines.map((line) => <StorefrontCartItem key={line.id} line={line} disabled={pendingLineId !== null || clearingCart} onQuantityChange={(quantity) => setQty(line, quantity)} />)
-          )}
+    <div className={styles.page}>
+      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+        <Link href="/">Home</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Shopping bag</span>
+      </nav>
+      <header className={styles.heading}>
+        <div>
+          <h1>Your shopping bag</h1>
         </div>
-
-        <aside className="panel">
-          <span className="eyebrow">Order summary</span>
-          <h2>
-            {cart.itemCount} item{cart.itemCount === 1 ? "" : "s"}
-          </h2>
-          <div className="row">
-            <span>Subtotal</span>
-            <strong>{cart.subtotal.formatted}</strong>
+        <Link className={styles.continueLink} href="/products">
+          <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" /> Continue
+          shopping
+        </Link>
+      </header>
+      {loadError && (
+        <div className={styles.error} role="alert">
+          <span>{loadError}</span>
+          <UIButton
+            variant="secondary"
+            size="s"
+            onClick={() => void loadCart()}
+            disabled={loading}
+          >
+            Try again
+          </UIButton>
+        </div>
+      )}
+      {!cart ? (
+        loading ? (
+          <div
+            className={styles.loading}
+            role="status"
+            aria-label="Loading your shopping bag"
+          >
+            <div />
+            <div />
+            <div />
+            <p>Loading your shopping bag…</p>
           </div>
-          <div className="row">
-            <span>Tax</span>
-            <strong>{cart.taxTotal.formatted}</strong>
-          </div>
-          <div className="row discount-row">
-            <span>Discount</span>
-            <strong>
-              {cart.discountTotal.centAmount > 0
-                ? `−${cart.discountTotal.formatted}`
-                : cart.discountTotal.formatted}
-            </strong>
-          </div>
-          <div className="row cart-total-row">
-            <span>Total</span>
-            <strong>{cart.total.formatted}</strong>
-          </div>
-          {cart.itemCount > 0 && (
-            <div className="discount-box">
-              <form className="discount-form" onSubmit={applyDiscount}>
-                <label htmlFor="discount-code">Discount code</label>
-                <div className="discount-form-controls">
+        ) : !loadError ? (
+          <p role="status">
+            Your shopping bag is unavailable. Please try again.
+          </p>
+        ) : null
+      ) : cart.lines.length === 0 ? (
+        <section className={styles.empty}>
+          <FontAwesomeIcon icon={faBagShopping} aria-hidden="true" />
+          <p className={styles.eyebrow}>Room for something lovely</p>
+          <h2>Your bag is waiting.</h2>
+          <p>Discover considered pieces for the spaces you love.</p>
+          <ButtonLink
+            href="/products"
+            variant="primary"
+            className={styles.checkout}
+          >
+            Explore the collection{" "}
+            <FontAwesomeIcon icon={faArrowRight} aria-hidden="true" />
+          </ButtonLink>
+        </section>
+      ) : (
+        <div className={styles.layout}>
+          <section
+            className={styles.items}
+            aria-label="Items in your shopping bag"
+            aria-busy={busy}
+          >
+            <div className={styles.listHeading}>
+              <h2>
+                {cart.itemCount} item{cart.itemCount === 1 ? "" : "s"} in your
+                bag
+              </h2>
+              <UIButton
+                variant="ghost"
+                size="s"
+                className={`${styles.continueLink} ${styles.clear}`}
+                disabled={busy}
+                loading={clearingCart}
+                onClick={clearAllItems}
+              >
+                Clear bag
+              </UIButton>
+            </div>
+            {cart.lines.map((line) => (
+              <article className={styles.item} key={line.id}>
+                <Link
+                  className={styles.image}
+                  href={`/products/${line.slug || line.productId}`}
+                  aria-label={`View ${line.name}`}
+                >
+                  <Image
+                    src={line.image}
+                    alt={line.name}
+                    fill
+                    sizes="(max-width: 600px) 104px, 180px"
+                    style={{ objectFit: "contain" }}
+                  />
+                </Link>
+                <div className={styles.productInfo}>
+                  <p className={styles.sku}>SKU {line.sku}</p>
+                  <h3>
+                    <Link href={`/products/${line.slug || line.productId}`}>
+                      {line.name}
+                    </Link>
+                  </h3>
+                  <CartLineVariant line={line} shopperFacing />
+                  <p className={styles.unitPrice}>
+                    {line.unitPrice.formatted} <span>/ each</span>
+                  </p>
+                  <div className={styles.actions}>
+                    <QuantitySelector
+                      className={styles.quantity}
+                      label={`Quantity for ${line.name}`}
+                      editable
+                      value={line.quantity}
+                      minValue={1}
+                      maxValue={99}
+                      disabled={busy}
+                      onChange={(quantity) => void setQty(line, quantity)}
+                    />
+                    <UIButton
+                      variant="ghost"
+                      size="s"
+                      className={styles.remove}
+                      disabled={busy}
+                      onClick={() => void setQty(line, 0)}
+                      aria-label={`Remove ${line.name}`}
+                    >
+                      <FontAwesomeIcon icon={faTrashCan} aria-hidden="true" />
+                      <span>Remove</span>
+                    </UIButton>
+                  </div>
+                </div>
+                <div className={styles.lineTotal}>
+                  <span>Item total</span>
+                  <strong>{line.total.formatted}</strong>
+                  {pendingLineId === line.id && (
+                    <small role="status">Updating…</small>
+                  )}
+                </div>
+              </article>
+            ))}
+          </section>
+          <aside
+            ref={summaryRef}
+            className={styles.summary}
+            aria-labelledby="cart-summary-title"
+          >
+            <p className={styles.eyebrow}>A little closer to home</p>
+            <h2 id="cart-summary-title">Order summary</h2>
+            <dl className={styles.totals}>
+              <div>
+                <dt>Subtotal</dt>
+                <dd>{cart.subtotal.formatted}</dd>
+              </div>
+              <div>
+                <dt>Tax</dt>
+                <dd>{cart.taxTotal.formatted}</dd>
+              </div>
+              <div
+                className={
+                  cart.discountTotal.centAmount > 0 ? styles.saving : undefined
+                }
+              >
+                <dt>Discount</dt>
+                <dd>
+                  {cart.discountTotal.centAmount > 0 ? "−" : ""}
+                  {cart.discountTotal.formatted}
+                </dd>
+              </div>
+            </dl>
+            <div className={styles.discount}>
+              <form onSubmit={applyDiscount}>
+                <label htmlFor="discount-code">Have a discount code?</label>
+                <div className={styles.discountControls}>
                   <CTInput
-                    autoComplete="off"
                     id="discount-code"
+                    containerClassName={styles.codeInput}
+                    aria-describedby={
+                      discountError ? "cart-discount-error" : undefined
+                    }
+                    aria-invalid={!!discountError}
+                    autoComplete="off"
                     maxLength={32}
                     minLength={2}
-                    pattern="\\S.*"
                     required
+                    disabled={busy}
                     value={discountCode}
                     onChange={(event) => {
                       setDiscountCode(event.target.value);
                       setDiscountError("");
                     }}
-                    placeholder="Enter code"
-                    title="Enter a valid discount code."
+                    placeholder="Enter your code"
                   />
-                  <UIButton variant="ghost" size="fit"
+                  <UIButton
+                    variant="secondary"
+                    size="s"
+                    className={styles.apply}
                     type="submit"
-                    disabled={!discountCode.trim() || applyingDiscount}
+                    disabled={!discountCode.trim() || busy}
+                    loading={applyingDiscount}
                   >
-                    {applyingDiscount ? "Applying…" : "Apply"}
+                    Apply
                   </UIButton>
                 </div>
               </form>
               {cart.discountCodes.length > 0 && (
-                <div className="discount-codes" aria-label="Applied discount codes">
+                <ul
+                  className={styles.codes}
+                  aria-label="Applied discount codes"
+                >
                   {cart.discountCodes.map((discount) => (
-                    <div className="discount-chip" key={discount.id}>
+                    <li key={discount.id}>
                       <span>
                         <strong>{discount.code}</strong>
                         {discount.state !== "MatchesCart" && (
-                          <small>{discount.state}</small>
+                          <small>Not applied to this bag</small>
                         )}
                       </span>
-                      <UIButton variant="ghost" size="fit"
-                        type="button"
-                        onClick={() => removeDiscount(discount.id)}
-                        disabled={removingDiscountId !== null}
+                      <UIButton
+                        variant="underlined"
+                        size="s"
+                        disabled={busy}
+                        onClick={() => void removeDiscount(discount.id)}
                         aria-label={`Remove discount code ${discount.code}`}
                       >
                         {removingDiscountId === discount.id
                           ? "Removing…"
                           : "Remove"}
                       </UIButton>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
               {discountError && (
-                <p className="discount-error" role="alert">
+                <p
+                  id="cart-discount-error"
+                  className={styles.discountError}
+                  role="alert"
+                >
                   {discountError}
                 </p>
               )}
             </div>
-          )}
-          <p className="muted">Shipping is calculated during checkout.</p>
-          {cart.itemCount > 0 && (
-            <ButtonLink variant="primary" href={`/checkout/${cart.mode}`}>
-              <span>Checkout as {cart.mode.toUpperCase()}</span>
-              <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-            </ButtonLink>
-          )}
-        </aside>
-      </div>
-
-      {suggestedProducts.length > 0 && (
+            <div className={styles.total}>
+              <span>Total</span>
+              <strong>{cart.total.formatted}</strong>
+            </div>
+            <p className={styles.shipping}>
+              Shipping is calculated at checkout.
+            </p>
+            {busy ? (
+              <UIButton
+                className={styles.checkout}
+                variant="primary"
+                size="full"
+                disabled
+              >
+                Updating your bag…
+              </UIButton>
+            ) : (
+              <ButtonLink
+                className={styles.checkout}
+                variant="primary"
+                size="full"
+                href={`/checkout/${cart.mode}`}
+              >
+                {cart.mode === "b2b"
+                  ? "Business checkout"
+                  : "Continue to checkout"}
+                <FontAwesomeIcon icon={faArrowRight} aria-hidden="true" />
+              </ButtonLink>
+            )}
+            <p className={styles.summaryNote}>
+              Review your delivery and payment details in the next step.
+            </p>
+          </aside>
+        </div>
+      )}
+      {cart && suggestedProducts.length > 0 && (
         <ProductItemSlider
-          className="panel recently-viewed"
-          eyebrow="Recently viewed"
+          className={`panel product-related ${styles.recent}`}
+          eyebrow="Worth another look"
+          title="Recently viewed"
           products={suggestedProducts}
           renderAction={(product) => {
-            const existingLine = cart.lines.find(
-              (line) => line.productId === product.id,
+            const existing = cart.lines.find(
+              (line) => line.sku === product.sku,
             );
-            const pendingProductLineId =
-              existingLine?.id ?? `recent-${product.id}`;
             return (
-              <UIButton variant="ghost" size="fit"
-                className="pill"
-                disabled={
-                  pendingLineId !== null ||
-                  clearingCart ||
-                  (existingLine?.quantity ?? 0) >= 99
+              <UIButton
+                size="xs"
+                iconPosition="left"
+                className={`launchpad-add-to-cart gap-10${existing ? " in-cart" : ""}`}
+                loading={
+                  pendingLineId === (existing?.id ?? `recent-${product.id}`)
                 }
-                onClick={() => addRecentlyViewedProduct(product)}
+                aria-label={
+                  existing
+                    ? `Add more to cart (${existing.quantity} in cart)`
+                    : undefined
+                }
+                disabled={busy || (existing?.quantity ?? 0) >= 99}
+                onClick={() => void addRecentlyViewedProduct(product)}
                 type="button"
               >
-                {pendingLineId === pendingProductLineId ? "Adding…" : "Add"}
+                <FontAwesomeIcon aria-hidden="true" icon={faCartPlus} />
+                <span>
+                  {existing ? `In cart (${existing.quantity}) +` : "Add"}
+                </span>
               </UIButton>
             );
           }}
-          title="Products you looked at"
         />
       )}
-    </>
+    </div>
   );
 }

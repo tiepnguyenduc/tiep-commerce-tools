@@ -1,10 +1,20 @@
 "use client";
 import ButtonLink from "@/components/commercetools-ui/atoms/button/link";
 import dynamic from "next/dynamic";
-const StorefrontCartItem = dynamic(() => import("./StorefrontCartItem").then((module) => module.StorefrontCartItem));
+const StorefrontCartItem = dynamic(() =>
+  import("./StorefrontCartItem").then((module) => module.StorefrontCartItem),
+);
 import Drawer from "@/components/commercetools-ui/atoms/drawer";
 import UIButton from "@/components/commercetools-ui/atoms/button";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +26,8 @@ import type { Cart, CartLine } from "@/lib/types";
 type MiniCartContextValue = {
   cart: Cart | null;
   itemCount: number;
+  loading: boolean;
+  loadError: string;
   isOpen: boolean;
   closeCart: () => void;
   loadCart: () => Promise<Cart | null>;
@@ -27,6 +39,8 @@ type MiniCartContextValue = {
 const MiniCartContext = createContext<MiniCartContextValue>({
   cart: null,
   itemCount: 0,
+  loading: true,
+  loadError: "",
   isOpen: false,
   closeCart: () => {},
   loadCart: async () => null,
@@ -46,7 +60,7 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
   const showToast = useToast();
   const requestVersion = useRef(0);
   const [loadError, setLoadError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const syncCart = useCallback((nextCart: Cart | null) => {
     requestVersion.current += 1;
@@ -62,11 +76,12 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch("/api/cart", { cache: "no-store" });
       if (!response.ok) throw new Error("Could not load your cart.");
-      const data = await response.json() as Cart;
+      const data = (await response.json()) as Cart;
       if (version === requestVersion.current) setCart(data);
       return version === requestVersion.current ? data : null;
     } catch {
-      if (version === requestVersion.current) setLoadError("Could not load your cart. Please try again.");
+      if (version === requestVersion.current)
+        setLoadError("Could not load your cart. Please try again.");
       return null;
     } finally {
       if (version === requestVersion.current) setLoading(false);
@@ -75,9 +90,15 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     void loadCart();
-    const onAuthChange = () => { setCart(null); void loadCart(); };
+    const onAuthChange = () => {
+      setCart(null);
+      void loadCart();
+    };
     window.addEventListener(customerAuthChangeEvent, onAuthChange);
-    return () => { requestVersion.current += 1; window.removeEventListener(customerAuthChangeEvent, onAuthChange); };
+    return () => {
+      requestVersion.current += 1;
+      window.removeEventListener(customerAuthChangeEvent, onAuthChange);
+    };
   }, [loadCart]);
 
   const setLineQuantity = useCallback(
@@ -118,14 +139,19 @@ export function MiniCartProvider({ children }: { children: React.ReactNode }) {
     () => ({
       cart,
       itemCount: cart?.itemCount ?? 0,
+      loading,
+      loadError,
       isOpen,
       closeCart: () => setIsOpen(false),
       loadCart,
-      openCart: () => { setIsOpen(true); void loadCart(); },
+      openCart: () => {
+        setIsOpen(true);
+        void loadCart();
+      },
       setLineQuantity,
       syncCart,
     }),
-    [cart, isOpen, loadCart, setLineQuantity, syncCart],
+    [cart, isOpen, loadCart, setLineQuantity, syncCart, loading, loadError],
   );
 
   return (
@@ -149,7 +175,9 @@ export function HeaderCartButton() {
   const { itemCount, openCart } = useMiniCart();
 
   return (
-    <UIButton variant="ghost" size="fit"
+    <UIButton
+      variant="ghost"
+      size="fit"
       aria-label={`Open cart with ${itemCount} item${itemCount === 1 ? "" : "s"}`}
       className="cart-icon-button"
       onClick={openCart}
@@ -163,7 +191,9 @@ export function HeaderCartButton() {
 }
 
 function MiniCartDrawer({
-  loading, loadError, onRetry,
+  loading,
+  loadError,
+  onRetry,
   cart,
   isOpen,
   onClose,
@@ -182,65 +212,95 @@ function MiniCartDrawer({
   const lines = cart?.lines ?? [];
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} aria-label="Mini cart" className="storefront-mini-cart">
-        <header className="mini-cart-head">
-          <div>
-            <span className="eyebrow">Shopping cart</span>
-            <h2>
-              {cart?.itemCount ?? 0} item{cart?.itemCount === 1 ? "" : "s"}
-            </h2>
-          </div>
-          <UIButton variant="ghost" size="fit" aria-label="Close mini cart" onClick={onClose} type="button">
-            <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
+    <Drawer
+      isOpen={isOpen}
+      onClose={onClose}
+      aria-label="Mini cart"
+      className="storefront-mini-cart"
+    >
+      <header className="mini-cart-head">
+        <div>
+          <span className="eyebrow">Shopping cart</span>
+          <h2>
+            {cart?.itemCount ?? 0} item{cart?.itemCount === 1 ? "" : "s"}
+          </h2>
+        </div>
+        <UIButton
+          variant="ghost"
+          size="fit"
+          aria-label="Close mini cart"
+          onClick={onClose}
+          type="button"
+        >
+          <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
+        </UIButton>
+      </header>
+
+      {loadError ? (
+        <div className="mini-cart-empty">
+          <p role="alert">{loadError}</p>
+          <UIButton type="button" onClick={onRetry}>
+            Try again
           </UIButton>
-        </header>
-
-        {loadError ? <div className="mini-cart-empty"><p role="alert">{loadError}</p><UIButton type="button" onClick={onRetry}>Try again</UIButton></div> : loading && !cart ? <p role="status" className="mini-cart-empty">Loading your cart…</p> : lines.length === 0 ? (
-          <div className="mini-cart-empty">
-            <h3>Your cart is empty.</h3>
-            <p className="muted">Browse the catalog and add products here.</p>
-            <ButtonLink variant="primary" href="/products" onClick={onClose}>
-              Browse catalog
-            </ButtonLink>
+        </div>
+      ) : loading && !cart ? (
+        <p role="status" className="mini-cart-empty">
+          Loading your cart…
+        </p>
+      ) : lines.length === 0 ? (
+        <div className="mini-cart-empty">
+          <h3>Your cart is empty.</h3>
+          <p className="muted">Browse the catalog and add products here.</p>
+          <ButtonLink variant="primary" href="/products" onClick={onClose}>
+            Browse catalog
+          </ButtonLink>
+        </div>
+      ) : (
+        <>
+          <div className="mini-cart-lines">
+            {lines.map((line) => (
+              <StorefrontCartItem
+                key={line.id}
+                onNavigate={onClose}
+                line={line}
+                disabled={pendingLineId !== null}
+                onQuantityChange={(quantity) => setLineQuantity(line, quantity)}
+              />
+            ))}
           </div>
-        ) : (
-          <>
-            <div className="mini-cart-lines">
-              {lines.map((line) => <StorefrontCartItem key={line.id} onNavigate={onClose} line={line} disabled={pendingLineId !== null} onQuantityChange={(quantity) => setLineQuantity(line, quantity)} />)}
-            </div>
 
-            <footer className="mini-cart-summary">
-              <div className="row">
-                <span>Subtotal</span>
-                <strong>{cart?.subtotal.formatted}</strong>
-              </div>
-              <div className="row">
-                <span>Discount</span>
-                <strong>
-                  {cart && cart.discountTotal.centAmount > 0
-                    ? `−${cart.discountTotal.formatted}`
-                    : cart?.discountTotal.formatted}
-                </strong>
-              </div>
-              <div className="row mini-cart-total">
-                <span>Total</span>
-                <strong>{cart?.total.formatted}</strong>
-              </div>
-              <div className="mini-cart-cta">
-                <ButtonLink variant="secondary" href="/cart" onClick={onClose}>
-                  View cart
-                </ButtonLink>
-                <ButtonLink
-                  variant="primary"
-                  href={`/checkout/${cart?.mode ?? "b2c"}`}
-                  onClick={onClose}
-                >
-                  Checkout
-                </ButtonLink>
-              </div>
-            </footer>
-          </>
-        )}
+          <footer className="mini-cart-summary">
+            <div className="row">
+              <span>Subtotal</span>
+              <strong>{cart?.subtotal.formatted}</strong>
+            </div>
+            <div className="row">
+              <span>Discount</span>
+              <strong>
+                {cart && cart.discountTotal.centAmount > 0
+                  ? `−${cart.discountTotal.formatted}`
+                  : cart?.discountTotal.formatted}
+              </strong>
+            </div>
+            <div className="row mini-cart-total">
+              <span>Total</span>
+              <strong>{cart?.total.formatted}</strong>
+            </div>
+            <div className="mini-cart-cta">
+              <ButtonLink variant="secondary" href="/cart" onClick={onClose}>
+                View cart
+              </ButtonLink>
+              <ButtonLink
+                variant="primary"
+                href={`/checkout/${cart?.mode ?? "b2c"}`}
+                onClick={onClose}
+              >
+                Checkout
+              </ButtonLink>
+            </div>
+          </footer>
+        </>
+      )}
     </Drawer>
   );
 }
