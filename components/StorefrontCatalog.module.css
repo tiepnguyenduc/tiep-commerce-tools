@@ -281,20 +281,6 @@
   white-space:nowrap;
 }
 
-.detail :global(.product-gallery-main) {
-  min-height:0;
-  border:0;
-  border-radius:4px;
-  background:#fff;
-}
-
-.detail :global(.product-gallery-zoom), .detail :global(.product-gallery-zoom img) {
-  height:560px;
-  min-height:0;
-  width:100%;
-  object-fit:contain;
-}
-
 .detail :global(.product-detail-info) {
   min-width:0;
   gap:20px;
@@ -410,9 +396,6 @@
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:24px;
   }
-  .detail :global(.product-gallery-zoom), .detail :global(.product-gallery-zoom img) {
-    height:440px;
-  }
 }
 
 /* Match the existing storefront sidebar breakpoint. */
@@ -460,9 +443,6 @@
   .detail {
     grid-template-columns:minmax(0,1fr);
     padding:20px 16px 40px;
-  }
-  .detail :global(.product-gallery-zoom), .detail :global(.product-gallery-zoom img) {
-    height:390px;
   }
   .detail :global(.product-detail-info h1) {
     font-size:34px;

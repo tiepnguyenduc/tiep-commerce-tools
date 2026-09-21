@@ -1,16 +1,11 @@
 "use client";
 import styles from "./StorefrontCatalog.module.css";
-import Modal from "@/components/commercetools-ui/organisms/modal";
 
 import UIButton from "@/components/commercetools-ui/atoms/button";
+import Gallery from "@/components/commercetools-ui/organisms/gallery";
 import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight, faXmark } from "@fortawesome/free-solid-svg-icons";
-import type { Swiper as SwiperClass } from "swiper";
-import { A11y, FreeMode, Keyboard, Thumbs } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { AddToCart } from "@/components/AddToCart";
 import { AddToWishlist } from "@/components/AddToWishlist";
 import { AddToCompare } from "@/components/ProductCompare";
@@ -138,31 +133,13 @@ export function ProductDetail({
     : product.images?.length
       ? product.images
       : [product.image];
-  const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [mainSwiper, setMainSwiper] = useState<SwiperClass | null>(null);
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
-  const [lightboxSwiper, setLightboxSwiper] = useState<SwiperClass | null>(null);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const optionGroups = useMemo(() => optionGroupsFor(variants), [variants]);
   const relatedItems = useMemo(
     () => productsToProductItems(relatedProducts),
     [relatedProducts],
   );
   const specs = specificationRows(product, selectedVariant);
-  const safeThumbsSwiper =
-    thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null;
-
-  useEffect(() => {
-    setActiveImage(0);
-    mainSwiper?.slideTo(0);
-    lightboxSwiper?.slideTo(0);
-  }, [selectedVariant.id]);
-
-  useEffect(() => {
-    if (!lightboxOpen) return;
-    lightboxSwiper?.slideTo(activeImage, 0);
-  }, [activeImage, lightboxOpen, lightboxSwiper]);
 
   function selectVariantOption(name: string, value: string) {
     const nextSelections = new Map(
@@ -186,17 +163,6 @@ export function ProductDetail({
       ) ??
       selectedVariant;
     setVariantId(nextVariant.id);
-  }
-
-  function openLightbox(index: number) {
-    setActiveImage(index);
-    setLightboxOpen(true);
-  }
-
-  function selectImage(index: number) {
-    setActiveImage(index);
-    mainSwiper?.slideTo(index);
-    lightboxSwiper?.slideTo(index);
   }
 
   function variantCards() {
@@ -255,80 +221,21 @@ export function ProductDetail({
     <main className={`shell detail product-detail ${styles.detail}`}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">All products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
       <section className="product-gallery" aria-label={`${product.name} gallery`}>
-        <div className="product-gallery-main">
-          {product.brand ? (
-            <Link
-              className="product-brand-badge"
-              href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
-            >
-              <span>Brand</span>
-              <strong>{product.brand}</strong>
-            </Link>
-          ) : null}
-          <Swiper
-            className="product-gallery-swiper"
-            keyboard
-            modules={[A11y, FreeMode, Keyboard, Thumbs]}
-            onSlideChange={(swiper) => setActiveImage(swiper.realIndex)}
-            onSwiper={setMainSwiper}
-            thumbs={{ swiper: safeThumbsSwiper }}
+        {product.brand ? (
+          <Link
+            className="product-brand-badge"
+            href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
           >
-            {gallery.map((image, index) => (
-              <SwiperSlide key={`${image}-${index}`}>
-                <UIButton variant="ghost" size="fit"
-                  aria-label={`Open product image ${index + 1}`}
-                  className="product-gallery-zoom"
-                  onClick={() => openLightbox(index)}
-                  type="button"
-                >
-                  <img src={image} alt={product.name} />
-                </UIButton>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          {gallery.length > 1 ? (
-            <div className="gallery-controls">
-              <UIButton variant="secondary" size="icon"
-                aria-label="Previous product image"
-                onClick={() => mainSwiper?.slidePrev()}
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
-              </UIButton>
-              <UIButton variant="secondary" size="icon"
-                aria-label="Next product image"
-                onClick={() => mainSwiper?.slideNext()}
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-              </UIButton>
-            </div>
-          ) : null}
-        </div>
-        {gallery.length > 1 ? (
-          <Swiper
-            className="product-thumbnails"
-            freeMode
-            modules={[A11y, Keyboard, Thumbs]}
-            onSwiper={setThumbsSwiper}
-            slidesPerView="auto"
-            spaceBetween={12}
-            watchSlidesProgress
-          >
-            {gallery.map((image, index) => (
-              <SwiperSlide key={`${image}-${index}`}>
-                <UIButton variant="ghost" size="fit"
-                  aria-label={`Show product image ${index + 1}`}
-                  aria-current={index === activeImage}
-                  onClick={() => selectImage(index)}
-                  type="button"
-                >
-                  <img src={image} alt="" />
-                </UIButton>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <span>Brand</span>
+            <strong>{product.brand}</strong>
+          </Link>
         ) : null}
+        <Gallery
+          images={gallery}
+          productName={product.name}
+          imageSuffix=""
+          thumbnailSuffix=""
+        />
       </section>
 
       <section className="product-detail-info">
@@ -446,55 +353,6 @@ export function ProductDetail({
           )}
           title="Related products"
         />
-      ) : null}
-      {lightboxOpen ? (
-        <Modal isOpen preventScroll onRequestClose={() => setLightboxOpen(false)} contentLabel={`${product.name} image preview`} className="product-lightbox-panel" style={{content: {width: 'min(1100px, 95vw)', maxWidth: '95vw'}, overlay: {backgroundColor: 'rgba(0,0,0,.8)'}}}>
-            <div className="product-lightbox-head">
-              <strong>{product.name}</strong>
-              <UIButton variant="secondary" size="icon"
-                aria-label="Close image preview"
-                onClick={() => setLightboxOpen(false)}
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-              </UIButton>
-            </div>
-            <Swiper
-              className="product-lightbox-swiper"
-              initialSlide={activeImage}
-              keyboard
-              modules={[A11y, Keyboard]}
-              onSlideChange={(swiper) => setActiveImage(swiper.realIndex)}
-              onSwiper={setLightboxSwiper}
-            >
-              {gallery.map((image, index) => (
-                <SwiperSlide key={`${image}-${index}`}>
-                  <img src={image} alt={`${product.name} preview ${index + 1}`} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            {gallery.length > 1 ? (
-              <div className="product-lightbox-controls">
-                <UIButton variant="secondary" size="icon"
-                  aria-label="Previous preview image"
-                  onClick={() => lightboxSwiper?.slidePrev()}
-                  type="button"
-                >
-                  <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
-                </UIButton>
-                <span>
-                  {activeImage + 1} / {gallery.length}
-                </span>
-                <UIButton variant="secondary" size="icon"
-                  aria-label="Next preview image"
-                  onClick={() => lightboxSwiper?.slideNext()}
-                  type="button"
-                >
-                  <FontAwesomeIcon aria-hidden="true" icon={faChevronRight} />
-                </UIButton>
-              </div>
-            ) : null}
-        </Modal>
       ) : null}
     </main>
   );
