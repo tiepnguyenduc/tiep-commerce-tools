@@ -4,7 +4,7 @@ vi.mock("server-only", () => ({}));
 const getApiRoot = vi.hoisted(() => vi.fn());
 vi.mock("../lib/ct/client", () => ({ getApiRoot }));
 
-import { createProductReview, readProductReviews } from "../lib/ct/reviews";
+import { createProductReview, readProductReviews, readProductReviewSummary } from "../lib/ct/reviews";
 import { GET, POST } from "../app/api/products/[productId]/reviews/route";
 
 const input = { authorName: "Alex", title: "Great chair", text: "Comfortable all day.", rating: 5 };
@@ -97,6 +97,34 @@ describe("product reviews", () => {
     });
     expect((await POST(request(input), context("missing"))).status).toBe(404);
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it("summarises training ratings into an average and a histogram", async () => {
+    expect(await readProductReviewSummary("p1")).toEqual({
+      average: 0,
+      count: 0,
+      distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    });
+    for (const rating of [5, 4, 5]) await createProductReview("p1", { ...input, rating });
+    expect(await readProductReviewSummary("p1")).toMatchObject({
+      average: 14 / 3,
+      count: 3,
+      distribution: { 1: 0, 2: 0, 3: 0, 4: 1, 5: 2 },
+    });
+  });
+
+  it("reads live rating statistics from the product projection", async () => {
+    const execute = vi.fn().mockResolvedValue({ body: { reviewRatingStatistics: {
+      averageRating: 4.5, count: 4, ratingsDistribution: { "4": 2, "5": 2 },
+    } } });
+    getApiRoot.mockReturnValue({
+      productProjections: () => ({ withId: () => ({ get: () => ({ execute }) }) }),
+    });
+    expect(await readProductReviewSummary("live-product")).toEqual({
+      average: 4.5,
+      count: 4,
+      distribution: { 1: 0, 2: 0, 3: 0, 4: 2, 5: 2 },
+    });
   });
 
   it("surfaces live failures safely without falling back to training data", async () => {

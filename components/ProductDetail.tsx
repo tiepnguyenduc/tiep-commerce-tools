@@ -3,6 +3,8 @@ import styles from "./StorefrontCatalog.module.css";
 
 import UIButton from "@/components/commercetools-ui/atoms/button";
 import Gallery from "@/components/commercetools-ui/organisms/gallery";
+import ProductTabs from "@/components/commercetools-ui/organisms/product/product-tabs";
+import SpecificationTable from "@/components/commercetools-ui/organisms/product/product-tabs/components/specification-table";
 import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -11,9 +13,20 @@ import { AddToWishlist } from "@/components/AddToWishlist";
 import { AddToCompare } from "@/components/ProductCompare";
 import { productToCompareProduct } from "@/components/ProductCompareData";
 import { ProductItemSlider } from "@/components/ProductItemSlider";
-import { ProductReviews } from "@/components/ProductReviews";
+import {
+  ProductRatingSnippet,
+  ProductReviewsProvider,
+  ProductReviewsSection,
+  useProductReviewCount,
+} from "@/components/ProductReviews";
 import { productsToProductItems } from "@/components/ProductItemData";
-import type { Product, ProductReviewPage, ProductSpecification, ProductVariant } from "@/lib/types";
+import type {
+  Product,
+  ProductRatingSummary,
+  ProductReviewPage,
+  ProductSpecification,
+  ProductVariant,
+} from "@/lib/types";
 
 type OptionGroup = {
   name: string;
@@ -110,16 +123,65 @@ function specificationRows(product: Product, variant: ProductVariant) {
   });
 }
 
+const TABS = { description: "description", specifications: "specifications", reviews: "reviews" } as const;
+
+type TabId = (typeof TABS)[keyof typeof TABS];
+
+function DetailTabs({
+  description,
+  specifications,
+  activeTab,
+  onTabChange,
+}: {
+  description: string;
+  specifications: ProductSpecification[];
+  activeTab: TabId;
+  onTabChange: (tab: TabId) => void;
+}) {
+  const reviewCount = useProductReviewCount();
+
+  return (
+    <ProductTabs
+      activeId={activeTab}
+      onChange={(id) => onTabChange(id as TabId)}
+      tabs={[
+        {
+          id: TABS.description,
+          label: "Description",
+          content: (
+            <p className="m-0 max-w-[860px] whitespace-pre-line text-15 leading-loose text-gray-600">
+              {description}
+            </p>
+          ),
+        },
+        {
+          id: TABS.specifications,
+          label: "Specifications",
+          content: <SpecificationTable specifications={specifications} />,
+        },
+        {
+          id: TABS.reviews,
+          label: "Reviews",
+          count: reviewCount,
+          content: <ProductReviewsSection embedded />,
+        },
+      ]}
+    />
+  );
+}
+
 export function ProductDetail({
   product,
   relatedProducts = [],
   initialReviews = null,
   reviewsError,
+  ratingSummary = null,
 }: {
   product: Product;
   relatedProducts?: Product[];
   initialReviews?: ProductReviewPage | null;
   reviewsError?: string;
+  ratingSummary?: ProductRatingSummary | null;
 }) {
   const variants = useMemo(
     () => (product.variants?.length ? product.variants : [fallbackVariant(product)]),
@@ -134,6 +196,7 @@ export function ProductDetail({
       ? product.images
       : [product.image];
   const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState<TabId>(TABS.description);
   const optionGroups = useMemo(() => optionGroupsFor(variants), [variants]);
   const relatedItems = useMemo(
     () => productsToProductItems(relatedProducts),
@@ -218,142 +281,140 @@ export function ProductDetail({
   }
 
   return (
-    <main className={`shell detail product-detail ${styles.detail}`}>
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">All products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
-      <section className="product-gallery" aria-label={`${product.name} gallery`}>
-        {product.brand ? (
-          <Link
-            className="product-brand-badge"
-            href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
-          >
-            <span>Brand</span>
-            <strong>{product.brand}</strong>
-          </Link>
-        ) : null}
-        <Gallery
-          images={gallery}
-          productName={product.name}
-          imageSuffix=""
-          thumbnailSuffix=""
-        />
-      </section>
-
-      <section className="product-detail-info">
-        <span className="eyebrow">{product.category} collection</span>
-        <h1>{product.name}</h1>
-        <a className="product-review-link" href="#product-reviews">Read &amp; write reviews</a>
-        <p className="product-summary">{product.description.length > 240 ? `${product.description.slice(0, 237).replace(/\s+\S*$/, "")}…` : product.description}</p>
-        <div className="product-price-block">
-          <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
-            {selectedVariant.originalPrice ? (
-              <span className="price-was">
-                {selectedVariant.originalPrice.formatted}
-              </span>
-            ) : null}
-            <span className="price-now">{selectedVariant.price.formatted}</span>
-          </p>
-          <span>In stock and ready to ship</span>
-        </div>
-
-        {optionGroups.length ? (
-          <div className="variant-options">
-            {variantCards()}
-            {optionGroups.map((group) => (
-              <fieldset key={group.name}>
-                <legend>{group.label}</legend>
-                <div className="variant-option-list">
-                  {group.values.map((value) => {
-                    const selected =
-                      selectedAttributeValue(selectedVariant, group.name) === value;
-                    return (
-                      <UIButton variant={selected ? "primary" : "secondary"} size="s"
-                        aria-pressed={selected}
-                        className={`gap-8 ${selected ? "selected" : ""}`}
-                        key={value}
-                        onClick={() => selectVariantOption(group.name, value)}
-                        type="button"
-                      >
-                        {/(color|colour)/i.test(group.label) ? (
-                          <span
-                            aria-hidden="true"
-                            className="color-swatch"
-                            style={{ backgroundColor: colorValue(value) }}
-                          />
-                        ) : null}
-                        <span>{value}</span>
-                      </UIButton>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            ))}
-          </div>
-        ) : variants.length > 1 ? (
-          <div className="variant-options">
-            {variantCards()}
-          </div>
-        ) : null}
-
-        <div className="quantity-control">
-          <span>Quantity</span>
-          <QuantitySelector value={quantity} minValue={1} maxValue={99} onChange={setQuantity} />
-        </div>
-
-        <div className="product-actions">
-          <AddToCart
-            productId={product.id}
-            quantity={quantity}
-            sku={selectedVariant.sku}
+    <ProductReviewsProvider
+      key={product.id}
+      productId={product.id}
+      productName={product.name}
+      initialReviews={initialReviews}
+      initialSummary={ratingSummary}
+      initialError={reviewsError}
+      onRevealReviews={() => setActiveTab(TABS.reviews)}
+    >
+      <main className={`shell detail product-detail ${styles.detail}`}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">All products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
+        <section className="product-gallery" aria-label={`${product.name} gallery`}>
+          {product.brand ? (
+            <Link
+              className="product-brand-badge"
+              href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
+            >
+              <span>Brand</span>
+              <strong>{product.brand}</strong>
+            </Link>
+          ) : null}
+          <Gallery
+            images={gallery}
+            productName={product.name}
+            imageSuffix=""
+            thumbnailSuffix=""
           />
-          <AddToWishlist productId={product.id} variantId={selectedVariant.id} />
-          <AddToCompare product={productToCompareProduct(product)} />
-        </div>
+        </section>
 
-        <div className="shipping-panel">
-          <strong>Shipping methods</strong>
-          <dl>
-            <div>
-              <dt>Standard delivery</dt>
-              <dd>3-5 business days</dd>
-            </div>
-            <div>
-              <dt>Express delivery</dt>
-              <dd>1-2 business days</dd>
-            </div>
-          </dl>
-          <p>Available methods and shipping costs are calculated at checkout.</p>
-        </div>
+        <section className="product-detail-info">
+          <span className="eyebrow">{product.category} collection</span>
+          <h1>{product.name}</h1>
+          <ProductRatingSnippet className="product-review-snippet" />
+          <p className="product-summary">{product.description.length > 240 ? `${product.description.slice(0, 237).replace(/\s+\S*$/, "")}…` : product.description}</p>
+          <div className="product-price-block">
+            <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
+              {selectedVariant.originalPrice ? (
+                <span className="price-was">
+                  {selectedVariant.originalPrice.formatted}
+                </span>
+              ) : null}
+              <span className="price-now">{selectedVariant.price.formatted}</span>
+            </p>
+            <span>In stock and ready to ship</span>
+          </div>
 
-        <div className="product-accordions">
-          <details>
-            <summary>Product description</summary>
-            <p>{product.description}</p>
-          </details>
-          <details open>
-            <summary>Product specifications</summary>
-            <dl className="spec-table">
-              {specs.map((spec) => (
-                <div key={`${spec.label}-${spec.value}`}>
-                  <dt>{spec.label}</dt>
-                  <dd>{spec.value}</dd>
-                </div>
+          {optionGroups.length ? (
+            <div className="variant-options">
+              {variantCards()}
+              {optionGroups.map((group) => (
+                <fieldset key={group.name}>
+                  <legend>{group.label}</legend>
+                  <div className="variant-option-list">
+                    {group.values.map((value) => {
+                      const selected =
+                        selectedAttributeValue(selectedVariant, group.name) === value;
+                      return (
+                        <UIButton variant={selected ? "primary" : "secondary"} size="s"
+                          aria-pressed={selected}
+                          className={`gap-8 ${selected ? "selected" : ""}`}
+                          key={value}
+                          onClick={() => selectVariantOption(group.name, value)}
+                          type="button"
+                        >
+                          {/(color|colour)/i.test(group.label) ? (
+                            <span
+                              aria-hidden="true"
+                              className="color-swatch"
+                              style={{ backgroundColor: colorValue(value) }}
+                            />
+                          ) : null}
+                          <span>{value}</span>
+                        </UIButton>
+                      );
+                    })}
+                  </div>
+                </fieldset>
               ))}
+            </div>
+          ) : variants.length > 1 ? (
+            <div className="variant-options">
+              {variantCards()}
+            </div>
+          ) : null}
+
+          <div className="quantity-control">
+            <span>Quantity</span>
+            <QuantitySelector value={quantity} minValue={1} maxValue={99} onChange={setQuantity} />
+          </div>
+
+          <div className="product-actions">
+            <AddToCart
+              productId={product.id}
+              quantity={quantity}
+              sku={selectedVariant.sku}
+            />
+            <AddToWishlist productId={product.id} variantId={selectedVariant.id} />
+            <AddToCompare product={productToCompareProduct(product)} />
+          </div>
+
+          <div className="shipping-panel">
+            <strong>Shipping methods</strong>
+            <dl>
+              <div>
+                <dt>Standard delivery</dt>
+                <dd>3-5 business days</dd>
+              </div>
+              <div>
+                <dt>Express delivery</dt>
+                <dd>1-2 business days</dd>
+              </div>
             </dl>
-          </details>
-        </div>
-      </section>
-      <ProductReviews key={product.id} productId={product.id} initialReviews={initialReviews} initialError={reviewsError} />
-      {relatedItems.length ? (
-        <ProductItemSlider
-          className="panel product-related"
-          eyebrow="Selected for this room"
-          products={relatedItems}
-          renderAction={(item) => (
-            <AddToCart compact productId={item.id} sku={item.sku} />
-          )}
-          title="Related products"
+            <p>Available methods and shipping costs are calculated at checkout.</p>
+          </div>
+        </section>
+
+        <DetailTabs
+          description={product.description}
+          specifications={specs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
-      ) : null}
-    </main>
+        {relatedItems.length ? (
+          <ProductItemSlider
+            className="panel product-related"
+            eyebrow="Selected for this room"
+            products={relatedItems}
+            renderAction={(item) => (
+              <AddToCart compact productId={item.id} sku={item.sku} />
+            )}
+            title="Related products"
+          />
+        ) : null}
+      </main>
+    </ProductReviewsProvider>
   );
 }

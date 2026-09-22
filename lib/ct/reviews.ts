@@ -2,7 +2,12 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { Review } from "@commercetools/platform-sdk";
 import { products } from "../sample-data";
-import type { ProductReview, ProductReviewInput, ProductReviewPage } from "../types";
+import type {
+  ProductRatingSummary,
+  ProductReview,
+  ProductReviewInput,
+  ProductReviewPage,
+} from "../types";
 import { getApiRoot } from "./client";
 
 const PAGE_SIZE = 5;
@@ -77,6 +82,57 @@ export async function readProductReviews(
     total: body.total ?? body.count,
     offset,
     limit: PAGE_SIZE,
+  };
+}
+
+const RATINGS = [1, 2, 3, 4, 5];
+
+function emptyDistribution() {
+  return Object.fromEntries(RATINGS.map((rating) => [rating, 0]));
+}
+
+function summarize(reviews: ProductReview[]): ProductRatingSummary {
+  const rated = reviews.filter((review) => typeof review.rating === "number");
+  const distribution = emptyDistribution();
+  let sum = 0;
+
+  for (const { rating } of rated) {
+    const value = Math.round(rating as number);
+    if (value < 1 || value > 5) continue;
+    distribution[value] += 1;
+    sum += value;
+  }
+
+  return { average: rated.length ? sum / rated.length : 0, count: rated.length, distribution };
+}
+
+/**
+ * Rating snapshot for the review summary and histogram. Live projects read
+ * commercetools' own review statistics, which only count published reviews and
+ * are recalculated asynchronously after a review is created.
+ */
+export async function readProductReviewSummary(productId: string): Promise<ProductRatingSummary> {
+  const apiRoot = getApiRoot();
+  if (!apiRoot) {
+    const { reviews } = trainingReviews(productId);
+    return summarize(reviews);
+  }
+
+  const { body } = await apiRoot.productProjections().withId({ ID: productId }).get({
+    queryArgs: { staged: false },
+  }).execute();
+  const statistics = body.reviewRatingStatistics;
+  const distribution = emptyDistribution();
+
+  for (const [rating, count] of Object.entries(statistics?.ratingsDistribution ?? {})) {
+    const value = Math.round(Number(rating));
+    if (value >= 1 && value <= 5) distribution[value] += Number(count) || 0;
+  }
+
+  return {
+    average: statistics?.averageRating ?? 0,
+    count: statistics?.count ?? 0,
+    distribution,
   };
 }
 

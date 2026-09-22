@@ -384,10 +384,6 @@
   padding:20px;
 }
 
-.detail :global(.spec-table dd) {
-  overflow-wrap:anywhere;
-}
-
 @media(max-width:1000px) {
   .productGrid {
     grid-template-columns:repeat(2,minmax(0,1fr));

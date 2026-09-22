@@ -1,153 +1,218 @@
 "use client";
 
-import CTRadio from "@/components/commercetools-ui/atoms/radio";
-import CTInput from "@/components/commercetools-ui/atoms/input";
-import CTTextarea from "@/components/commercetools-ui/atoms/textarea";
-import Button from "@/components/commercetools-ui/atoms/button";
-import { useState, type FormEvent } from "react";
-import type { ProductReviewPage } from "@/lib/types";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import ReviewsSection from "@/components/commercetools-ui/organisms/product/product-reviews";
+import RatingSnippet from "@/components/commercetools-ui/organisms/product/product-reviews/components/rating-snippet";
+import ReviewFormModal, {
+  emptyReviewDraft,
+  type ReviewDraft,
+} from "@/components/commercetools-ui/organisms/product/product-reviews/components/review-form-modal";
+import { useToast } from "@/components/Toast";
+import type { ProductRatingSummary, ProductReviewPage } from "@/lib/types";
 import { loadProductReviews, submitProductReview } from "@/lib/reviews-api";
 
-function ReviewStars({ rating }: { rating: number }) {
+const EMPTY_DISTRIBUTION: ProductRatingSummary["distribution"] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+/** Folds a freshly published review into the snapshot the server sent. */
+function withReview(summary: ProductRatingSummary | null, rating: number): ProductRatingSummary {
+  const base = summary ?? { average: 0, count: 0, distribution: EMPTY_DISTRIBUTION };
+  const count = base.count + 1;
+  return {
+    count,
+    average: (base.average * base.count + rating) / count,
+    distribution: { ...base.distribution, [rating]: (base.distribution[rating] ?? 0) + 1 },
+  };
+}
+
+type ReviewsValue = {
+  productName: string;
+  page: ProductReviewPage | null;
+  summary: ProductRatingSummary | null;
+  reviewCount: number;
+  loading: boolean;
+  listError: string;
+  highlightedReviewId: string;
+  openForm: () => void;
+  loadPage: (offset: number) => void;
+  revealReviews: () => void;
+};
+
+const ReviewsContext = createContext<ReviewsValue | null>(null);
+
+function useReviews() {
+  const value = useContext(ReviewsContext);
+  if (!value) throw new Error("Product review components must be rendered inside ProductReviewsProvider.");
+  return value;
+}
+
+export function ProductReviewsProvider({
+  productId,
+  productName,
+  initialReviews,
+  initialSummary = null,
+  initialError = "",
+  onRevealReviews,
+  children,
+}: {
+  productId: string;
+  productName: string;
+  initialReviews: ProductReviewPage | null;
+  initialSummary?: ProductRatingSummary | null;
+  initialError?: string;
+  /** Lets the page open the tab holding the reviews before we scroll to them. */
+  onRevealReviews?: () => void;
+  children: ReactNode;
+}) {
+  const showToast = useToast();
+  const [page, setPage] = useState(initialReviews);
+  const [summary, setSummary] = useState(initialSummary);
+  const [listError, setListError] = useState(initialError);
+  const [loading, setLoading] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [draft, setDraft] = useState<ReviewDraft>(emptyReviewDraft);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [highlightedReviewId, setHighlightedReviewId] = useState("");
+
+  const revealReviews = useCallback(() => {
+    onRevealReviews?.();
+    // The panel may only mount once the tab switch has rendered.
+    requestAnimationFrame(() => {
+      const target = document.getElementById("product-tabs") ?? document.getElementById("product-reviews");
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [onRevealReviews]);
+
+  const loadPage = useCallback(
+    async (offset: number) => {
+      setLoading(true);
+      setListError("");
+      try {
+        setPage(await loadProductReviews(productId, offset));
+      } catch (error) {
+        setListError(error instanceof Error ? error.message : "Unable to load reviews.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [productId],
+  );
+
+  const submit = useCallback(
+    async (values: ReviewDraft) => {
+      if (submitting) return;
+      setSubmitError("");
+      setSubmitting(true);
+      try {
+        const { review } = await submitProductReview(productId, values);
+
+        setSummary((current) => withReview(current, values.rating));
+        setHighlightedReviewId(review.id);
+        setDraft(emptyReviewDraft);
+        setFormOpen(false);
+        showToast("Thank you! Your review has been published.", "success");
+
+        // Re-read the first page, but never let eventual consistency hide the
+        // review the shopper just wrote.
+        const refreshed = await loadProductReviews(productId, 0).catch(() => null);
+        setPage((previous) => {
+          const base = refreshed ?? { reviews: [], total: previous?.total ?? 0, offset: 0, limit: previous?.limit ?? 5 };
+          if (base.reviews.some((item) => item.id === review.id)) return base;
+          return {
+            ...base,
+            reviews: [review, ...base.reviews].slice(0, base.limit),
+            total: base.total + 1,
+          };
+        });
+
+        revealReviews();
+      } catch (error) {
+        setSubmitError(
+          error instanceof Error ? error.message : "Unable to submit your review. Please try again.",
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [productId, revealReviews, showToast, submitting],
+  );
+
+  const value = useMemo<ReviewsValue>(
+    () => ({
+      productName,
+      page,
+      summary,
+      reviewCount: summary?.count ?? page?.total ?? 0,
+      loading,
+      listError,
+      highlightedReviewId,
+      openForm: () => {
+        setSubmitError("");
+        setFormOpen(true);
+      },
+      loadPage: (offset: number) => void loadPage(offset),
+      revealReviews,
+    }),
+    [productName, page, summary, loading, listError, highlightedReviewId, loadPage, revealReviews],
+  );
+
   return (
-    <span className="review-stars" role="img" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }, (_, index) => (
-        <span aria-hidden="true" className={index < rating ? "filled" : ""} key={index}>★</span>
-      ))}
-    </span>
+    <ReviewsContext.Provider value={value}>
+      {children}
+      <ReviewFormModal
+        isOpen={formOpen}
+        productName={productName}
+        draft={draft}
+        submitting={submitting}
+        error={submitError}
+        onDraftChange={setDraft}
+        onSubmit={(values) => void submit(values)}
+        onClose={() => !submitting && setFormOpen(false)}
+      />
+    </ReviewsContext.Provider>
   );
 }
 
-export function ProductReviews({
-  productId,
-  initialReviews,
-  initialError = "",
-}: {
-  productId: string;
-  initialReviews: ProductReviewPage | null;
-  initialError?: string;
-}) {
-  const [page, setPage] = useState(initialReviews);
-  const [listError, setListError] = useState(initialError);
-  const [submitError, setSubmitError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [rating, setRating] = useState(0);
+/** Number of published reviews, for the product tab label. */
+export function useProductReviewCount() {
+  return useReviews().reviewCount;
+}
 
-  async function loadPage(offset: number) {
-    setLoading(true);
-    setListError("");
-    try {
-      setPage(await loadProductReviews(productId, offset));
-    } catch (error) {
-      setListError(error instanceof Error ? error.message : "Unable to load reviews.");
-    } finally {
-      setLoading(false);
-    }
-  }
+/** Compact stars + review count shown next to the product title. */
+export function ProductRatingSnippet({ className = "" }: { className?: string }) {
+  const { summary, openForm, revealReviews } = useReviews();
+  return (
+    <RatingSnippet
+      className={className}
+      summary={summary}
+      onShowReviews={revealReviews}
+      onWriteReview={openForm}
+    />
+  );
+}
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (submitting || loading) return;
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    setSubmitError("");
-    setSuccess("");
-    setSubmitting(true);
-    try {
-      const { review } = await submitProductReview(productId, {
-        authorName: String(data.get("authorName") ?? ""),
-        title: String(data.get("title") ?? ""),
-        text: String(data.get("text") ?? ""),
-        rating,
-      });
-      // Show the saved review immediately, even if refreshing the list fails.
-      setPage((previous) => ({
-        reviews: [review, ...(previous?.offset === 0 ? previous.reviews : [])].slice(0, 5),
-        total: (previous?.total ?? 0) + 1,
-        offset: 0,
-        limit: 5,
-      }));
-      form.reset();
-      setRating(0);
-      setSuccess("Thank you! Your review has been published.");
-      await loadPage(0);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Unable to submit your review. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
+export function ProductReviewsSection({ embedded = false }: { embedded?: boolean }) {
+  const { productName, page, summary, loading, listError, highlightedReviewId, openForm, loadPage } = useReviews();
 
   return (
-    <section className="product-reviews" id="product-reviews" aria-labelledby="reviews-heading">
-      <div className="product-reviews-heading">
-        <div>
-          <span className="eyebrow">From our community</span>
-          <h2 id="reviews-heading">Customer reviews</h2>
-        </div>
-        {page ? <span>{page.total} {page.total === 1 ? "review" : "reviews"}</span> : null}
-      </div>
-      <div className="product-reviews-grid">
-        <div className="product-reviews-list" aria-busy={loading}>
-          {listError ? (
-            <div role="alert" className="review-error">
-              <p>{listError}</p>
-              <Button variant="primary" type="button" disabled={loading || submitting} onClick={() => void loadPage(page?.offset ?? 0)}>Retry loading reviews</Button>
-            </div>
-          ) : null}
-          {page?.total === 0 && !listError ? (
-            <div className="review-empty">
-              <h3>Be the first to share your experience</h3>
-              <p>How does it fit into your everyday life? Your review helps others choose.</p>
-            </div>
-          ) : null}
-          {page?.reviews.map((review) => (
-            <article className="product-review" key={review.id}>
-              <div className="product-review-meta">
-                <strong>{review.authorName}</strong>
-                <time dateTime={review.createdAt}>
-                  {new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(review.createdAt))}
-                </time>
-              </div>
-              {review.rating !== undefined ? <ReviewStars rating={review.rating} /> : null}
-              {review.title ? <h3>{review.title}</h3> : null}
-              <p>{review.text}</p>
-            </article>
-          ))}
-          {page && page.total > page.limit ? (
-            <nav className="review-pagination" aria-label="Review pages">
-              <Button variant="primary" type="button" disabled={loading || submitting || page.offset === 0} onClick={() => void loadPage(Math.max(0, page.offset - page.limit))}>Previous</Button>
-              <span aria-live="polite">{loading ? "Loading…" : `${page.offset + 1}–${page.offset + page.reviews.length} of ${page.total}`}</span>
-              <Button variant="primary" type="button" disabled={loading || submitting || page.offset + page.limit >= page.total || page.offset + page.limit > 10000} onClick={() => void loadPage(page.offset + page.limit)}>Next</Button>
-            </nav>
-          ) : null}
-        </div>
-        <form className="product-review-form" onSubmit={submit}>
-          <h3>Write a review</h3>
-          <p>Share your thoughts with other shoppers. All fields are required.</p>
-          <fieldset disabled={submitting} className="review-rating-input">
-            <legend>Your rating</legend>
-            <div className="review-rating-options">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <label key={value}>
-                  <CTRadio type="radio" name="rating" value={value} required checked={rating === value} onChange={() => setRating(value)} aria-label={`${value} ${value === 1 ? "star" : "stars"}`} />
-                  <span aria-hidden="true" className={value <= rating ? "selected" : ""}>★</span>
-                </label>
-              ))}
-              <span className="review-rating-value">{rating ? `${rating} / 5` : "Select a rating"}</span>
-            </div>
-          </fieldset>
-          <label>Your name<CTInput name="authorName" autoComplete="name" required maxLength={80} disabled={submitting} placeholder="Name shown with your review" /></label>
-          <label>Review title<CTInput name="title" required maxLength={120} disabled={submitting} placeholder="Sum up your experience" /></label>
-          <label>Your review<CTTextarea name="text" required maxLength={2000} rows={5} disabled={submitting} placeholder="What did you like? What could be better?" /></label>
-          <small>Your name and review will be visible to other shoppers.</small>
-          {submitError ? <p role="alert" className="review-error">{submitError}</p> : null}
-          {success ? <p role="status" className="review-success">{success}</p> : null}
-          <Button variant="primary" type="submit" disabled={submitting || loading}>{submitting ? "Submitting…" : "Submit review"}</Button>
-        </form>
-      </div>
-    </section>
+    <ReviewsSection
+      productName={productName}
+      page={page}
+      summary={summary}
+      embedded={embedded}
+      loading={loading}
+      listError={listError}
+      highlightedReviewId={highlightedReviewId}
+      onRetry={() => loadPage(page?.offset ?? 0)}
+      onPageChange={loadPage}
+      onWriteReview={openForm}
+    />
   );
 }

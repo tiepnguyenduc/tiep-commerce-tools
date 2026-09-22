@@ -19,6 +19,13 @@ export type ProductReviewPage = {
   offset: number;
   limit: number;
 };
+export type ProductRatingSummary = {
+  /** Mean of every published rating, 0 when the product has none yet. */
+  average: number;
+  count: number;
+  /** Review count per whole-star rating; always holds the keys 1 through 5. */
+  distribution: Record<number, number>;
+};
 export type Money = {
   centAmount: number;
   currencyCode: string;
