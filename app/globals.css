@@ -3872,3 +3872,11 @@ textarea {
     width: 32px;
 }
 .category-nav { overflow: visible; }
+
+/*
+  The product detail carries an always-on buy bar fixed to the bottom of the viewport,
+  so the document reserves the strip it covers.
+*/
+body {
+    padding-bottom: var(--product-sticky-bar, 0px);
+}

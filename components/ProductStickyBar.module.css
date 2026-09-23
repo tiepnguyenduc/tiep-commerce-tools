@@ -1,0 +1,202 @@
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Under the sticky header (z-index 40), above the page. */
+  z-index: 38;
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -16px 30px -26px rgba(21, 37, 29, .55);
+  color: var(--ink);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 76px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bar .thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.copy strong,
+.copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.copy small {
+  font-size: 12px;
+  color: #6a7568;
+}
+
+.sections {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.sectionLink {
+  border: 0;
+  background: transparent;
+  color: #52604f;
+  cursor: pointer;
+}
+
+.sectionLink span {
+  display: block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.sectionLink:hover span {
+  background: #eef1e9;
+  color: var(--ink);
+}
+
+.sectionLink[data-current] span {
+  background: var(--ink);
+  color: #fff;
+}
+
+.purchase {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.price s {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a8a8a;
+}
+
+.onSale > span {
+  color: var(--orange);
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantityLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #52604f;
+}
+
+.bar a:focus-visible,
+.bar button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+/* Smaller screens keep only what a thumb needs. */
+@media (max-width: 1000px) {
+  .inner {
+    gap: 12px;
+    min-height: 64px;
+  }
+  .sections,
+  .copy small {
+    display: none;
+  }
+  .bar .thumb {
+    width: 44px;
+    height: 44px;
+  }
+  .purchase {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Quantity stays in the buy box; the bar keeps the shopper's chosen amount. */
+  .quantity {
+    display: none;
+  }
+  .identity {
+    flex: 0 1 auto;
+  }
+  .purchase {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  /*
+    The Launchpad button's padding comes from an id-scoped Tailwind utility, so the
+    call to action can only be kept on one line by out-ranking it here.
+  */
+  .purchase :global(.launchpad-add-to-cart) {
+    flex: 1 1 auto;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    white-space: nowrap;
+  }
+  .copy strong {
+    font-size: 14px;
+  }
+  .price {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 460px) {
+  .copy {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .sectionLink span {
+    transition-duration: 1ms;
+  }
+}

@@ -6,7 +6,7 @@ import Gallery from "@/components/commercetools-ui/organisms/gallery";
 import ProductTabs from "@/components/commercetools-ui/organisms/product/product-tabs";
 import SpecificationTable from "@/components/commercetools-ui/organisms/product/product-tabs/components/specification-table";
 import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AddToCart } from "@/components/AddToCart";
 import { AddToWishlist } from "@/components/AddToWishlist";
@@ -20,6 +20,7 @@ import {
   useProductReviewCount,
 } from "@/components/ProductReviews";
 import { productsToProductItems } from "@/components/ProductItemData";
+import { ProductStickyBar } from "@/components/ProductStickyBar";
 import type {
   Product,
   ProductRatingSummary,
@@ -203,6 +204,32 @@ export function ProductDetail({
     [relatedProducts],
   );
   const specs = specificationRows(product, selectedVariant);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const variantSummary =
+    optionGroups
+      .map((group) => selectedAttributeValue(selectedVariant, group.name))
+      .filter(Boolean)
+      .join(" · ") || (variants.length > 1 ? variantLabel(selectedVariant) : "");
+  const stickyMeta = [variantSummary, selectedVariant.sku ? `SKU ${selectedVariant.sku}` : ""]
+    .filter(Boolean)
+    .join(" · ");
+
+  /** Opens a tab and scrolls it clear of the sticky header and the sticky bar. */
+  function jumpToSection(section: TabId) {
+    setActiveTab(section);
+
+    const target = tabsRef.current;
+    if (!target) return;
+
+    // The buy bar sits at the bottom, so only the sticky header can hide the section.
+    const header = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    window.scrollTo({
+      top: target.getBoundingClientRect().top + window.scrollY - header - 24,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  }
 
   function selectVariantOption(name: string, value: string) {
     const nextSelections = new Map(
@@ -397,12 +424,14 @@ export function ProductDetail({
           </div>
         </section>
 
-        <DetailTabs
-          description={product.description}
-          specifications={specs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+        <div ref={tabsRef}>
+          <DetailTabs
+            description={product.description}
+            specifications={specs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </div>
         {relatedItems.length ? (
           <ProductItemSlider
             className="panel product-related"
@@ -415,6 +444,17 @@ export function ProductDetail({
           />
         ) : null}
       </main>
+
+      {/* Outside the article: a fixed overlay should not inherit the detail layout. */}
+      <ProductStickyBar
+        product={product}
+        variant={selectedVariant}
+        meta={stickyMeta}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        activeSection={activeTab}
+        onSelectSection={jumpToSection}
+      />
     </ProductReviewsProvider>
   );
 }
