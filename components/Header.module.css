@@ -18,20 +18,17 @@
 .primaryLinks { display: flex; flex: 0 0 auto; gap: 26px; align-items: center; padding: 17px 30px 17px 0; border-right: 1px solid #ededE7; font-size: 13px; font-weight: 600; }
 .sale { color: #a43f22; }
 .categoryLinks { overflow: visible; min-width: 0; }
-.categoryLinks :global(.category-nav) { gap: 28px; min-width: 0; padding: 17px 0; }
-.categoryLinks :global(.category-nav a) { font-size: 13px; font-weight: 400; }
 .header a:focus-visible, .header button:focus-visible { outline: 2px solid #a43f22; outline-offset: 4px; }
 .mobileMenu { display: none; }
 .menuTrigger, .drawerHead button { border: 0; background: transparent; min-width: 40px; height: 44px; cursor: pointer; }
 .drawer { margin: 0; padding: 0; width: min(380px, 90vw); height: 100dvh; max-height: 100dvh; max-width: none; border: 0; background: #faf9f5; color: #202620; }
 .drawer::backdrop { background: rgba(15, 22, 17, .5); }
 .drawerHead { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid #deded8; font-size: 15px; font-weight: 700; }
-.mobileLinks { display: grid; padding: 20px 24px; gap: 0; }
+.drawerBody { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.mobileLinks { display: grid; padding: 12px 24px; gap: 0; }
 .mobileLinks a { padding: 14px 0; font-size: 24px; }
 .menuLabel { padding: 0 24px; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; }
-.drawer :global(.category-nav) { display: grid; gap: 0; padding: 0 24px 20px; }
-.drawer :global(.category-nav a) { display: block; padding: 12px 0; white-space: normal; }
-.mobileFooter { display: grid; gap: 0; padding: 20px 24px; border-top: 1px solid #deded8; }
+.mobileFooter { display: grid; gap: 0; margin-top: auto; padding: 20px 24px; border-top: 1px solid #deded8; }
 .mobileFooter a { padding: 12px 0; font-size: 14px; }
 @media (max-width: 1000px) {
  .mainRow { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; padding-top: 12px; padding-bottom: 16px; }
@@ -51,6 +48,3 @@
  .actions :global(.header-wishlist-link), .actions :global(.header-compare-link) { display: none; }
  .search { margin-top: 8px; }
 }
-
-.categoryLinks { min-width: 0; }
-.categoryLinks :global(.category-nav) { flex-wrap: wrap; }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HeaderCategoryNavigation } from "./HeaderCategoryNavigation";
+import { HeaderMobileCategoryMenu } from "./HeaderMobileCategoryMenu";
 import { HeaderMobileMenu } from "./HeaderMobileMenu";
 import styles from "./Header.module.css";
 import { Suspense, cache } from "react";
@@ -13,16 +14,29 @@ import { HeaderCartButton } from "@/components/MiniCart";
 import { HeaderSearch } from "@/components/HeaderSearch";
 import { HeaderCompareLink } from "@/components/ProductCompare";
 import { HeaderWishlistLink } from "@/components/HeaderWishlistLink";
+import { toLaunchpadCategoryTree } from "@/lib/mappers/launchpad-category";
 
 const loadNavigationCategories = cache(listCatalogCategories);
 
-async function HeaderCategoryLinks() {
+async function loadNavigationTree() {
   await connection();
-  const categories = await loadNavigationCategories();
+  return toLaunchpadCategoryTree(await loadNavigationCategories());
+}
+
+async function HeaderCategoryLinks() {
+  const categories = await loadNavigationTree();
 
   if (categories.length === 0) return null;
 
   return <HeaderCategoryNavigation categories={categories} />;
+}
+
+async function HeaderMobileCategoryLinks() {
+  const categories = await loadNavigationTree();
+
+  if (categories.length === 0) return null;
+
+  return <HeaderMobileCategoryMenu categories={categories} />;
 }
 
 async function HeaderAccountSlot() {
@@ -54,7 +68,7 @@ export function Header() {
       </div>
       <div className={`shell header-inner ${styles.mainRow}`}>
         <HeaderMobileMenu>
-          <Suspense fallback={<p className={styles.menuLabel}>Loading categories…</p>}><HeaderCategoryLinks /></Suspense>
+          <Suspense fallback={<p className={styles.menuLabel}>Loading categories…</p>}><HeaderMobileCategoryLinks /></Suspense>
         </HeaderMobileMenu>
         <Link className={`brand ${styles.logo}`} href="/" aria-label="WORK/SHOP home">WORK<i>/</i>SHOP</Link>
         <div className={styles.search}>

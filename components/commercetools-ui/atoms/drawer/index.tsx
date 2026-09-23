@@ -11,7 +11,11 @@ export interface DrawerProps {
   'aria-label'?: string;
 }
 
-/** Accessible Launchpad drawer: focus containment, Escape, backdrop and focus return. */
+/**
+ * Accessible Launchpad drawer: focus containment, Escape, backdrop and focus return.
+ * Backdrop and panel transition in and out; `data-direction` tells the stylesheet
+ * which edge to slide from.
+ */
 const Drawer = ({ className = '', isOpen, direction = 'right', onClose,
   children, 'aria-label': label = 'Drawer' }: React.PropsWithChildren<DrawerProps>) => {
   const positions = {
@@ -19,8 +23,8 @@ const Drawer = ({ className = '', isOpen, direction = 'right', onClose,
     top: 'left-0 top-0 w-full', bottom: 'left-0 bottom-0 w-full',
   };
   return <Dialog open={isOpen} onClose={() => onClose?.()} aria-label={label} className="launchpad-drawer-root">
-    <DialogBackdrop className="launchpad-drawer-backdrop" />
-    <DialogPanel className={`launchpad-drawer-panel ${positions[direction]} ${className}`}>
+    <DialogBackdrop transition className="launchpad-drawer-backdrop" />
+    <DialogPanel transition data-direction={direction} className={`launchpad-drawer-panel ${positions[direction]} ${className}`}>
       {children}
     </DialogPanel>
   </Dialog>;

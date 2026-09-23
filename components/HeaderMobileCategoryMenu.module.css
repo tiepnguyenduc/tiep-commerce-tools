@@ -1,0 +1,214 @@
+.menu {
+  padding: 4px 0 8px;
+  color: #202620;
+}
+
+/* The Launchpad button centres its content, so every row lays itself out. */
+.row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.levelHeader {
+  animation: 260ms cubic-bezier(.22, .61, .36, 1) both levelInForward;
+}
+
+.levelHeader[data-direction='back'] {
+  animation-name: levelInBack;
+}
+
+.back {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #506159;
+  cursor: pointer;
+}
+
+.back .row {
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.back svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 200ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.back:hover svg {
+  transform: translateX(-3px);
+}
+
+.heading {
+  margin: 0;
+  padding: 6px 24px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #546257;
+}
+
+.menu .back + .heading {
+  font-size: 22px;
+  letter-spacing: -.5px;
+  text-transform: none;
+  color: #182b22;
+  padding-top: 0;
+}
+
+.heading:focus {
+  outline: none;
+}
+
+.viewAll {
+  transition: color 160ms ease, border-color 160ms ease;
+  display: inline-flex;
+  align-items: center;
+  margin: 8px 24px 4px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #214e3b;
+  font-size: 13px;
+  font-weight: 700;
+  color: #214e3b;
+}
+
+.list {
+  display: grid;
+  margin: 8px 0 0;
+  padding: 0 24px;
+  list-style: none;
+}
+
+/* Rows arrive one after another so a level change reads as movement, not a swap. */
+.list li {
+  animation: 260ms cubic-bezier(.22, .61, .36, 1) both rowInForward;
+  animation-delay: calc(var(--row, 0) * 18ms);
+}
+
+.list[data-direction='back'] li {
+  animation-name: rowInBack;
+}
+
+/* The separator lives on the row because the Launchpad button resets its own borders. */
+.list li + li {
+  border-top: 1px solid #e3e2d7;
+}
+
+.item {
+  display: flex;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #202620;
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.item .row {
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #657267;
+  transition: transform 200ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.item:hover svg {
+  transform: translateX(3px);
+}
+
+.item:hover,
+.item[data-active] {
+  color: #a43f22;
+}
+
+.item[data-active] .row {
+  font-weight: 700;
+}
+
+.menu a:focus-visible,
+.menu button:focus-visible {
+  outline: 2px solid #a43f22;
+  outline-offset: -2px;
+}
+
+@keyframes rowInForward {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes rowInBack {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes levelInForward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes levelInBack {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .levelHeader,
+  .list li {
+    animation: none;
+  }
+  .item,
+  .item svg,
+  .back svg,
+  .viewAll {
+    transition-duration: 1ms;
+  }
+  .item:hover svg,
+  .back:hover svg {
+    transform: none;
+  }
+}
