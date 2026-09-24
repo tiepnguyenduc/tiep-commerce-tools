@@ -18,7 +18,9 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body id="launchpad-storefront" data-theme="default">
+      {/* Extensions (ColorZilla, Grammarly, ...) inject attributes on <body> before
+          React hydrates; suppress the resulting one-level attribute mismatch. */}
+      <body id="launchpad-storefront" data-theme="default" suppressHydrationWarning>
         <LaunchpadUIProvider resetStyles={false}>
           <ToastProvider>
             <MiniCartProvider>

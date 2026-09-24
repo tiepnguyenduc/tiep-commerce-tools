@@ -1,4 +1,14 @@
 export type StoreMode = "b2c" | "b2b";
+export type ReviewMediaType = "image" | "video";
+/** A photo or video a shopper attached to their review. */
+export type ReviewMedia = {
+  id: string;
+  type: ReviewMediaType;
+  /** Storefront URL serving the stored file. */
+  url: string;
+  contentType: string;
+  name?: string;
+};
 export type ProductReview = {
   id: string;
   authorName: string;
@@ -6,18 +16,39 @@ export type ProductReview = {
   text: string;
   rating?: number;
   createdAt: string;
+  media: ReviewMedia[];
 };
 export type ProductReviewInput = {
   authorName: string;
   title: string;
   text: string;
   rating: number;
+  media?: ReviewMedia[];
+};
+export type ReviewSortOrder = "newest" | "oldest" | "highest" | "lowest";
+/** Everything the shopper can narrow the review list down by. */
+export type ProductReviewQuery = {
+  offset?: number;
+  search?: string;
+  /** Whole-star ratings to keep; empty means every rating. */
+  ratings?: number[];
+  /** Keep only reviews that carry a photo or a video. */
+  withMedia?: boolean;
+  sort?: ReviewSortOrder;
+};
+/** Counts over every review of the product, so the filter controls can show totals. */
+export type ProductReviewFacets = {
+  total: number;
+  withMedia: number;
+  distribution: Record<number, number>;
 };
 export type ProductReviewPage = {
   reviews: ProductReview[];
+  /** Reviews matching the current query, which paginates this page. */
   total: number;
   offset: number;
   limit: number;
+  facets: ProductReviewFacets;
 };
 export type ProductRatingSummary = {
   /** Mean of every published rating, 0 when the product has none yet. */
@@ -25,6 +56,8 @@ export type ProductRatingSummary = {
   count: number;
   /** Review count per whole-star rating; always holds the keys 1 through 5. */
   distribution: Record<number, number>;
+  /** Reviews that carry at least one photo or video. */
+  withMedia: number;
 };
 export type Money = {
   centAmount: number;

@@ -4,7 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -14,22 +16,42 @@ import ReviewFormModal, {
   emptyReviewDraft,
   type ReviewDraft,
 } from "@/components/commercetools-ui/organisms/product/product-reviews/components/review-form-modal";
+import { releaseMediaDrafts } from "@/components/commercetools-ui/organisms/product/product-reviews/components/review-media-field";
 import { useToast } from "@/components/Toast";
-import type { ProductRatingSummary, ProductReviewPage } from "@/lib/types";
+import type {
+  ProductRatingSummary,
+  ProductReview,
+  ProductReviewPage,
+  ProductReviewQuery,
+} from "@/lib/types";
 import { loadProductReviews, submitProductReview } from "@/lib/reviews-api";
 
 const EMPTY_DISTRIBUTION: ProductRatingSummary["distribution"] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+const DEFAULT_QUERY: ProductReviewQuery = {
+  offset: 0,
+  search: "",
+  ratings: [],
+  withMedia: false,
+  sort: "newest",
+};
+const SEARCH_DEBOUNCE_MS = 300;
 
 /** Folds a freshly published review into the snapshot the server sent. */
-function withReview(summary: ProductRatingSummary | null, rating: number): ProductRatingSummary {
-  const base = summary ?? { average: 0, count: 0, distribution: EMPTY_DISTRIBUTION };
+function withReview(summary: ProductRatingSummary | null, review: ProductReview): ProductRatingSummary {
+  const base = summary ?? { average: 0, count: 0, distribution: EMPTY_DISTRIBUTION, withMedia: 0 };
+  const rating = review.rating ?? 0;
   const count = base.count + 1;
+
   return {
     count,
     average: (base.average * base.count + rating) / count,
     distribution: { ...base.distribution, [rating]: (base.distribution[rating] ?? 0) + 1 },
+    withMedia: base.withMedia + (review.media.length ? 1 : 0),
   };
 }
+
+const isDefaultQuery = ({ search, ratings, withMedia, sort, offset }: ProductReviewQuery) =>
+  !search?.trim() && !ratings?.length && !withMedia && (sort ?? "newest") === "newest" && !offset;
 
 type ReviewsValue = {
   productName: string;
@@ -39,8 +61,13 @@ type ReviewsValue = {
   loading: boolean;
   listError: string;
   highlightedReviewId: string;
+  query: ProductReviewQuery;
+  searchValue: string;
   openForm: () => void;
   loadPage: (offset: number) => void;
+  changeQuery: (patch: Partial<ProductReviewQuery>) => void;
+  changeSearch: (value: string) => void;
+  resetFilters: () => void;
   revealReviews: () => void;
 };
 
@@ -80,6 +107,11 @@ export function ProductReviewsProvider({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [highlightedReviewId, setHighlightedReviewId] = useState("");
+  const [query, setQuery] = useState<ProductReviewQuery>(DEFAULT_QUERY);
+  const [searchValue, setSearchValue] = useState("");
+  /** Review published in this session, kept until the server lists it itself. */
+  const [publishedReview, setPublishedReview] = useState<ProductReview | null>(null);
+  const serverRendered = useRef(true);
 
   const revealReviews = useCallback(() => {
     onRevealReviews?.();
@@ -90,20 +122,58 @@ export function ProductReviewsProvider({
     });
   }, [onRevealReviews]);
 
-  const loadPage = useCallback(
-    async (offset: number) => {
-      setLoading(true);
-      setListError("");
-      try {
-        setPage(await loadProductReviews(productId, offset));
-      } catch (error) {
+  // The first page came from the server; after that every query change refetches.
+  useEffect(() => {
+    if (serverRendered.current) {
+      serverRendered.current = false;
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setListError("");
+
+    loadProductReviews(productId, query)
+      .then((result) => !cancelled && setPage(result))
+      .catch((error: unknown) => {
+        if (cancelled) return;
         setListError(error instanceof Error ? error.message : "Unable to load reviews.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [productId],
-  );
+      })
+      .finally(() => !cancelled && setLoading(false));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, query]);
+
+  // Typing filters the list without a request per keystroke.
+  useEffect(() => {
+    if (searchValue.trim() === (query.search ?? "").trim()) return;
+
+    const timer = setTimeout(
+      () => setQuery((current) => ({ ...current, search: searchValue, offset: 0 })),
+      SEARCH_DEBOUNCE_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [searchValue, query.search]);
+
+  const changeQuery = useCallback((patch: Partial<ProductReviewQuery>) => {
+    // Any filter change starts the list again at its first page.
+    setQuery((current) => ({ ...current, offset: 0, ...patch }));
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setSearchValue("");
+    setQuery(DEFAULT_QUERY);
+  }, []);
+
+  const closeForm = useCallback(() => {
+    setDraft((current) => {
+      releaseMediaDrafts(current.media);
+      return emptyReviewDraft;
+    });
+    setFormOpen(false);
+  }, []);
 
   const submit = useCallback(
     async (values: ReviewDraft) => {
@@ -111,27 +181,25 @@ export function ProductReviewsProvider({
       setSubmitError("");
       setSubmitting(true);
       try {
-        const { review } = await submitProductReview(productId, values);
+        const { review } = await submitProductReview(productId, {
+          authorName: values.authorName,
+          title: values.title,
+          text: values.text,
+          rating: values.rating,
+          files: values.media.map((item) => item.file),
+        });
 
-        setSummary((current) => withReview(current, values.rating));
+        setSummary((current) => withReview(current, review));
         setHighlightedReviewId(review.id);
+        setPublishedReview(review);
+        releaseMediaDrafts(values.media);
         setDraft(emptyReviewDraft);
         setFormOpen(false);
         showToast("Thank you! Your review has been published.", "success");
 
-        // Re-read the first page, but never let eventual consistency hide the
-        // review the shopper just wrote.
-        const refreshed = await loadProductReviews(productId, 0).catch(() => null);
-        setPage((previous) => {
-          const base = refreshed ?? { reviews: [], total: previous?.total ?? 0, offset: 0, limit: previous?.limit ?? 5 };
-          if (base.reviews.some((item) => item.id === review.id)) return base;
-          return {
-            ...base,
-            reviews: [review, ...base.reviews].slice(0, base.limit),
-            total: base.total + 1,
-          };
-        });
-
+        // Show the new review where it belongs: unfiltered and newest first.
+        setSearchValue("");
+        setQuery({ ...DEFAULT_QUERY });
         revealReviews();
       } catch (error) {
         setSubmitError(
@@ -144,23 +212,60 @@ export function ProductReviewsProvider({
     [productId, revealReviews, showToast, submitting],
   );
 
+  /**
+   * commercetools indexes a new review asynchronously, so the shopper's own review is
+   * kept at the top of the unfiltered first page until the server returns it.
+   */
+  const visiblePage = useMemo(() => {
+    if (!page || !publishedReview || !isDefaultQuery(query)) return page;
+    if (page.reviews.some((review) => review.id === publishedReview.id)) return page;
+
+    return {
+      ...page,
+      reviews: [publishedReview, ...page.reviews].slice(0, page.limit),
+      total: page.total + 1,
+      facets: {
+        ...page.facets,
+        total: page.facets.total + 1,
+        withMedia: page.facets.withMedia + (publishedReview.media.length ? 1 : 0),
+      },
+    };
+  }, [page, publishedReview, query]);
+
   const value = useMemo<ReviewsValue>(
     () => ({
       productName,
-      page,
+      page: visiblePage,
       summary,
-      reviewCount: summary?.count ?? page?.total ?? 0,
+      reviewCount: summary?.count ?? visiblePage?.facets.total ?? 0,
       loading,
       listError,
       highlightedReviewId,
+      query,
+      searchValue,
       openForm: () => {
         setSubmitError("");
         setFormOpen(true);
       },
-      loadPage: (offset: number) => void loadPage(offset),
+      loadPage: (offset: number) => setQuery((current) => ({ ...current, offset })),
+      changeQuery,
+      changeSearch: setSearchValue,
+      resetFilters,
       revealReviews,
     }),
-    [productName, page, summary, loading, listError, highlightedReviewId, loadPage, revealReviews],
+    [
+      productName,
+      visiblePage,
+      summary,
+      loading,
+      listError,
+      highlightedReviewId,
+      query,
+      searchValue,
+      changeQuery,
+      resetFilters,
+      revealReviews,
+    ],
   );
 
   return (
@@ -174,7 +279,7 @@ export function ProductReviewsProvider({
         error={submitError}
         onDraftChange={setDraft}
         onSubmit={(values) => void submit(values)}
-        onClose={() => !submitting && setFormOpen(false)}
+        onClose={() => !submitting && closeForm()}
       />
     </ReviewsContext.Provider>
   );
@@ -199,7 +304,21 @@ export function ProductRatingSnippet({ className = "" }: { className?: string })
 }
 
 export function ProductReviewsSection({ embedded = false }: { embedded?: boolean }) {
-  const { productName, page, summary, loading, listError, highlightedReviewId, openForm, loadPage } = useReviews();
+  const {
+    productName,
+    page,
+    summary,
+    loading,
+    listError,
+    highlightedReviewId,
+    query,
+    searchValue,
+    openForm,
+    loadPage,
+    changeQuery,
+    changeSearch,
+    resetFilters,
+  } = useReviews();
 
   return (
     <ReviewsSection
@@ -210,9 +329,14 @@ export function ProductReviewsSection({ embedded = false }: { embedded?: boolean
       loading={loading}
       listError={listError}
       highlightedReviewId={highlightedReviewId}
+      query={query}
+      searchValue={searchValue}
       onRetry={() => loadPage(page?.offset ?? 0)}
       onPageChange={loadPage}
       onWriteReview={openForm}
+      onSearchChange={changeSearch}
+      onQueryChange={changeQuery}
+      onResetFilters={resetFilters}
     />
   );
 }

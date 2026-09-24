@@ -1,6 +1,7 @@
 "use client";
 import { FC } from 'react';
 import RatingStars from '@/components/commercetools-ui/organisms/product/product-reviews/components/rating-stars';
+import ReviewMediaGallery from '@/components/commercetools-ui/organisms/product/product-reviews/components/review-media-gallery';
 import type { ProductReview } from '@/lib/types';
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' });
@@ -44,6 +45,8 @@ const ReviewCard: FC<ReviewCardProps> = ({ review, highlighted }) => (
     <p className="mt-6 whitespace-pre-wrap text-14 leading-loose text-gray-600 [overflow-wrap:anywhere]">
       {review.text}
     </p>
+
+    <ReviewMediaGallery media={review.media ?? []} authorName={review.authorName} />
   </article>
 );
 

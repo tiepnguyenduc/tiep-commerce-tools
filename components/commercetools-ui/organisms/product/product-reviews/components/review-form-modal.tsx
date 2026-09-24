@@ -6,15 +6,19 @@ import Input from '@/components/commercetools-ui/atoms/input/index';
 import Textarea from '@/components/commercetools-ui/atoms/textarea/index';
 import Modal from '@/components/commercetools-ui/organisms/modal/index';
 import RatingInput from '@/components/commercetools-ui/organisms/product/product-reviews/components/rating-input';
+import ReviewMediaField, {
+  type ReviewMediaDraft,
+} from '@/components/commercetools-ui/organisms/product/product-reviews/components/review-media-field';
 
 export interface ReviewDraft {
   rating: number;
   authorName: string;
   title: string;
   text: string;
+  media: ReviewMediaDraft[];
 }
 
-export const emptyReviewDraft: ReviewDraft = { rating: 0, authorName: '', title: '', text: '' };
+export const emptyReviewDraft: ReviewDraft = { rating: 0, authorName: '', title: '', text: '', media: [] };
 
 /** Mirrors the limits the reviews API enforces, so nothing round-trips to fail. */
 const LIMITS = { authorName: 80, title: 120, text: 2000 };
@@ -189,6 +193,12 @@ const ReviewFormModal: FC<ReviewFormModalProps> = ({
               </span>
             </div>
           </div>
+
+          <ReviewMediaField
+            media={draft.media}
+            disabled={submitting}
+            onChange={(media) => update({ media })}
+          />
 
           {error && (
             <p className="rounded-md bg-red-100 px-12 py-10 text-14 font-medium text-red-700" role="alert">

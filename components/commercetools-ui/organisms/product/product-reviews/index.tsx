@@ -6,7 +6,8 @@ import { classnames } from '@/lib/launchpad/helpers/utils/classnames/index';
 import RatingBreakdown from '@/components/commercetools-ui/organisms/product/product-reviews/components/rating-breakdown';
 import RatingStars from '@/components/commercetools-ui/organisms/product/product-reviews/components/rating-stars';
 import ReviewCard from '@/components/commercetools-ui/organisms/product/product-reviews/components/review-card';
-import type { ProductRatingSummary, ProductReviewPage } from '@/lib/types';
+import ReviewFilters from '@/components/commercetools-ui/organisms/product/product-reviews/components/review-filters';
+import type { ProductRatingSummary, ProductReviewFacets, ProductReviewPage, ProductReviewQuery } from '@/lib/types';
 
 export interface ProductReviewsProps {
   productName: string;
@@ -18,9 +19,16 @@ export interface ProductReviewsProps {
   highlightedReviewId?: string;
   /** Drops the heading and outer spacing when a product tab already frames it. */
   embedded?: boolean;
+  /** Current search, rating and media filters; omit to render the plain list. */
+  query?: ProductReviewQuery;
+  /** Live search box value, which the page debounces before querying. */
+  searchValue?: string;
   onRetry: () => void;
   onPageChange: (offset: number) => void;
   onWriteReview: () => void;
+  onSearchChange?: (value: string) => void;
+  onQueryChange?: (patch: Partial<ProductReviewQuery>) => void;
+  onResetFilters?: () => void;
 }
 
 const ProductReviews: FC<ProductReviewsProps> = ({
@@ -31,13 +39,26 @@ const ProductReviews: FC<ProductReviewsProps> = ({
   listError = '',
   highlightedReviewId,
   embedded = false,
+  query = {},
+  searchValue = '',
   onRetry,
   onPageChange,
   onWriteReview,
+  onSearchChange,
+  onQueryChange,
+  onResetFilters,
 }) => {
-  const total = summary?.count || page?.total || 0;
+  const facets: ProductReviewFacets = page?.facets ?? {
+    total: summary?.count ?? 0,
+    withMedia: summary?.withMedia ?? 0,
+    distribution: summary?.distribution ?? {},
+  };
+  // `total` counts what the filters matched; `facets.total` the whole product.
+  const total = page?.total ?? summary?.count ?? 0;
   const hasSummary = (summary?.count ?? 0) > 0;
   const showPagination = !!page && page.total > page.limit;
+  const filtering = !!searchValue.trim() || !!query.ratings?.length || !!query.withMedia;
+  const canFilter = !!onQueryChange && !!onSearchChange && !!onResetFilters && facets.total > 0;
 
   const writeButton = (
     <Button
@@ -87,6 +108,11 @@ const ProductReviews: FC<ProductReviewsProps> = ({
             <p className="text-13 text-gray-500">
               Based on {summary.count} {summary.count === 1 ? 'review' : 'reviews'}
             </p>
+            {summary.withMedia > 0 && (
+              <p className="text-13 text-gray-500">
+                {summary.withMedia} with photos or video
+              </p>
+            )}
 
             {embedded && <div className="mt-8">{writeButton}</div>}
           </div>
@@ -95,6 +121,19 @@ const ProductReviews: FC<ProductReviewsProps> = ({
             <RatingBreakdown summary={summary} />
           </div>
         </div>
+      )}
+
+      {canFilter && (
+        <ReviewFilters
+          query={query}
+          facets={facets}
+          searchValue={searchValue}
+          resultCount={total}
+          busy={loading}
+          onSearchChange={onSearchChange}
+          onChange={onQueryChange}
+          onReset={onResetFilters}
+        />
       )}
 
       <div className="mt-24" aria-busy={loading}>
@@ -107,13 +146,29 @@ const ProductReviews: FC<ProductReviewsProps> = ({
           </div>
         )}
 
-        {!listError && total === 0 && (
+        {!listError && total === 0 && facets.total === 0 && (
           <div className="rounded-lg border border-dashed border-neutral-500 bg-white px-20 py-32 text-center">
             <h3 className="text-18 font-semibold text-gray-700">Be the first to review {productName}</h3>
             <p className="mx-auto mt-8 max-w-[420px] text-14 leading-loose text-gray-500">
               How does it fit into your everyday life? Your review helps other shoppers choose with confidence.
             </p>
             <div className="mt-20 flex justify-center">{writeButton}</div>
+          </div>
+        )}
+
+        {!listError && total === 0 && facets.total > 0 && (
+          <div className="rounded-lg border border-dashed border-neutral-500 bg-white px-20 py-32 text-center">
+            <h3 className="text-18 font-semibold text-gray-700">No reviews match your filters</h3>
+            <p className="mx-auto mt-8 max-w-[420px] text-14 leading-loose text-gray-500">
+              Try a different rating, clear the search, or look at every review of {productName}.
+            </p>
+            {onResetFilters && (
+              <div className="mt-20 flex justify-center">
+                <Button variant="secondary" type="button" onClick={onResetFilters}>
+                  Clear filters
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -134,7 +189,9 @@ const ProductReviews: FC<ProductReviewsProps> = ({
             </Button>
 
             <span className="text-14 text-gray-500" aria-live="polite">
-              {loading ? 'Loading…' : `${page.offset + 1}–${page.offset + page.reviews.length} of ${page.total}`}
+              {loading
+                ? 'Loading…'
+                : `${page.offset + 1}–${page.offset + page.reviews.length} of ${page.total}${filtering ? ' matching' : ''}`}
             </span>
 
             <Button
