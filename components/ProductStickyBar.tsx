@@ -1,21 +1,11 @@
 "use client";
 
-import Button from "@/components/commercetools-ui/atoms/button";
 import QuantitySelector from "@/components/commercetools-ui/atoms/quantity-selector";
 import { useEffect, useRef, type RefObject } from "react";
 import { AddToCart } from "@/components/AddToCart";
 import { AddToWishlist } from "@/components/AddToWishlist";
-import { useProductReviewCount } from "@/components/ProductReviews";
 import styles from "./ProductStickyBar.module.css";
 import type { Product, ProductVariant } from "@/lib/types";
-
-export type ProductSection = "description" | "specifications" | "reviews";
-
-const SECTIONS: { id: ProductSection; label: string }[] = [
-  { id: "description", label: "Description" },
-  { id: "specifications", label: "Specifications" },
-  { id: "reviews", label: "Reviews" },
-];
 
 /**
  * Publishes the bar's height so the document can reserve the strip it covers at the
@@ -49,19 +39,14 @@ export function ProductStickyBar({
   meta,
   quantity,
   onQuantityChange,
-  activeSection,
-  onSelectSection,
 }: {
   product: Product;
   variant: ProductVariant;
   meta?: string;
   quantity: number;
   onQuantityChange: (quantity: number) => void;
-  activeSection?: ProductSection;
-  onSelectSection?: (section: ProductSection) => void;
 }) {
   const barRef = useRef<HTMLDivElement>(null);
-  const reviewCount = useProductReviewCount();
 
   useReservedSpace(barRef);
 
@@ -84,27 +69,6 @@ export function ProductStickyBar({
             {meta ? <small>{meta}</small> : null}
           </span>
         </div>
-
-        {onSelectSection ? (
-          <nav className={styles.sections} aria-label="Product details">
-            {SECTIONS.map((section) => (
-              <Button
-                key={section.id}
-                variant="ghost"
-                size="fit"
-                type="button"
-                className={styles.sectionLink}
-                data-current={activeSection === section.id || undefined}
-                onClick={() => onSelectSection(section.id)}
-              >
-                <span>
-                  {section.label}
-                  {section.id === "reviews" && reviewCount ? ` (${reviewCount})` : ""}
-                </span>
-              </Button>
-            ))}
-          </nav>
-        ) : null}
 
         <div className={styles.purchase}>
           <p className={wasPrice ? `${styles.price} ${styles.onSale}` : styles.price}>

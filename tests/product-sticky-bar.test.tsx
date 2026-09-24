@@ -8,8 +8,6 @@ vi.mock("../components/AddToCart", () => ({
 vi.mock("../components/AddToWishlist", () => ({
   AddToWishlist: () => <button type="button">Wishlist</button>,
 }));
-vi.mock("../components/ProductReviews", () => ({ useProductReviewCount: () => 4 }));
-
 import { ProductStickyBar } from "../components/ProductStickyBar";
 
 const variant: ProductVariant = {
@@ -47,8 +45,6 @@ const render = (overrides: Record<string, unknown> = {}) =>
       meta="Oak · SKU ALC-01"
       quantity={3}
       onQuantityChange={() => undefined}
-      activeSection="description"
-      onSelectSection={() => undefined}
       {...overrides}
     />,
   );
@@ -74,18 +70,10 @@ describe("product sticky bar", () => {
     expect(html).toContain("/chair-oak.jpg");
   });
 
-  it("offers the detail sections with the review count and marks the active one", () => {
+  it("keeps to the purchase decision and leaves the tabs to the page", () => {
     const html = render();
 
-    expect(html).toContain("Specifications");
-    expect(html).toContain("Reviews (4)");
-    expect(html).toContain('data-current="true"');
-  });
-
-  it("drops the section links when the page does not handle them", () => {
-    const html = render({ onSelectSection: undefined });
-
     expect(html).not.toContain("Specifications");
-    expect(html).toContain("€637.50");
+    expect(html).not.toContain("Reviews");
   });
 });
