@@ -149,7 +149,7 @@ const ReviewMediaField: FC<ReviewMediaFieldProps> = ({ media, onChange, disabled
               <span className="block size-80 overflow-hidden rounded-md border border-neutral-400 bg-neutral-200">
                 {item.type === 'image' ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.previewUrl} alt="" className="size-full object-cover" />
+                  <img src={item.previewUrl} alt="" className="size-full object-contain" />
                 ) : (
                   <span className="relative block size-full">
                     <video src={item.previewUrl} className="size-full object-cover" muted playsInline preload="metadata" />

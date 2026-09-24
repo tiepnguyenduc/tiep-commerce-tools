@@ -1358,8 +1358,6 @@ textarea {
 .detail img {
     width: 100%;
     height: 620px;
-    object-fit: cover;
-    border-radius: 30px;
 }
 
 /* The gallery clips its own media, so it opts out of the blanket rule above. */

@@ -30,7 +30,7 @@ const ReviewMediaGallery: FC<ReviewMediaGalleryProps> = ({ media, authorName }) 
           <li key={item.id}>
             <button
               type="button"
-              className="block size-72 overflow-hidden rounded-md border border-neutral-400 bg-neutral-200 transition hover:border-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-700"
+              className="block size-72 overflow-hidden rounded-md border border-neutral-400 bg-neutral-200 transition hover:border-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-700 p-0"
               aria-label={`Open ${describe(item, index, media.length, authorName)}`}
               onClick={() => setOpenIndex(index)}
             >
