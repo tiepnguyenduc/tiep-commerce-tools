@@ -63,3 +63,25 @@ it("rejects invalid quantities before performing a cart write", async () => {
   expect(response.status).toBe(400);
   expect(mocks.b2bAction).not.toHaveBeenCalled();
 });
+
+it("explains missing associate permissions without exposing customer identifiers", async () => {
+  mocks.b2bAction.mockRejectedValueOnce({
+    statusCode: 400,
+    body: { errors: [{ code: "AssociateMissingPermission", message: "Customer private-id needs CreateMyCarts" }] },
+  });
+  const response = await POST(new NextRequest("https://shop.test/api/b2b", {
+    method: "POST",
+    headers: { origin: "https://shop.test", "content-type": "application/json" },
+    body: JSON.stringify({
+      action: "add-to-cart",
+      productId: "f4f7f0a4-ab56-4b5c-81de-95503be9c1e3",
+      variantId: 1,
+      quantity: 1,
+    }),
+  }));
+  expect(response.status).toBe(403);
+  const body = await response.json();
+  expect(body.error).toContain("buyer role");
+  expect(body.error).not.toContain("private-id");
+  expect(mocks.writeB2BSession).not.toHaveBeenCalled();
+});

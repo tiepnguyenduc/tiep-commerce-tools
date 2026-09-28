@@ -213,6 +213,31 @@ async function priceArgs(
     expand: "categories[*]",
   };
 }
+export async function catalogCandidates(store: Store): Promise<{ id: string }[]> {
+  try {
+    const { body } = await api().products().search().post({
+      body: {
+        query: { exact: { field: "stores", value: store.id } },
+        limit: 100,
+      },
+    }).execute();
+    return body.results;
+  } catch (error) {
+    const failure = error as {
+      statusCode?: number;
+      body?: { errors?: { code: string }[] };
+    };
+    const unavailable = failure.statusCode === 404 ||
+      failure.body?.errors?.some((e) => e.code === "SearchDeactivated");
+    if (!unavailable) throw error;
+    // Candidate IDs only. Every candidate must pass the in-Store projection
+    // below before its data can be returned to the customer.
+    const { body } = await api().productProjections().get({
+      queryArgs: { staged: false, limit: 100 },
+    }).execute();
+    return body.results.map(({ id }) => ({ id }));
+  }
+}
 async function productsFor(session: B2BSession, q = "") {
   if (!session.context) {
     const { body } = await api()
@@ -226,30 +251,29 @@ async function productsFor(session: B2BSession, q = "") {
       .filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
   }
   const { store, context, unit } = await verifiedContext(session);
-  // Product Search's stores predicate enforces active product selections; storeProjection alone does not.
-  const { body: search } = await api()
-    .products()
-    .search()
-    .post({
-      body: {
-        query: { exact: { field: "stores", value: store.id } },
-        limit: 100,
-      },
-    })
-    .execute();
+  const candidates = await catalogCandidates(store);
   const pricing = await priceArgs(session, unit, context);
   const products = await Promise.all(
-    search.results.map(async (result) => {
-      const { body } = await api()
-        .inStoreKeyWithStoreKeyValue({ storeKey: store.key })
-        .productProjections()
-        .withId({ ID: result.id })
-        .get({ queryArgs: pricing })
-        .execute();
-      return mapB2BProduct(body, context);
+    candidates.map(async (result) => {
+      try {
+        const { body } = await api()
+          .inStoreKeyWithStoreKeyValue({ storeKey: store.key })
+          .productProjections()
+          .withId({ ID: result.id })
+          .get({ queryArgs: pricing })
+          .execute();
+        return mapB2BProduct(body, context);
+      } catch (error) {
+        // Missing/unpublished products and Store-excluded variants are not exposed.
+        if ((error as { statusCode?: number }).statusCode === 404) return null;
+        throw error;
+      }
     }),
   );
-  return products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
+  return products.filter(
+    (p): p is B2BProduct =>
+      p !== null && p.name.toLowerCase().includes(q.toLowerCase()),
+  );
 }
 function cartRoot(session: B2BSession) {
   return api()

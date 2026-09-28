@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({ getApiRoot: vi.fn() }));
 vi.mock("../lib/ct/client", () => ({ getB2BApiRoot: mocks.getApiRoot }));
 import {
   assertMember,
+  catalogCandidates,
   cartMatchesContext,
   resolveContext,
   mapB2BProduct,
@@ -472,5 +473,26 @@ describe("B2B product attribute formatting", () => {
     expect(mapped.variants[0].attributes.map((a) => a.value)).toEqual([
       "Hydraulic, Tracked", "2019", "Yes",
     ]);
+  });
+});
+
+describe("catalog without a Search index", () => {
+  it.each([404, 403])("only falls back for unavailable Search (status %i)", async (statusCode) => {
+    const failure = { statusCode };
+    const execute = vi.fn().mockRejectedValue(failure);
+    const query = vi.fn().mockReturnValue({
+      execute: vi.fn().mockResolvedValue({ body: { results: [{ id: "candidate", name: "private raw data" }] } }),
+    });
+    mocks.getApiRoot.mockReturnValue({
+      products: () => ({ search: () => ({ post: () => ({ execute }) }) }),
+      productProjections: () => ({ get: query }),
+    });
+    if (statusCode === 404) {
+      expect(await catalogCandidates(store)).toEqual([{ id: "candidate" }]);
+      expect(query).toHaveBeenCalledWith({ queryArgs: { staged: false, limit: 100 } });
+    } else {
+      await expect(catalogCandidates(store)).rejects.toEqual(failure);
+      expect(query).not.toHaveBeenCalled();
+    }
   });
 });

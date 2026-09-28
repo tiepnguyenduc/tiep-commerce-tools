@@ -63,9 +63,16 @@ function failure(error: unknown) {
     );
   const e = error as {
     statusCode?: number;
-    body?: { errors?: { code: string }[] };
+    body?: { errors?: { code: string; message?: string }[] };
   };
   const code = e.body?.errors?.[0]?.code;
+  if (code === "AssociateMissingPermission")
+    return NextResponse.json(
+      {
+        error: "Your role in this business unit does not allow this action. Ask your company administrator to assign the buyer role for creating and updating your business bag.",
+      },
+      { status: 403 },
+    );
   const message =
     code === "InvalidCredentials"
       ? "Email or password is incorrect."
