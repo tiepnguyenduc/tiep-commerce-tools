@@ -71,6 +71,9 @@ export function formatAttributeValue(value: unknown, locale: string): string {
 
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
+    // Resource references are relationships, not readable specifications.
+    if (typeof record.typeId === "string" && typeof record.id === "string")
+      return "";
     if (
       typeof record.centAmount === "number" &&
       typeof record.currencyCode === "string"

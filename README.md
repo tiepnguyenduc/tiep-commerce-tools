@@ -61,7 +61,21 @@ For a production implementation, replace the process-local session in `lib/ct/se
 
 ## B2B as-associate mapping
 
-The `/b2b` and `/checkout/b2b` journey demonstrates Business Unit selection, a PO number, and the approval-pending path. Live B2B cart/order mutations now use this SDK chain:
+### Business storefront
+
+The dedicated `/b2b` portal now provides account registration/sign-in, company creation, authorized associate assignment, Business Unit/Store selection, store-scoped product prices, product details, and an independent business cart. `/b2b/account`, `/b2b/products`, and `/b2b/cart` share this authenticated business context. Its encrypted HTTP-only cookie session is separate from the legacy B2C process-local session. Business operations validate membership and Store assignments on the server.
+
+See [B2B setup and verification](docs/B2B.md) for required merchant configuration and limitations. Preview the merchant setup without changing the project:
+
+```bash
+node --env-file=.env.local scripts/setup-b2b.mjs
+```
+
+Only after reviewing the target project and resource plan, add `--apply` to create the named roles, Stores, and distribution channels. This does not create prices, customers, or Business Units. Channel prices and Store assignments must be configured before business purchasing is available. The new portal does not yet submit orders or use the legacy `/checkout/b2b` flow.
+
+### Legacy training checkout
+
+The legacy `/checkout/b2b` training journey demonstrates a PO number and the approval-pending path using environment-configured context. It is separate from the new authenticated portal. Its live B2B cart/order mutations use this SDK chain:
 
 ```ts
 apiRoot

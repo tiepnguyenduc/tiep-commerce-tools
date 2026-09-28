@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import LaunchpadUIProvider from "@/components/LaunchpadUIProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { MiniCartProvider } from "@/components/MiniCart";
+import StorefrontChrome from "@/components/StorefrontChrome";
 import { ToastProvider } from "@/components/Toast";
 export const metadata: Metadata = {
   title: "WORK/SHOP · Commerce Launchpad",
@@ -20,14 +20,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <html lang="en">
       {/* Extensions (ColorZilla, Grammarly, ...) inject attributes on <body> before
           React hydrates; suppress the resulting one-level attribute mismatch. */}
-      <body id="launchpad-storefront" data-theme="default" suppressHydrationWarning>
+      <body
+        id="launchpad-storefront"
+        data-theme="default"
+        suppressHydrationWarning
+      >
         <LaunchpadUIProvider resetStyles={false}>
           <ToastProvider>
-            <MiniCartProvider>
-              <Header />
+            <StorefrontChrome header={<Header />} footer={<Footer />}>
               {children}
-              <Footer />
-            </MiniCartProvider>
+            </StorefrontChrome>
           </ToastProvider>
         </LaunchpadUIProvider>
       </body>

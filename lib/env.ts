@@ -46,3 +46,20 @@ export function getB2BReadiness(env: EnvInput = process.env): B2BReadiness {
   const missing = required.filter((key) => !env[key]);
   return { ready: missing.length === 0, missing };
 }
+
+// Dedicated B2B credentials are all-or-nothing; never mix project credentials.
+export function getB2BApiEnv(env: EnvInput = process.env): EnvInput {
+  const fields = [
+    "PROJECT_KEY",
+    "CLIENT_ID",
+    "CLIENT_SECRET",
+    "AUTH_URL",
+    "API_URL",
+    "SCOPES",
+  ];
+  if (!fields.some((field) => Boolean(env[`CTP_B2B_${field}`]?.trim())))
+    return env;
+  return Object.fromEntries(
+    fields.map((field) => [`CTP_${field}`, env[`CTP_B2B_${field}`]]),
+  );
+}

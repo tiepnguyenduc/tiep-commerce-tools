@@ -1,4 +1,4 @@
-import { Home } from "@/components/Home";
+import { B2BCatalog } from "@/components/b2b/B2BCatalog";
 export default function Page() {
-  return <Home mode="b2b" />;
+  return <B2BCatalog home />;
 }

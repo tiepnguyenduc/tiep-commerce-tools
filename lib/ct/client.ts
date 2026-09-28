@@ -1,25 +1,25 @@
 import "server-only";
 import { ClientBuilder } from "@commercetools/sdk-client-v2";
 import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
-import { getEnvReadiness } from "../env";
+import { getB2BApiEnv, getEnvReadiness } from "../env";
 
-function createApiRoot() {
+function createApiRoot(env: Record<string, string | undefined> = process.env) {
   return createApiBuilderFromCtpClient(
     new ClientBuilder()
-      .withProjectKey(process.env.CTP_PROJECT_KEY!)
+      .withProjectKey(env.CTP_PROJECT_KEY!)
       .withClientCredentialsFlow({
-        host: process.env.CTP_AUTH_URL!,
-        projectKey: process.env.CTP_PROJECT_KEY!,
+        host: env.CTP_AUTH_URL!,
+        projectKey: env.CTP_PROJECT_KEY!,
         credentials: {
-          clientId: process.env.CTP_CLIENT_ID!,
-          clientSecret: process.env.CTP_CLIENT_SECRET!,
+          clientId: env.CTP_CLIENT_ID!,
+          clientSecret: env.CTP_CLIENT_SECRET!,
         },
-        scopes: process.env.CTP_SCOPES!.split(" "),
+        scopes: env.CTP_SCOPES!.split(" "),
         fetch,
       })
-      .withHttpMiddleware({ host: process.env.CTP_API_URL!, fetch })
+      .withHttpMiddleware({ host: env.CTP_API_URL!, fetch })
       .build(),
-  ).withProjectKey({ projectKey: process.env.CTP_PROJECT_KEY! });
+  ).withProjectKey({ projectKey: env.CTP_PROJECT_KEY! });
 }
 
 let cachedApiRoot: ReturnType<typeof createApiRoot> | null = null;
@@ -28,4 +28,13 @@ export function getApiRoot() {
   if (!getEnvReadiness().ready) return null;
   cachedApiRoot ??= createApiRoot();
   return cachedApiRoot;
+}
+
+let cachedB2BApiRoot: ReturnType<typeof createApiRoot> | null = null;
+
+export function getB2BApiRoot() {
+  const env = getB2BApiEnv();
+  if (!getEnvReadiness(env).ready) return null;
+  cachedB2BApiRoot ??= createApiRoot(env);
+  return cachedB2BApiRoot;
 }
