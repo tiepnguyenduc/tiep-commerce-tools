@@ -866,3 +866,425 @@
     --content-gutter: 18px;
   }
 }
+
+/* Business bag: intentionally scoped to avoid changing account and catalog pages. */
+.bagMain {
+  padding-bottom: 90px;
+}
+.bagHeading {
+  padding: 48px 0 34px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.bagHeading h1 {
+  margin: 12px 0 13px;
+  font-size: clamp(42px, 4.6vw, 62px);
+  line-height: 1.05;
+  letter-spacing: -2.7px;
+  font-weight: 650;
+}
+.bagHeading h1 span {
+  color: #947342;
+}
+.bagHeading p {
+  color: #62655c;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.bagCount {
+  font-size: 12px;
+  color: #62655c;
+  padding-bottom: 3px;
+  white-space: nowrap;
+}
+.bagLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 365px;
+  align-items: start;
+  gap: 46px;
+}
+.bagItems {
+  min-width: 0;
+}
+.bagSectionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+.bagSectionHeading h2 {
+  font-size: 14px;
+  font-weight: 650;
+}
+.bagSectionHeading > span {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: #64665d;
+}
+.bagLine {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+.bagImage {
+  display: block;
+  height: 150px;
+  background: #fff;
+}
+.bagImage img {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  object-fit: contain;
+}
+.bagProduct h3 {
+  margin: 1px 0 8px;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.bagProduct h3 a {
+  color: var(--ink);
+}
+.bagProduct h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.bagProduct > p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #65685e;
+  overflow-wrap: anywhere;
+}
+.bagProduct .bagSku {
+  font-size: 10px;
+  letter-spacing: 0.35px;
+}
+.bagProduct .bagUnitPrice {
+  color: var(--ink);
+  font-size: 13px;
+  margin-top: 12px;
+}
+.bagUnitPrice span {
+  color: #676a60;
+}
+.bagLineTotal {
+  text-align: right;
+  padding-top: 3px;
+}
+.bagLineTotal > span {
+  display: block;
+  font-size: 10px;
+  color: #676a60;
+  margin-bottom: 7px;
+}
+.bagLineTotal strong {
+  font-size: 16px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.bagQuantityForm {
+  margin-top: 19px;
+}
+.bagQuantityForm > label {
+  display: block;
+  font-size: 10px;
+  margin-bottom: 7px;
+  color: #5a5f52;
+}
+.bagControls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.bagStepper {
+  display: flex;
+  height: 38px;
+  border: 1px solid #c6c5bc;
+  background: #fff;
+}
+.root .bagStepper button {
+  min-width: 32px;
+  width: 32px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #242722;
+  font-size: 17px;
+  justify-content: center;
+}
+.root .bagStepper button:hover:not(:disabled) {
+  background: #eae7dd;
+}
+.bagStepper input {
+  border: 0;
+  border-left: 1px solid #e4e1d7;
+  border-right: 1px solid #e4e1d7;
+  background: transparent;
+  width: 42px;
+  padding: 0 2px;
+  text-align: center;
+  font-size: 12px;
+}
+.root .bagRemove {
+  padding: 7px 0;
+  min-width: auto;
+  height: auto;
+  color: #62655b;
+  font-size: 11px;
+  background: none;
+  text-underline-offset: 4px;
+}
+.root .bagUpdate {
+  background: #222;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 0;
+  min-width: auto;
+  height: 38px;
+  font-size: 11px;
+  justify-content: center;
+}
+.bagError,
+.bagFeedback {
+  display: block;
+  margin-top: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.bagError {
+  color: #963f26;
+}
+.bagFeedback {
+  color: #62655b;
+}
+.bagContinue {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 24px;
+  align-items: center;
+}
+.bagContinue > span {
+  font-size: 10px;
+  color: #666a5e;
+}
+.bagSummary {
+  position: sticky;
+  top: 24px;
+  background: #eae6db;
+  border-top: 2px solid #282b25;
+  padding: 28px;
+}
+.bagSummary > .eyebrow {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+}
+.bagSummary h2 {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  margin: 10px 0 23px;
+  font-weight: 600;
+}
+.bagContext {
+  border-bottom: 1px solid #d1cdc1;
+  padding-bottom: 20px;
+  margin-bottom: 13px;
+}
+.bagContext strong,
+.bagContext span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.bagContext strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+.bagContext span {
+  font-size: 11px;
+  color: #64665c;
+  margin-top: 5px;
+}
+.bagTotals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  font-size: 12px;
+}
+.bagTotals dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+.bagTotals .bagGrandTotal {
+  margin-top: 13px;
+  padding: 20px 0 0;
+  border-top: 1px solid #c9c5b9;
+  align-items: baseline;
+  font-size: 18px;
+  font-weight: 650;
+}
+.bagGrandTotal dt span {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 400;
+  color: #61665a;
+  margin-left: 5px;
+}
+.bagGrandTotal dd {
+  font-size: 28px;
+  letter-spacing: -0.8px;
+}
+.bagTaxNote {
+  font-size: 10px;
+  color: #65685f;
+  line-height: 1.6;
+  margin: 8px 0 24px;
+}
+.bagCheckoutNotice {
+  border: 1px solid #cbc6b9;
+  padding: 16px;
+  background: #f3f0e8;
+}
+.bagCheckoutNotice strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+}
+.bagCheckoutNotice p {
+  margin-top: 7px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #62655a;
+}
+.bagSavedNote {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #65685c;
+  margin-top: 16px;
+  text-align: center;
+}
+.bagEmpty {
+  text-align: center;
+  background: #eae6db;
+  border-top: 1px solid #b8b3a4;
+  padding: 65px 28px;
+}
+.bagEmpty h2 {
+  font-size: clamp(26px, 3vw, 37px);
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin: 17px 0;
+}
+.bagEmpty p {
+  max-width: 440px;
+  margin: 0 auto 25px;
+  color: #61665a;
+  font-size: 14px;
+  line-height: 1.8;
+}
+/* Match the storefront reset’s ID specificity for cart borders only. */
+:global(#launchpad-storefront) .root .bagSectionHeading {
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+:global(#launchpad-storefront) .root .bagLine {
+  border-bottom: 1px solid var(--line);
+}
+:global(#launchpad-storefront) .root .bagSummary {
+  border-top: 2px solid #282b25;
+}
+:global(#launchpad-storefront) .root .bagContext {
+  border-bottom: 1px solid #d1cdc1;
+}
+:global(#launchpad-storefront) .root .bagTotals .bagGrandTotal {
+  border-top: 1px solid #c9c5b9;
+}
+:global(#launchpad-storefront) .root .bagStepper {
+  border: 1px solid #c6c5bc;
+}
+:global(#launchpad-storefront) .root .bagStepper input {
+  border: 0;
+  border-left: 1px solid #e4e1d7;
+  border-right: 1px solid #e4e1d7;
+}
+:global(#launchpad-storefront) .root .bagCheckoutNotice {
+  border: 1px solid #cbc6b9;
+}
+:global(#launchpad-storefront) .root .bagEmpty {
+  border-top: 1px solid #b8b3a4;
+}
+@media (max-width: 1000px) {
+  .bagLayout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 26px;
+  }
+  .bagLine {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .bagImage {
+    height: 120px;
+    grid-row: span 2;
+  }
+  .bagLineTotal {
+    grid-column: 2;
+    text-align: left;
+    padding-top: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .bagLineTotal > span {
+    margin: 0;
+  }
+  .bagSummary {
+    padding: 24px;
+  }
+}
+@media (max-width: 700px) {
+  .bagHeading {
+    padding: 34px 0 26px;
+    align-items: start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .bagHeading h1 {
+    font-size: 46px;
+  }
+  .bagHeading p {
+    font-size: 13px;
+  }
+  .bagLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .bagSummary {
+    position: static;
+    padding: 26px;
+  }
+  .bagLine {
+    padding: 23px 0;
+  }
+  .bagProduct h3 {
+    font-size: 16px;
+  }
+  .bagContinue {
+    gap: 16px;
+  }
+  .bagEmpty {
+    padding: 45px 22px;
+  }
+}
