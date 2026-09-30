@@ -1,29 +1,31 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { businessCategories, filterBusinessProducts } from "@/lib/b2b/catalog-navigation";
 import Image from "@/components/commercetools-ui/atoms/image";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
-export function B2BCatalog({ home = false }: { home?: boolean }) {
+function CatalogContent({ home = false }: { home?: boolean }) {
   const { state, busy } = useB2B();
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  useEffect(() => {
-    setQuery(new URLSearchParams(window.location.search).get("q") || "");
-  }, []);
+  const params = useSearchParams();
+  const pathname = usePathname();
+  const query = params.get("q") || "";
+  const category = params.get("category") || "";
+  const categoryId = params.get("categoryId") || "";
   const products = state?.products ?? [];
-  const categories = [
-    ...new Set(products.map((p) => p.category).filter(Boolean)),
-  ];
-  const filtered = products.filter(
-    (p) =>
-      (!category || p.category === category) &&
-      `${p.name} ${p.category} ${p.variants.map((v) => v.sku).join(" ")}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
+  const categories = businessCategories(products);
+  const filtered = filterBusinessProducts(products, category, query, categoryId);
+  function updateFilters(changes: { q?: string; category?: string }) {
+    const next = new URLSearchParams(params.toString());
+    if ("category" in changes) next.delete("categoryId");
+    for (const [key, value] of Object.entries(changes)) {
+      if (value) next.set(key, value); else next.delete(key);
+    }
+    window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`);
+  }
   return (
     <main className={s.main}>
       {home ? (
@@ -88,7 +90,7 @@ export function B2BCatalog({ home = false }: { home?: boolean }) {
                   <button
                     key={cat}
                     onClick={() => {
-                      setCategory(cat);
+                      updateFilters({ category: cat, q: "" });
                       document
                         .getElementById("business-products")
                         ?.scrollIntoView({ behavior: "smooth" });
@@ -128,33 +130,33 @@ export function B2BCatalog({ home = false }: { home?: boolean }) {
                 ? "YOUR STORE ASSORTMENT"
                 : "EXPLORE THE COLLECTION"}
             </span>
-            <h2>{home ? "Ready for your next project" : "All products"}</h2>
+            <h2>{category || (home ? "Ready for your next project" : "All products")}</h2>
           </div>
-          <span>{filtered.length} products</span>
+          <span>{filtered.length} {filtered.length === 1 ? "product" : "products"}</span>
         </div>
         <div className={s.filters}>
           <input
             aria-label="Filter products"
             placeholder="Find a product…"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => updateFilters({ q: e.target.value })}
           />
           <select
             aria-label="Filter by category"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => updateFilters({ category: e.target.value })}
           >
             <option value="">All categories</option>
+            {category && !categories.includes(category) && <option value={category}>{category}</option>}
             {categories.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
-          {(category || query) && (
+          {(category || categoryId || query) && (
             <Button
               variant="underlined"
               onClick={() => {
-                setCategory("");
-                setQuery("");
+                updateFilters({ q: "", category: "" });
               }}
             >
               Reset filters
@@ -204,8 +206,8 @@ export function B2BCatalog({ home = false }: { home?: boolean }) {
           <div className={s.empty}>
             <h3>No products found</h3>
             <p>
-              {state.context
-                ? "Try another search or category in this store."
+              {products.length
+                ? "Try another search or category, or reset your filters to see the full collection."
                 : "Your catalog will appear here when products are available."}
             </p>
           </div>
@@ -213,4 +215,8 @@ export function B2BCatalog({ home = false }: { home?: boolean }) {
       </section>
     </main>
   );
+}
+
+export function B2BCatalog({ home = false }: { home?: boolean }) {
+  return <Suspense fallback={<main className={s.main}><div className={s.empty}>Loading your collection…</div></main>}><CatalogContent home={home} /></Suspense>;
 }

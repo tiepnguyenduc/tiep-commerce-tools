@@ -1,4 +1,10 @@
 import type { Cart, Money } from "../types";
+export type B2BNavigationCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  children: B2BNavigationCategory[];
+};
 export type B2BStore = { key: string; name: string };
 export type B2BUnit = {
   key: string;
@@ -19,6 +25,7 @@ export type B2BProduct = {
   name: string;
   description: string;
   category: string;
+  categoryIds?: string[];
   image: string;
   images: string[];
   variants: {

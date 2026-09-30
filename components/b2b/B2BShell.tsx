@@ -1,80 +1,57 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { StorefrontAnnouncement } from "../StorefrontAnnouncement";
 import { useState } from "react";
 import {
   ArrowRightIcon,
   BuildingOffice2Icon,
   ShoppingBagIcon,
   UserIcon,
-  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useB2B } from "./B2BProvider";
+import { B2BHeaderNavigation, B2BHeaderSearch } from "./B2BHeaderNavigation";
 import s from "./B2B.module.css";
 export function B2BShell({ children }: { children: React.ReactNode }) {
   const { state, busy, error, reload, act } = useB2B();
-  const path = usePathname();
   const [unitKey, setUnitKey] = useState("");
   const unit =
     state?.businessUnits.find(
       (u) => u.key === (unitKey || state.context?.businessUnitKey),
     ) ?? state?.businessUnits[0];
+  const activeUnit = state?.businessUnits.find((item) => item.key === state.context?.businessUnitKey);
+  const activeStore = activeUnit?.stores.find((store) => store.key === state?.context?.storeKey);
   return (
     <div className={`${s.root} ct-ui`}>
-      <div className={s.topline}>
-        <span>WORK/SHOP FOR BUSINESS</span>
-        <Link href="/">Visit our retail store ↗</Link>
-      </div>
+      <StorefrontAnnouncement business />
       <header className={s.header}>
         <Link href="/b2b" className={s.logo}>
-          WORK<span>/</span>SHOP<small>BUSINESS SUPPLY</small>
+          WORK<span>/</span>SHOP<small>EQUIPMENT & PARTS</small>
         </Link>
-        <form action="/b2b/products" className={s.search}>
-          <input
-            name="q"
-            aria-label="Search business catalog"
-            placeholder="Search products, materials, essentials…"
-          />
-          <button aria-label="Search">
-            <MagnifyingGlassIcon />
-          </button>
-        </form>
+        <B2BHeaderSearch />
         <div className={s.headerActions}>
           <Link href="/b2b/account" aria-label="Business account">
             <UserIcon />
-            <span>{state?.customer?.firstName || "Account"}</span>
+            <span><small>{state?.customer ? "Welcome back" : "Business account"}</small><strong>{state?.customer?.firstName || (state?.customer ? "Your account" : "Sign in / Register")}</strong></span>
           </Link>
           <Link
             href="/b2b/cart"
             aria-label={`Business bag, ${state?.cart?.itemCount ?? 0} items`}
           >
             <ShoppingBagIcon />
-            <span>Bag {state?.cart?.itemCount ?? 0}</span>
+            <span><small>Purchasing bag</small><strong>{state?.cart?.itemCount ?? 0} items</strong></span><b className={s.mobileBagCount}>{state?.cart?.itemCount ?? 0}</b>
           </Link>
         </div>
       </header>
-      <nav className={s.nav} aria-label="Business navigation">
-        <Link aria-current={path === "/b2b" ? "page" : undefined} href="/b2b">
-          Overview
-        </Link>
-        <Link
-          aria-current={path.includes("/products") ? "page" : undefined}
-          href="/b2b/products"
-        >
-          Shop all
-        </Link>
-        <Link href="/b2b/account">Your business</Link>
-        <span>Considered products. Built for business.</span>
-      </nav>
+      <B2BHeaderNavigation />
       <div className={s.context}>
         <BuildingOffice2Icon />
         <div>
-          <strong>Your purchasing workspace</strong>
+          <strong>{activeUnit?.name || "Your purchasing workspace"}</strong>
           <span>
             {state?.context
-              ? `${state.businessUnits.find((u) => u.key === state.context?.businessUnitKey)?.name || state.context.businessUnitKey} · ${state.context.storeKey} · ${state.context.currency}`
-              : "Choose your business and store to see your prices"}
+              ? `${activeStore?.name || state.context.storeKey} · ${state.context.country} · ${state.context.currency}`
+              : state?.customer ? "Choose a business and store to access your assortment and prices" : "Sign in to access your company’s assortment and agreed prices"}
           </span>
         </div>
         {state?.customer ? (

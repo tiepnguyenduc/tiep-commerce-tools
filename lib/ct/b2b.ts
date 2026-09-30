@@ -181,6 +181,10 @@ export function mapB2BProduct(
     name: localized(product.name),
     description: localized(product.description),
     category: localized(product.categories[0]?.obj?.name) || "Equipment",
+    categoryIds: [...new Set(product.categories.flatMap((category) => [
+      category.id,
+      ...(category.obj?.ancestors ?? []).map((ancestor) => ancestor.id),
+    ]))],
     image: variants[0].image,
     images: (product.masterVariant.images ?? []).map((i) => i.url),
     price: variants[0].price,

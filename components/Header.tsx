@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StorefrontAnnouncement } from "./StorefrontAnnouncement";
 import { HeaderCategoryNavigation } from "./HeaderCategoryNavigation";
 import { HeaderMobileCategoryMenu } from "./HeaderMobileCategoryMenu";
 import { HeaderMobileMenu } from "./HeaderMobileMenu";
@@ -63,9 +64,7 @@ async function HeaderSearchSlot() {
 export function Header() {
   return (
     <header className={`header ${styles.header}`}>
-      <div className={styles.utilityBar}>
-        <div className="shell"><span>Considered design. Everyday living.</span><Link href="/b2b">Shopping for your business? <span aria-hidden="true">↗</span></Link></div>
-      </div>
+      <StorefrontAnnouncement />
       <div className={`shell header-inner ${styles.mainRow}`}>
         <HeaderMobileMenu>
           <Suspense fallback={<p className={styles.menuLabel}>Loading categories…</p>}><HeaderMobileCategoryLinks /></Suspense>
