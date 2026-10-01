@@ -37,8 +37,15 @@ function api() {
     );
   return root;
 }
-const localized = (value?: Record<string, string>) =>
-  value?.["en-US"] || value?.en || Object.values(value ?? {})[0] || "";
+const defaultLocale = () => process.env.CTP_B2B_LOCALE || "en-US";
+const localized = (value?: Record<string, string>, locale = defaultLocale()) =>
+  value?.[locale] ||
+  value?.[locale.split("-")[0]] ||
+  value?.[defaultLocale()] ||
+  value?.["en-US"] ||
+  value?.en ||
+  Object.values(value ?? {})[0] ||
+  "";
 export function requireCustomer(session: B2BSession) {
   if (!session.customer)
     throw new B2BError("Please sign in to your business account.", 401);
@@ -151,6 +158,7 @@ async function verifiedContext(session: B2BSession) {
 export function mapB2BProduct(
   product: ProductProjection,
   context?: B2BContext,
+  locale = defaultLocale(),
 ): B2BProduct {
   const variant = (v: ProductVariant) => {
     const selected =
@@ -164,12 +172,12 @@ export function mapB2BProduct(
       sku: v.sku || "",
       image: v.images?.[0]?.url || "",
       price: selected
-        ? mapMoney(selected.discounted?.value ?? selected.value)
+        ? mapMoney(selected.discounted?.value ?? selected.value, locale)
         : null,
       attributes: (v.attributes ?? [])
         .map((a) => ({
           name: a.name,
-          value: formatAttributeValue(a.value, process.env.CTP_LOCALE || "en-US"),
+          value: formatAttributeValue(a.value, locale),
         }))
         .filter((a) => a.value !== ""),
     };
@@ -177,14 +185,19 @@ export function mapB2BProduct(
   const variants = [product.masterVariant, ...product.variants].map(variant);
   return {
     id: product.id,
-    slug: localized(product.slug),
-    name: localized(product.name),
-    description: localized(product.description),
-    category: localized(product.categories[0]?.obj?.name) || "Equipment",
-    categoryIds: [...new Set(product.categories.flatMap((category) => [
-      category.id,
-      ...(category.obj?.ancestors ?? []).map((ancestor) => ancestor.id),
-    ]))],
+    slug: localized(product.slug, locale),
+    name: localized(product.name, locale),
+    description: localized(product.description, locale),
+    category:
+      localized(product.categories[0]?.obj?.name, locale) || "Equipment",
+    categoryIds: [
+      ...new Set(
+        product.categories.flatMap((category) => [
+          category.id,
+          ...(category.obj?.ancestors ?? []).map((ancestor) => ancestor.id),
+        ]),
+      ),
+    ],
     image: variants[0].image,
     images: (product.masterVariant.images ?? []).map((i) => i.url),
     price: variants[0].price,
@@ -217,15 +230,25 @@ async function priceArgs(
     expand: "categories[*]",
   };
 }
-async function publishedProjections(expandCategories = false): Promise<ProductProjection[]> {
+async function publishedProjections(
+  expandCategories = false,
+): Promise<ProductProjection[]> {
   const products: ProductProjection[] = [];
   let cursor: string | undefined;
   for (;;) {
-    const { body } = await api().productProjections().get({ queryArgs: {
-      staged: false, limit: 100, sort: "id asc", withTotal: false,
-      ...(expandCategories ? { expand: "categories[*]" } : {}),
-      ...(cursor ? { where: `id > ${JSON.stringify(cursor)}` } : {}),
-    } }).execute();
+    const { body } = await api()
+      .productProjections()
+      .get({
+        queryArgs: {
+          staged: false,
+          limit: 100,
+          sort: "id asc",
+          withTotal: false,
+          ...(expandCategories ? { expand: "categories[*]" } : {}),
+          ...(cursor ? { where: `id > ${JSON.stringify(cursor)}` } : {}),
+        },
+      })
+      .execute();
     products.push(...body.results);
     if (body.results.length < 100) return products;
     const next = body.results[body.results.length - 1].id;
@@ -233,30 +256,53 @@ async function publishedProjections(expandCategories = false): Promise<ProductPr
     cursor = next;
   }
 }
-export async function catalogCandidates(store: Store): Promise<{ id: string }[]> {
+export async function catalogCandidates(
+  store: Store,
+): Promise<{ id: string }[]> {
   try {
     const candidates: { id: string }[] = [];
     for (let offset = 0; offset < 10000; offset += 100) {
-      const { body } = await api().products().search().post({ body: {
-        query: { exact: { field: "stores", value: store.id } },
-        limit: 100, offset, sort: [{ field: "id", order: "asc" }],
-      } }).execute();
+      const { body } = await api()
+        .products()
+        .search()
+        .post({
+          body: {
+            query: { exact: { field: "stores", value: store.id } },
+            limit: 100,
+            offset,
+            sort: [{ field: "id", order: "asc" }],
+          },
+        })
+        .execute();
       candidates.push(...body.results.map(({ id }) => ({ id })));
-      if (body.results.length < 100 || (typeof body.total === "number" && candidates.length >= body.total)) return candidates;
+      if (
+        body.results.length < 100 ||
+        (typeof body.total === "number" && candidates.length >= body.total)
+      )
+        return candidates;
     }
     // Search pagination cannot cover more than 10,000 results. Retrieve all
     // published candidate IDs instead; every ID still passes in-Store validation.
   } catch (error) {
-    const failure = error as { statusCode?: number; body?: { errors?: { code: string }[] } };
-    const unavailable = failure.statusCode === 404 || failure.body?.errors?.some((e) => e.code === "SearchDeactivated");
+    const failure = error as {
+      statusCode?: number;
+      body?: { errors?: { code: string }[] };
+    };
+    const unavailable =
+      failure.statusCode === 404 ||
+      failure.body?.errors?.some((e) => e.code === "SearchDeactivated");
     if (!unavailable) throw error;
   }
   return (await publishedProjections()).map(({ id }) => ({ id }));
 }
-async function productsFor(session: B2BSession, q = "") {
+async function productsFor(
+  session: B2BSession,
+  q = "",
+  locale = defaultLocale(),
+) {
   if (!session.context) {
     return (await publishedProjections(true))
-      .map((p) => mapB2BProduct(p))
+      .map((p) => mapB2BProduct(p, undefined, locale))
       .filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
   }
   const { store, context, unit } = await verifiedContext(session);
@@ -264,23 +310,26 @@ async function productsFor(session: B2BSession, q = "") {
   const pricing = await priceArgs(session, unit, context);
   const products: (B2BProduct | null)[] = [];
   for (let offset = 0; offset < candidates.length; offset += 20) {
-    products.push(...await Promise.all(
-    candidates.slice(offset, offset + 20).map(async (result) => {
-      try {
-        const { body } = await api()
-          .inStoreKeyWithStoreKeyValue({ storeKey: store.key })
-          .productProjections()
-          .withId({ ID: result.id })
-          .get({ queryArgs: pricing })
-          .execute();
-        return mapB2BProduct(body, context);
-      } catch (error) {
-        // Missing/unpublished products and Store-excluded variants are not exposed.
-        if ((error as { statusCode?: number }).statusCode === 404) return null;
-        throw error;
-      }
-    }),
-    ));
+    products.push(
+      ...(await Promise.all(
+        candidates.slice(offset, offset + 20).map(async (result) => {
+          try {
+            const { body } = await api()
+              .inStoreKeyWithStoreKeyValue({ storeKey: store.key })
+              .productProjections()
+              .withId({ ID: result.id })
+              .get({ queryArgs: pricing })
+              .execute();
+            return mapB2BProduct(body, context, locale);
+          } catch (error) {
+            // Missing/unpublished products and Store-excluded variants are not exposed.
+            if ((error as { statusCode?: number }).statusCode === 404)
+              return null;
+            throw error;
+          }
+        }),
+      )),
+    );
   }
   return products.filter(
     (p): p is B2BProduct =>
@@ -340,7 +389,11 @@ async function cartFor(session: B2BSession) {
   }
   return body;
 }
-export async function b2bState(session: B2BSession, q = ""): Promise<B2BState> {
+export async function b2bState(
+  session: B2BSession,
+  q = "",
+  locale = defaultLocale(),
+): Promise<B2BState> {
   if (!getApiRoot())
     return {
       configured: false,
@@ -365,7 +418,7 @@ export async function b2bState(session: B2BSession, q = ""): Promise<B2BState> {
             .withKey({ key: s.key })
             .get()
             .execute();
-          return { key: s.key, name: localized(body.name) || s.key };
+          return { key: s.key, name: localized(body.name, locale) || s.key };
         }),
       ),
     })),
@@ -390,7 +443,7 @@ export async function b2bState(session: B2BSession, q = ""): Promise<B2BState> {
       "Your company is ready. Ask your account manager to assign a Store with contract pricing.";
   let products: B2BProduct[] = [];
   try {
-    products = await productsFor(session, q);
+    products = await productsFor(session, q, locale);
   } catch {
     notice =
       "The catalog is unavailable. Check Product Search activation and Store configuration, then refresh.";

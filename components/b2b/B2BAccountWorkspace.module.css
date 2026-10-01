@@ -1,0 +1,401 @@
+:global(#launchpad-storefront) .workspace {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 36px;
+  max-width: 1240px;
+  margin: auto;
+  padding: 42px 28px 70px;
+}
+:global(#launchpad-storefront) .workspace .sidebar {
+  border-right: 1px solid #deddd4;
+  padding-right: 24px;
+}
+:global(#launchpad-storefront) .workspace .sidebarTitle {
+  font-size: 10px;
+  color: #7d816f;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+:global(#launchpad-storefront) .workspace .sidebar h2 {
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 500;
+  margin: 0 0 24px;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .workspace .sidebar nav {
+  display: grid;
+  gap: 5px;
+}
+:global(#launchpad-storefront) .workspace .sidebar a {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #5c6452;
+  border-left: 2px solid transparent;
+}
+:global(#launchpad-storefront) .workspace .sidebar a svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .workspace .sidebar a[aria-current="page"] {
+  background: #e7eadd;
+  border-color: #707b50;
+  color: #343e2b;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .workspace .sidebar a:hover {
+  background: #efeee7;
+}
+:global(#launchpad-storefront) .workspace .content {
+  min-width: 0;
+}
+:global(#launchpad-storefront) .workspace .heading {
+  border-bottom: 1px solid #ddded4;
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+}
+:global(#launchpad-storefront) .workspace .heading p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #717762;
+  margin: 12px 0 0;
+}
+:global(#launchpad-storefront) .workspace .heading h1 {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1px;
+  margin: 0;
+  line-height: 1.2;
+}
+:global(#launchpad-storefront) .workspace .cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+:global(#launchpad-storefront) .workspace .card {
+  display: block;
+  border: 1px solid #deded3;
+  background: #fff;
+  padding: 24px;
+}
+:global(#launchpad-storefront) .workspace .card > svg {
+  width: 26px;
+  height: 26px;
+  color: #7b825d;
+  margin-bottom: 20px;
+}
+:global(#launchpad-storefront) .workspace .card h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 500;
+}
+:global(#launchpad-storefront) .workspace .card p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #747a65;
+  margin: 0;
+}
+:global(#launchpad-storefront) .workspace .card:hover {
+  border-color: #9da484;
+}
+:global(#launchpad-storefront) .workspace .cardAction {
+  display: block;
+  margin-top: 20px;
+  color: #5d6b42;
+  font-size: 12px;
+}
+:global(#launchpad-storefront) .workspace .panel {
+  padding: 25px;
+  background: #fff;
+  border: 1px solid #ddded4;
+  margin-bottom: 20px;
+}
+:global(#launchpad-storefront) .workspace .panel h2 {
+  margin: 0 0 20px;
+  font-size: 21px;
+  font-weight: 500;
+}
+:global(#launchpad-storefront) .workspace .panel h3 {
+  margin: 16px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .workspace .panel p {
+  font-size: 13px;
+  color: #646d57;
+  line-height: 1.7;
+}
+:global(#launchpad-storefront) .workspace .metadata {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+:global(#launchpad-storefront) .workspace .metadata dt {
+  color: #7a806c;
+}
+:global(#launchpad-storefront) .workspace .metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .workspace .addresses {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+:global(#launchpad-storefront) .workspace .address {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #616d54;
+}
+:global(#launchpad-storefront) .workspace .address strong {
+  color: #323f2b;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .workspace .badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0;
+}
+:global(#launchpad-storefront) .workspace .badges span {
+  background: #edf0e6;
+  padding: 4px 8px;
+  color: #5b6b40;
+  font-size: 10px;
+}
+:global(#launchpad-storefront) .workspace .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 22px;
+}
+:global(#launchpad-storefront) .workspace .button,
+:global(#launchpad-storefront) .workspace .actions button,
+:global(#launchpad-storefront) .workspace .actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 15px;
+  background: #fff;
+  border: 1px solid #c7cdb9;
+  color: #485b34;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+:global(#launchpad-storefront) .workspace .primary {
+  background: #65774d !important;
+  border-color: #65774d !important;
+  color: #fff !important;
+}
+:global(#launchpad-storefront) .workspace .button:disabled,
+:global(#launchpad-storefront) .workspace .actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+:global(#launchpad-storefront) .workspace .accordion {
+  border: 1px solid #deded3;
+  background: #fff;
+  margin: 14px 0;
+}
+:global(#launchpad-storefront) .workspace .accordion summary {
+  padding: 20px 24px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+}
+:global(#launchpad-storefront) .workspace .accordion > div {
+  padding: 0 24px 24px;
+}
+:global(#launchpad-storefront) .workspace .form {
+  display: grid;
+  gap: 18px;
+}
+:global(#launchpad-storefront) .workspace .fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+:global(#launchpad-storefront) .workspace .field {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #526242;
+}
+:global(#launchpad-storefront) .workspace .field input,
+:global(#launchpad-storefront) .workspace .field select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #b8c2aa;
+  border-radius: 3px;
+  background: #fcfdf9;
+  color: #344329;
+  padding: 12px;
+  min-height: 44px;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .workspace .check {
+  display: flex;
+  gap: 10px;
+  align-items: start;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #606d50;
+}
+:global(#launchpad-storefront) .workspace .check input {
+  margin-top: 3px;
+}
+:global(#launchpad-storefront) .workspace .danger {
+  color: #953e31;
+}
+:global(#launchpad-storefront) .workspace .dangerButton {
+  border-color: #a05343 !important;
+  background: #a05343 !important;
+  color: #fff !important;
+}
+:global(#launchpad-storefront) .workspace .feedback {
+  padding: 14px 18px;
+  background: #e9eedf;
+  color: #435b2e;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+:global(#launchpad-storefront) .workspace .error {
+  background: #f7e9e3;
+  color: #913e2c;
+}
+:global(#launchpad-storefront) .workspace .loading {
+  padding: 30px;
+  border: 1px solid #deded3;
+  font-size: 14px;
+  color: #68745a;
+}
+:global(#launchpad-storefront) .workspace .legacy > div {
+  padding: 0;
+}
+:global(#launchpad-storefront) .workspace .legacy :global(.pageTitle) {
+  display: none;
+}
+@media (max-width: 1000px) {
+  :global(#launchpad-storefront) .workspace {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 24px;
+  }
+  :global(#launchpad-storefront) .workspace .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :global(#launchpad-storefront) .workspace .addresses {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 700px) {
+  :global(#launchpad-storefront) .workspace {
+    grid-template-columns: 1fr;
+    padding: 26px 20px 50px;
+  }
+  :global(#launchpad-storefront) .workspace .sidebar {
+    border-right: 0;
+    padding: 0 0 18px;
+    border-bottom: 1px solid #deddd4;
+  }
+  :global(#launchpad-storefront) .workspace .sidebar h2 {
+    margin-bottom: 14px;
+  }
+  :global(#launchpad-storefront) .workspace .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  :global(#launchpad-storefront) .workspace .sidebar a {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  :global(#launchpad-storefront) .workspace .sidebar a svg {
+    width: 16px;
+    height: 16px;
+  }
+  :global(#launchpad-storefront) .workspace .fields {
+    grid-template-columns: 1fr;
+  }
+  :global(#launchpad-storefront) .workspace .metadata {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+  :global(#launchpad-storefront) .workspace .panel {
+    padding: 20px;
+  }
+}
+@media (max-width: 420px) {
+  :global(#launchpad-storefront) .workspace .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+:global(#launchpad-storefront) .workspace .logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  border: 0;
+  background: transparent;
+  padding: 12px;
+  color: #7c4536;
+  cursor: pointer;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .workspace .logout svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .workspace .logout:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Keep form controls legible above the scoped Launchpad border reset. */
+:global(#launchpad-storefront) .workspace .field input::placeholder {
+  color: #79836e;
+  opacity: 1;
+}
+:global(#launchpad-storefront) .workspace .field input:focus,
+:global(#launchpad-storefront) .workspace .field select:focus {
+  border-color: #65774d;
+  outline: 2px solid #65774d;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px #65774d16;
+}
+:global(#launchpad-storefront) .workspace .field input:disabled,
+:global(#launchpad-storefront) .workspace .field select:disabled {
+  background: #f0f2ea;
+  border-color: #d2d8c9;
+  color: #7a846f;
+  cursor: not-allowed;
+}
+:global(#launchpad-storefront) .workspace .check input {
+  appearance: auto;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #65774d;
+}
+:global(#launchpad-storefront) .workspace .check input:focus-visible {
+  outline: 2px solid #65774d;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  :global(#launchpad-storefront) .workspace .field input,
+  :global(#launchpad-storefront) .workspace .field select {
+    font-size: 16px;
+  }
+}

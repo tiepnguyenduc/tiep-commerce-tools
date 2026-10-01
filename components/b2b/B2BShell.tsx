@@ -1,4 +1,5 @@
 "use client";
+import { useB2BTranslations } from "./useB2BTranslations";
 import Link from "next/link";
 import { StorefrontAnnouncement } from "../StorefrontAnnouncement";
 import { useState } from "react";
@@ -15,16 +16,21 @@ import { B2BHeaderWishlistLink } from "./B2BWishlist";
 import { B2BHeaderCompareLink } from "./B2BCompare";
 import s from "./B2B.module.css";
 export function B2BShell({ children }: { children: React.ReactNode }) {
+  const { t, locale } = useB2BTranslations();
   const { state, busy, error, reload, act } = useB2B();
   const [unitKey, setUnitKey] = useState("");
   const unit =
     state?.businessUnits.find(
       (u) => u.key === (unitKey || state.context?.businessUnitKey),
     ) ?? state?.businessUnits[0];
-  const activeUnit = state?.businessUnits.find((item) => item.key === state.context?.businessUnitKey);
-  const activeStore = activeUnit?.stores.find((store) => store.key === state?.context?.storeKey);
+  const activeUnit = state?.businessUnits.find(
+    (item) => item.key === state.context?.businessUnitKey,
+  );
+  const activeStore = activeUnit?.stores.find(
+    (store) => store.key === state?.context?.storeKey,
+  );
   return (
-    <div className={`${s.root} ct-ui`}>
+    <div className={`${s.root} ct-ui`} lang={locale}>
       <StorefrontAnnouncement business />
       <header className={s.header}>
         <Link href="/b2b" className={s.logo}>
@@ -32,17 +38,34 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
         </Link>
         <B2BHeaderSearch />
         <div className={s.headerActions}>
-          <Link href="/b2b/account" aria-label="Business account">
+          <Link href="/b2b/account" aria-label={t("Business account")}>
             <UserIcon />
-            <span><small>{state?.customer ? "Welcome back" : "Business account"}</small><strong>{state?.customer?.firstName || (state?.customer ? "Your account" : "Sign in / Register")}</strong></span>
+            <span>
+              <small>
+                {state?.customer ? t("Welcome back") : t("Business account")}
+              </small>
+              <strong>
+                {state?.customer?.firstName ||
+                  (state?.customer
+                    ? t("Your account")
+                    : t("Sign in / Register"))}
+              </strong>
+            </span>
           </Link>
-          <B2BHeaderCompareLink /><B2BHeaderWishlistLink />
+          <B2BHeaderCompareLink />
+          <B2BHeaderWishlistLink />
           <Link
             href="/b2b/cart"
-            aria-label={`Business bag, ${state?.cart?.itemCount ?? 0} items`}
+            aria-label={`Business bag, ${t("{count} items", { count: state?.cart?.itemCount ?? 0 })}`}
           >
             <ShoppingBagIcon />
-            <span><small>Purchasing bag</small><strong>{state?.cart?.itemCount ?? 0} items</strong></span><b className={s.mobileBagCount}>{state?.cart?.itemCount ?? 0}</b>
+            <span>
+              <small>{t("Purchasing bag")}</small>
+              <strong>
+                {t("{count} items", { count: state?.cart?.itemCount ?? 0 })}
+              </strong>
+            </span>
+            <b className={s.mobileBagCount}>{state?.cart?.itemCount ?? 0}</b>
           </Link>
         </div>
       </header>
@@ -50,17 +73,23 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
       <div className={s.context}>
         <BuildingOffice2Icon />
         <div>
-          <strong>{activeUnit?.name || "Your purchasing workspace"}</strong>
+          <strong>{activeUnit?.name || t("Your purchasing workspace")}</strong>
           <span>
             {state?.context
               ? `${activeStore?.name || state.context.storeKey} · ${state.context.country} · ${state.context.currency}`
-              : state?.customer ? "Choose a business and store to access your assortment and prices" : "Sign in to access your company’s assortment and agreed prices"}
+              : state?.customer
+                ? t(
+                    "Choose a business and store to access your assortment and prices",
+                  )
+                : t(
+                    "Sign in to access your company’s assortment and agreed prices",
+                  )}
           </span>
         </div>
         {state?.customer ? (
           <>
             <label>
-              Business unit
+              {t("Business unit")}
               <select
                 disabled={busy || !state.businessUnits.length}
                 value={unit?.key || ""}
@@ -92,7 +121,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
               </select>
             </label>
             <label>
-              Store
+              {t("Store")}
               <select
                 disabled={busy || !unit?.stores.length}
                 value={
@@ -111,7 +140,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
               >
                 <option value="">
                   {unit?.stores.length
-                    ? "Select a store"
+                    ? t("Select a store")
                     : "Awaiting store assignment"}
                 </option>
                 {unit?.stores.map((store) => (
@@ -124,7 +153,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
           </>
         ) : (
           <Link className={s.textLink} href="/b2b/account">
-            Sign in to your business <ArrowRightIcon />
+            {t("Sign in to your business")} <ArrowRightIcon />
           </Link>
         )}
       </div>
@@ -136,7 +165,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
             onClick={() => void reload()}
             disabled={busy}
           >
-            Try again
+            {t("Try again")}
           </Button>
         </div>
       )}
@@ -160,8 +189,8 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
           <Link href="/b2b/account">Manage your business</Link>
           <Link href="/b2b/cart">Your purchasing bag</Link>
           <Link href="/b2b/search">Search equipment</Link>
-          <Link href="/b2b/categories">All categories</Link>
-          <Link href="/b2b/wishlist">Saved products</Link>
+          <Link href="/b2b/categories">{t("All categories")}</Link>
+          <Link href="/b2b/wishlist">{t("Saved products")}</Link>
           <Link href="/b2b/quick-order">Quick order by SKU</Link>
         </div>
         <div>

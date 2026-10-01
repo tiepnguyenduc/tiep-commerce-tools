@@ -1,4 +1,4 @@
-import { B2BAccount } from "@/components/b2b/B2BAccount";
+import { B2BAccountDashboard } from "@/components/b2b/B2BAccountWorkspace";
 export default function Page() {
-  return <B2BAccount />;
+  return <B2BAccountDashboard />;
 }

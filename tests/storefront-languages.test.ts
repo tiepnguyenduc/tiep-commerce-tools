@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { isLocale, languageDisplayName, languagePreferenceKey, parseStorefrontLanguages, resolveStorefrontLanguage } from "../lib/storefront-languages";
+import { isLocale, languageShortCode, languageDisplayName, languagePreferenceKey, parseStorefrontLanguages, resolveStorefrontLanguage } from "../lib/storefront-languages";
 import { loadStorefrontLanguages } from "../components/useStorefrontLanguages";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -28,6 +28,12 @@ describe("API-driven storefront languages", () => {
     expect(languagePreferenceKey("b2c")).toBe("workshop-language-b2c");
     expect(languagePreferenceKey("b2b")).not.toBe(languagePreferenceKey("b2c"));
     expect(languagePreferenceKey("b2b")).not.toBe("workshop-market-preference");
+  });
+  it("uses compact language labels without losing regional distinctions", () => {
+    expect(languageShortCode("en")).toBe("ENG");
+    expect(languageShortCode("de")).toBe("GER");
+    expect(languageShortCode("en-GB")).toBe("ENG-GB");
+    expect(languageShortCode("en-AU")).toBe("ENG-AU");
   });
   it("gives regional languages meaningful distinct display names", () => {
     expect(languageDisplayName("en-GB")).toBe("English (United Kingdom)");

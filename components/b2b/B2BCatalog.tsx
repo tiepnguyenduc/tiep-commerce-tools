@@ -1,17 +1,34 @@
 "use client";
+import { useB2BTranslations } from "./useB2BTranslations";
 import Link from "next/link";
 import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { businessCategories, filterBusinessProducts } from "@/lib/b2b/catalog-navigation";
+import {
+  businessCategories,
+  filterBusinessProducts,
+} from "@/lib/b2b/catalog-navigation";
 import Image from "@/components/commercetools-ui/atoms/image";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
-import { businessPage, canSortBusinessPrices, normalizeBusinessSort, sortBusinessProducts, updateBusinessQuery } from "@/lib/b2b/catalog-browsing";
+import {
+  businessPage,
+  canSortBusinessPrices,
+  normalizeBusinessSort,
+  sortBusinessProducts,
+  updateBusinessQuery,
+} from "@/lib/b2b/catalog-browsing";
 import { B2BSaveButton } from "./B2BWishlist";
 import { B2BCompareButton } from "./B2BCompare";
-function CatalogContent({ home = false, search = false }: { home?: boolean; search?: boolean }) {
+function CatalogContent({
+  home = false,
+  search = false,
+}: {
+  home?: boolean;
+  search?: boolean;
+}) {
+  const { t, locale } = useB2BTranslations();
   const { state, busy } = useB2B();
   const params = useSearchParams();
   const pathname = usePathname();
@@ -20,23 +37,46 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
   const categoryId = params.get("categoryId") || "";
   const products = state?.products ?? [];
   const categories = businessCategories(products);
-  const filtered = filterBusinessProducts(products, category, query, categoryId);
-  const pricesAllowed = canSortBusinessPrices(products, Boolean(state?.context));
+  const filtered = filterBusinessProducts(
+    products,
+    category,
+    query,
+    categoryId,
+  );
+  const pricesAllowed = canSortBusinessPrices(
+    products,
+    Boolean(state?.context),
+  );
   const sort = normalizeBusinessSort(params.get("sort"), pricesAllowed);
   const sorted = sortBusinessProducts(filtered, sort);
-  const pagination = businessPage(sorted.length, home ? null : params.get("page"), home ? 8 : 12);
+  const pagination = businessPage(
+    sorted.length,
+    home ? null : params.get("page"),
+    home ? 8 : 12,
+  );
   const visible = sorted.slice(pagination.start, pagination.end);
   const paramsString = params.toString();
   useEffect(() => {
     if (!state || home) return;
     const next = new URLSearchParams(paramsString);
-    if (sort === "recommended") next.delete("sort"); else next.set("sort", sort);
-    if (pagination.page === 1) next.delete("page"); else next.set("page", String(pagination.page));
-    if (next.toString() !== paramsString) window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`);
+    if (sort === "recommended") next.delete("sort");
+    else next.set("sort", sort);
+    if (pagination.page === 1) next.delete("page");
+    else next.set("page", String(pagination.page));
+    if (next.toString() !== paramsString)
+      window.history.replaceState(
+        null,
+        "",
+        `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`,
+      );
   }, [state, home, pathname, paramsString, pagination.page, sort]);
   function updateFilters(changes: Record<string, string>) {
     const next = updateBusinessQuery(params.toString(), changes);
-    window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`);
+    window.history.replaceState(
+      null,
+      "",
+      `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`,
+    );
   }
   function pageUrl(page: number) {
     const next = updateBusinessQuery(params.toString(), { page: String(page) });
@@ -48,20 +88,15 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
         <>
           <section className={s.hero}>
             <div>
-              <span className={s.eyebrow}>THE BUSINESS COLLECTION</span>
-              <h1>
-                Made for
-                <br />
-                the way
-                <br />
-                <em>you work.</em>
-              </h1>
+              <span className={s.eyebrow}>{t("BUSINESS COLLECTION")}</span>
+              <h1>{t("Made for the way you work.")}</h1>
               <p>
-                Bring your next project together with thoughtful products and a
-                purchasing workspace built around your business.
+                {t(
+                  "Bring your next project together with thoughtful products and a purchasing workspace built around your business.",
+                )}
               </p>
               <Link className={s.primaryLink} href="/b2b/products">
-                Explore the collection <ArrowRightIcon />
+                {t("Explore the collection")} <ArrowRightIcon />
               </Link>
             </div>
             <div className={s.heroImage}>
@@ -73,32 +108,30 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
                 priority
               />
               <span>
-                Spaces with purpose.
-                <br />
-                Products with possibility.
+                {t("Spaces with purpose. Products with possibility.")}
               </span>
             </div>
           </section>
           <div className={s.serviceStrip}>
             <span>
-              <b>01</b> Create your account
+              <b>01</b> {t("Create your account")}
             </span>
             <span>
-              <b>02</b> Connect your business
+              <b>02</b> {t("Connect your business")}
             </span>
             <span>
-              <b>03</b> Select your store & shop
+              <b>03</b> {t("Select your store & shop")}
             </span>
           </div>
           {categories.length > 0 && (
             <section className={s.categorySection}>
               <div className={s.sectionTitle}>
                 <div>
-                  <span className={s.eyebrow}>FIND YOUR FOCUS</span>
-                  <h2>Shop by category</h2>
+                  <span className={s.eyebrow}>{t("BUSINESS COLLECTION")}</span>
+                  <h2>{t("Shop by category")}</h2>
                 </div>
                 <Link href="/b2b/products" className={s.textLink}>
-                  View the collection <ArrowRightIcon />
+                  {t("View the collection")} <ArrowRightIcon />
                 </Link>
               </div>
               <div className={s.categories}>
@@ -133,9 +166,21 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
         </>
       ) : (
         <div className={s.pageTitle}>
-          <span className={s.eyebrow}>BUSINESS COLLECTION</span>
-          <h1>{search ? (query ? `Results for “${query}”` : "Find your next piece of equipment.") : "Products with purpose."}</h1>
-          <p>{search ? "Search your current business assortment by product name or SKU." : "Discover the right pieces for your next project."}</p>
+          <span className={s.eyebrow}>{t("BUSINESS COLLECTION")}</span>
+          <h1>
+            {search
+              ? query
+                ? t("Results for “{query}”", { query })
+                : t("Find your next piece of equipment.")
+              : t("Products with purpose.")}
+          </h1>
+          <p>
+            {search
+              ? t(
+                  "Search your current business assortment by product name or SKU.",
+                )
+              : t("Discover the right pieces for your next project.")}
+          </p>
         </div>
       )}
       <section id="business-products" className={s.catalogSection}>
@@ -143,17 +188,24 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
           <div>
             <span className={s.eyebrow}>
               {state?.context
-                ? "YOUR STORE ASSORTMENT"
-                : "EXPLORE THE COLLECTION"}
+                ? t("YOUR STORE ASSORTMENT")
+                : t("BUSINESS COLLECTION")}
             </span>
-            <h2>{category || (home ? "Ready for your next project" : "All products")}</h2>
+            <h2>
+              {category ||
+                (home ? t("Ready for your next project") : t("All products"))}
+            </h2>
           </div>
-          <span>{filtered.length} {filtered.length === 1 ? "product" : "products"}</span>
+          <span>
+            {t(filtered.length === 1 ? "{count} product" : "{count} products", {
+              count: filtered.length,
+            })}
+          </span>
         </div>
         <div className={s.filters}>
           <input
             aria-label="Filter products"
-            placeholder="Find a product…"
+            placeholder={t("Find a product…")}
             value={query}
             onChange={(e) => updateFilters({ q: e.target.value })}
           />
@@ -162,18 +214,31 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
             value={category}
             onChange={(e) => updateFilters({ category: e.target.value })}
           >
-            <option value="">All categories</option>
-            {category && !categories.includes(category) && <option value={category}>{category}</option>}
+            <option value="">{t("All categories")}</option>
+            {category && !categories.includes(category) && (
+              <option value={category}>{category}</option>
+            )}
             {categories.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
-          {!home && <select aria-label="Sort products" value={sort} onChange={(event) => updateFilters({ sort: event.target.value })}>
-            <option value="recommended">Recommended</option>
-            <option value="name-asc">Name: A–Z</option>
-            <option value="name-desc">Name: Z–A</option>
-            {pricesAllowed && <><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></>}
-          </select>}
+          {!home && (
+            <select
+              aria-label="Sort products"
+              value={sort}
+              onChange={(event) => updateFilters({ sort: event.target.value })}
+            >
+              <option value="recommended">{t("Recommended")}</option>
+              <option value="name-asc">{t("Name: A–Z")}</option>
+              <option value="name-desc">{t("Name: Z–A")}</option>
+              {pricesAllowed && (
+                <>
+                  <option value="price-asc">{t("Price: low to high")}</option>
+                  <option value="price-desc">{t("Price: high to low")}</option>
+                </>
+              )}
+            </select>
+          )}
           {(category || categoryId || query) && (
             <Button
               variant="underlined"
@@ -181,15 +246,23 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
                 updateFilters({ q: "", category: "" });
               }}
             >
-              Reset filters
+              {t("Reset filters")}
             </Button>
           )}
         </div>
-        {!home && state && filtered.length > 0 && <p className={s.resultRange} role="status">Showing {pagination.start + 1}–{pagination.end} of {filtered.length} {filtered.length === 1 ? "product" : "products"}</p>}
+        {!home && state && filtered.length > 0 && (
+          <p className={s.resultRange} role="status">
+            {t("Showing {start}–{end} of {count}", {
+              start: pagination.start + 1,
+              end: pagination.end,
+              count: filtered.length,
+            })}
+          </p>
+        )}
         {!state ? (
           <div className={s.empty}>
             {busy
-              ? "Loading your collection…"
+              ? t("Loading your collection…")
               : "The collection is unavailable. Please try again above."}
           </div>
         ) : filtered.length ? (
@@ -207,7 +280,7 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
                     sizes="(max-width: 700px) 45vw, (max-width: 1000px) 30vw, 22vw"
                   />
                   <span>
-                    View product <ArrowRightIcon />
+                    {t("View product")} <ArrowRightIcon />
                   </span>
                 </Link>
                 <p className={s.productCategory}>{p.category}</p>
@@ -219,34 +292,84 @@ function CatalogContent({ home = false, search = false }: { home?: boolean; sear
                 <div className={s.price}>
                   {p.price?.formatted ??
                     (state.context
-                      ? "Price unavailable"
-                      : "Sign in & select a store for pricing")}
+                      ? t("Price unavailable")
+                      : t("Sign in & select a store for pricing"))}
                 </div>
-                <div className={s.productTools}><B2BCompareButton productId={p.id} /><B2BSaveButton productId={p.id} /></div>
+                <div className={s.productTools}>
+                  <B2BCompareButton productId={p.id} />
+                  <B2BSaveButton productId={p.id} />
+                </div>
               </article>
             ))}
           </div>
         ) : (
           <div className={s.empty}>
-            <h3>No products found</h3>
+            <h3>{t("No products found")}</h3>
             <p>
               {products.length
-                ? "Try another search or category, or reset your filters to see the full collection."
+                ? t(
+                    "Try another search or category, or reset your filters to see the full collection.",
+                  )
                 : "Your catalog will appear here when products are available."}
             </p>
           </div>
         )}
-        {!home && state && pagination.pageCount > 1 && <nav className={s.pagination} aria-label="Product pages">
-          {pagination.page > 1 ? <Link href={pageUrl(pagination.page - 1)}>← Previous</Link> : <span aria-disabled="true">← Previous</span>}
-          <div>{Array.from({ length: pagination.pageCount }, (_, index) => index + 1).map((page) => <Link key={page} href={pageUrl(page)} aria-current={pagination.page === page ? "page" : undefined} aria-label={`Page ${page}`}>{page}</Link>)}</div>
-          {pagination.page < pagination.pageCount ? <Link href={pageUrl(pagination.page + 1)}>Next →</Link> : <span aria-disabled="true">Next →</span>}
-        </nav>}
-        {home && filtered.length > 8 && <div className={s.previewLink}><Link href="/b2b/products">View the full collection →</Link></div>}
+        {!home && state && pagination.pageCount > 1 && (
+          <nav className={s.pagination} aria-label="Product pages">
+            {pagination.page > 1 ? (
+              <Link href={pageUrl(pagination.page - 1)}>{t("← Previous")}</Link>
+            ) : (
+              <span aria-disabled="true">{t("← Previous")}</span>
+            )}
+            <div>
+              {Array.from(
+                { length: pagination.pageCount },
+                (_, index) => index + 1,
+              ).map((page) => (
+                <Link
+                  key={page}
+                  href={pageUrl(page)}
+                  aria-current={pagination.page === page ? "page" : undefined}
+                  aria-label={`Page ${page}`}
+                >
+                  {page}
+                </Link>
+              ))}
+            </div>
+            {pagination.page < pagination.pageCount ? (
+              <Link href={pageUrl(pagination.page + 1)}>{t("Next →")}</Link>
+            ) : (
+              <span aria-disabled="true">{t("Next →")}</span>
+            )}
+          </nav>
+        )}
+        {home && filtered.length > 8 && (
+          <div className={s.previewLink}>
+            <Link href="/b2b/products">{t("View the full collection →")}</Link>
+          </div>
+        )}
       </section>
     </main>
   );
 }
 
-export function B2BCatalog({ home = false, search = false }: { home?: boolean; search?: boolean }) {
-  return <Suspense fallback={<main className={s.main}><div className={s.empty}>Loading your collection…</div></main>}><CatalogContent home={home} search={search} /></Suspense>;
+export function B2BCatalog({
+  home = false,
+  search = false,
+}: {
+  home?: boolean;
+  search?: boolean;
+}) {
+  const { t, locale } = useB2BTranslations();
+  return (
+    <Suspense
+      fallback={
+        <main className={s.main}>
+          <div className={s.empty}>{t("Loading your collection…")}</div>
+        </main>
+      }
+    >
+      <CatalogContent home={home} search={search} />
+    </Suspense>
+  );
 }

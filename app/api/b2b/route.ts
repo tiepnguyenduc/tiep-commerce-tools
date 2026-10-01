@@ -6,6 +6,14 @@ import {
   writeB2BSession,
   sealSession,
 } from "@/lib/b2b/session";
+import { canonicalStorefrontLocale } from "@/lib/ct/storefront-languages";
+function requestLocale(request: NextRequest) {
+  const value = request.nextUrl.searchParams.get("locale");
+  if (value === null) return undefined;
+  const locale = canonicalStorefrontLocale(value);
+  if (!locale) throw new B2BError("Invalid language locale.", 400);
+  return locale;
+}
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const email = z.string().trim().email().max(254);
@@ -69,7 +77,8 @@ function failure(error: unknown) {
   if (code === "AssociateMissingPermission")
     return NextResponse.json(
       {
-        error: "Your role in this business unit does not allow this action. Ask your company administrator to assign the buyer role for creating and updating your business bag.",
+        error:
+          "Your role in this business unit does not allow this action. Ask your company administrator to assign the buyer role for creating and updating your business bag.",
       },
       { status: 403 },
     );
@@ -97,11 +106,13 @@ function failure(error: unknown) {
 }
 export async function GET(request: NextRequest) {
   try {
+    const locale = requestLocale(request);
     const session = await readB2BSession();
     const previous = JSON.stringify(session);
     const state = await b2bState(
       session,
       request.nextUrl.searchParams.get("q")?.slice(0, 200),
+      locale,
     );
     if (JSON.stringify(session) !== previous) await writeB2BSession(session);
     return NextResponse.json(state, {
@@ -120,12 +131,13 @@ export async function POST(request: NextRequest) {
         403,
       );
     const input = action.parse(await request.json());
+    const locale = requestLocale(request);
     const session = await readB2BSession();
     sealSession({}); // Validate session configuration before creating any resources.
     await b2bAction(session, input);
     // Save successful auth/mutations even if a subsequent catalogue read is unavailable.
     await writeB2BSession(session);
-    const state = await b2bState(session);
+    const state = await b2bState(session, "", locale);
     await writeB2BSession(session);
     return NextResponse.json(state, {
       headers: { "Cache-Control": "private, no-store" },

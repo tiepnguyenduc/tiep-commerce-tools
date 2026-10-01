@@ -19,3 +19,10 @@ export function resolveStorefrontLanguage(languages: string[], saved: string | n
 export function languageDisplayName(locale: string, displayLocale = "en") {
   try { return new Intl.DisplayNames([displayLocale], { type: "language", languageDisplay: "standard" }).of(locale) || locale; } catch { return locale; }
 }
+
+/** Compact labels retain regional suffixes so options remain distinguishable. */
+export function languageShortCode(locale: string) {
+  const [language, ...region] = locale.split("-");
+  const codes: Record<string, string> = { en: "ENG", de: "GER", fr: "FRA", es: "ESP", it: "ITA", vi: "VIE", pt: "POR", nl: "NLD", ja: "JPN", zh: "ZHO" };
+  return [codes[language.toLowerCase()] ?? language.toUpperCase(), ...region.map((part) => part.toUpperCase())].join("-");
+}

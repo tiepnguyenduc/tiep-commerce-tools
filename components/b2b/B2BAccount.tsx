@@ -1,11 +1,14 @@
 "use client";
+import { useB2BTranslations } from "./useB2BTranslations";
 import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/commercetools-ui/atoms/button";
 import Input from "@/components/commercetools-ui/atoms/input";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
-export function B2BAccount() {
+export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
+  const { t } = useB2BTranslations();
+  const Container = embedded ? "div" : "main";
   const { state, busy, act } = useB2B();
   const [register, setRegister] = useState(false);
   const [success, setSuccess] = useState("");
@@ -15,19 +18,30 @@ export function B2BAccount() {
       (u) => u.key === (managedUnit || state.context?.businessUnitKey),
     ) ?? state?.businessUnits[0];
   return (
-    <main className={s.main}>
-      <div className={s.pageTitle}>
-        <span className={s.eyebrow}>YOUR BUSINESS WORKSPACE</span>
-        <h1>
-          {state?.customer ? "A place for your business." : "Better together."}
-        </h1>
-        <p>
-          {state?.customer
-            ? "Manage your company and the people who purchase with you."
-            : "Your account connects your team, stores and business pricing."}
-        </p>
-      </div>
-      <nav className={s.accountToolLinks} aria-label="Business shopping tools"><Link href="/b2b/quick-order">Quick order by SKU →</Link><Link href="/b2b/wishlist">Saved products →</Link><Link href="/b2b/compare">Compare equipment →</Link><Link href="/b2b/categories">Browse categories →</Link></nav>
+    <Container className={embedded ? undefined : s.main}>
+      {!embedded && (
+        <div className={s.pageTitle}>
+          <span className={s.eyebrow}>YOUR BUSINESS WORKSPACE</span>
+          <h1>
+            {state?.customer
+              ? "A place for your business."
+              : t("Better together.")}
+          </h1>
+          <p>
+            {state?.customer
+              ? "Manage your company and the people who purchase with you."
+              : t(
+                  "Your account connects your team, stores and business pricing.",
+                )}
+          </p>
+        </div>
+      )}
+      <nav className={s.accountToolLinks} aria-label="Business shopping tools">
+        <Link href="/b2b/quick-order">Quick order by SKU →</Link>
+        <Link href="/b2b/wishlist">Saved products →</Link>
+        <Link href="/b2b/compare">Compare equipment →</Link>
+        <Link href="/b2b/categories">Browse categories →</Link>
+      </nav>
       {success && (
         <p role="status" className={s.success}>
           {success}
@@ -43,13 +57,15 @@ export function B2BAccount() {
                 aria-pressed={!register}
                 onClick={() => setRegister(false)}
               >
-                Sign in
+                {t("Sign in")}
               </button>
               <button aria-pressed={register} onClick={() => setRegister(true)}>
-                Create account
+                {t("Create account")}
               </button>
             </div>
-            <h2>{register ? "Start your business account" : "Welcome back"}</h2>
+            <h2>
+              {register ? t("Start your business account") : t("Welcome back")}
+            </h2>
             <p>
               {register
                 ? "Create an account, then set up your company or ask its administrator to add you."
@@ -72,13 +88,13 @@ export function B2BAccount() {
               {register && (
                 <div className={s.twoColumns}>
                   <Input
-                    label="First name"
+                    label={t("First name")}
                     name="firstName"
                     autoComplete="given-name"
                     required
                   />
                   <Input
-                    label="Last name"
+                    label={t("Last name")}
                     name="lastName"
                     autoComplete="family-name"
                     required
@@ -86,14 +102,14 @@ export function B2BAccount() {
                 </div>
               )}
               <Input
-                label="Work email"
+                label={t("Work email")}
                 type="email"
                 name="email"
                 autoComplete="email"
                 required
               />
               <Input
-                label="Password"
+                label={t("Password")}
                 type="password"
                 name="password"
                 minLength={register ? 8 : 1}
@@ -101,7 +117,7 @@ export function B2BAccount() {
                 required
               />
               <Button className={s.button} loading={busy} type="submit">
-                {register ? "Create account" : "Sign in"}
+                {register ? t("Create account") : t("Sign in")}
               </Button>
             </form>
           </section>
@@ -282,6 +298,6 @@ export function B2BAccount() {
           </aside>
         </div>
       )}
-    </main>
+    </Container>
   );
 }

@@ -8,13 +8,11 @@
 .trigger { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 0 0 8px; border: 0; background: transparent; color: #fff; cursor: pointer; font: inherit; font-size: 12px; }
 .trigger svg { width: 12px; height: 12px; transition: transform .15s; }
 .trigger svg[data-open='true'] { transform: rotate(180deg); }
-.flag { font-size: 19px; line-height: 1; }
-.panel { position: absolute; right: 0; top: calc(100% + 6px); width: 310px; max-width: calc(100vw - 32px); padding: 20px; max-height: 75dvh; overflow-y: auto; overscroll-behavior: contain; background: #fff; color: #252c27; border: 1px solid #e4e5e1; box-shadow: 0 8px 28px #17201826; font-size: 13px; letter-spacing: 0; }
-.panel fieldset { padding: 0; margin: 0 0 16px; border: 0; min-width: 0; }
+.panel { position: absolute; right: 0; top: calc(100% + 6px); width: 230px; max-width: calc(100vw - 32px); padding: 20px; max-height: 75dvh; overflow-y: auto; overscroll-behavior: contain; background: #fff; color: #252c27; border: 1px solid #e4e5e1; box-shadow: 0 8px 28px #17201826; font-size: 13px; letter-spacing: 0; }
+.panel fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
 .panel legend { padding: 0; margin-bottom: 7px; font-weight: 600; font-size: 13px; }
 .option { display: flex; align-items: center; gap: 9px; min-height: 36px; cursor: pointer; }
 .option input { margin: 0; width: 16px; height: 16px; accent-color: #303633; flex-shrink: 0; }
-.note { margin: 0; padding-top: 12px; border-top: 1px solid #e9e9e3; color: #5a625b; font-size: 11px; line-height: 1.5; }
 .bar a:focus-visible, .bar button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .panel input:focus-visible { outline: 2px solid #a43f22; outline-offset: 3px; }
 @media (max-width: 1000px) { .inner { padding: 0 24px; grid-template-columns: 1fr auto; gap: 16px; } .otherStore { display: none; } .announcement { justify-self: start; } }
@@ -32,7 +30,3 @@
 .panel .retry:focus-visible { outline-color: #a43f22; }
 @media (max-width: 540px) { .activeLanguage { max-width: 100px; } .languageOptions { max-height: 220px; } }
 
-.countryOptions { max-height: 220px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; margin: -4px; }
-.countryOptions .option { min-height: 48px; padding: 5px 0; }
-.flag svg { width: 18px; height: 18px; }
-@media (max-width: 540px) { .countryOptions { max-height: 180px; } }
