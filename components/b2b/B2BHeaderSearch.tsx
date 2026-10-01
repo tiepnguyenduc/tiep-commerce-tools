@@ -13,9 +13,9 @@ function SearchContent() {
   const params = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const urlQuery = pathname === "/b2b/products" ? params.get("q") || "" : "";
-  const category = pathname === "/b2b/products" ? params.get("category") || "" : "";
-  const categoryId = pathname === "/b2b/products" ? params.get("categoryId") || "" : "";
+  const urlQuery = (pathname === "/b2b/products" || pathname === "/b2b/search") ? params.get("q") || "" : "";
+  const category = (pathname === "/b2b/products" || pathname === "/b2b/search") ? params.get("category") || "" : "";
+  const categoryId = (pathname === "/b2b/products" || pathname === "/b2b/search") ? params.get("categoryId") || "" : "";
   const [query, setQuery] = useState(urlQuery);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -32,9 +32,9 @@ function SearchContent() {
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, []);
-  const allUrl = businessCatalogUrl({ category, categoryId, q: query });
+  const allUrl = businessCatalogUrl({ category, categoryId, q: query }).replace("/b2b/products", "/b2b/search");
   return <div ref={root} className={s.root} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false); }}>
-    <form action="/b2b/products" className={s.form} role="search" onSubmit={() => setOpen(false)}>
+    <form action="/b2b/search" className={s.form} role="search" onSubmit={() => setOpen(false)}>
       {categoryId && <input type="hidden" name="categoryId" value={categoryId} />}
       {category && <input type="hidden" name="category" value={category} />}
       <MagnifyingGlassIcon aria-hidden="true" />

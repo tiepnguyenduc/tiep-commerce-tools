@@ -217,48 +217,55 @@ async function priceArgs(
     expand: "categories[*]",
   };
 }
+async function publishedProjections(expandCategories = false): Promise<ProductProjection[]> {
+  const products: ProductProjection[] = [];
+  let cursor: string | undefined;
+  for (;;) {
+    const { body } = await api().productProjections().get({ queryArgs: {
+      staged: false, limit: 100, sort: "id asc", withTotal: false,
+      ...(expandCategories ? { expand: "categories[*]" } : {}),
+      ...(cursor ? { where: `id > ${JSON.stringify(cursor)}` } : {}),
+    } }).execute();
+    products.push(...body.results);
+    if (body.results.length < 100) return products;
+    const next = body.results[body.results.length - 1].id;
+    if (next === cursor) throw new Error("Product pagination did not advance.");
+    cursor = next;
+  }
+}
 export async function catalogCandidates(store: Store): Promise<{ id: string }[]> {
   try {
-    const { body } = await api().products().search().post({
-      body: {
+    const candidates: { id: string }[] = [];
+    for (let offset = 0; offset < 10000; offset += 100) {
+      const { body } = await api().products().search().post({ body: {
         query: { exact: { field: "stores", value: store.id } },
-        limit: 100,
-      },
-    }).execute();
-    return body.results;
+        limit: 100, offset, sort: [{ field: "id", order: "asc" }],
+      } }).execute();
+      candidates.push(...body.results.map(({ id }) => ({ id })));
+      if (body.results.length < 100 || (typeof body.total === "number" && candidates.length >= body.total)) return candidates;
+    }
+    // Search pagination cannot cover more than 10,000 results. Retrieve all
+    // published candidate IDs instead; every ID still passes in-Store validation.
   } catch (error) {
-    const failure = error as {
-      statusCode?: number;
-      body?: { errors?: { code: string }[] };
-    };
-    const unavailable = failure.statusCode === 404 ||
-      failure.body?.errors?.some((e) => e.code === "SearchDeactivated");
+    const failure = error as { statusCode?: number; body?: { errors?: { code: string }[] } };
+    const unavailable = failure.statusCode === 404 || failure.body?.errors?.some((e) => e.code === "SearchDeactivated");
     if (!unavailable) throw error;
-    // Candidate IDs only. Every candidate must pass the in-Store projection
-    // below before its data can be returned to the customer.
-    const { body } = await api().productProjections().get({
-      queryArgs: { staged: false, limit: 100 },
-    }).execute();
-    return body.results.map(({ id }) => ({ id }));
   }
+  return (await publishedProjections()).map(({ id }) => ({ id }));
 }
 async function productsFor(session: B2BSession, q = "") {
   if (!session.context) {
-    const { body } = await api()
-      .productProjections()
-      .get({
-        queryArgs: { staged: false, limit: 100, expand: "categories[*]" },
-      })
-      .execute();
-    return body.results
+    return (await publishedProjections(true))
       .map((p) => mapB2BProduct(p))
       .filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
   }
   const { store, context, unit } = await verifiedContext(session);
   const candidates = await catalogCandidates(store);
   const pricing = await priceArgs(session, unit, context);
-  const products = await Promise.all(
-    candidates.map(async (result) => {
+  const products: (B2BProduct | null)[] = [];
+  for (let offset = 0; offset < candidates.length; offset += 20) {
+    products.push(...await Promise.all(
+    candidates.slice(offset, offset + 20).map(async (result) => {
       try {
         const { body } = await api()
           .inStoreKeyWithStoreKeyValue({ storeKey: store.key })
@@ -273,7 +280,8 @@ async function productsFor(session: B2BSession, q = "") {
         throw error;
       }
     }),
-  );
+    ));
+  }
   return products.filter(
     (p): p is B2BProduct =>
       p !== null && p.name.toLowerCase().includes(q.toLowerCase()),

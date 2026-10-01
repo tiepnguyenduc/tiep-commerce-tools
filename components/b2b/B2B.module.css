@@ -1322,3 +1322,8 @@
 .pagination [aria-disabled='true'] { color: #929487; }
 .previewLink { margin-top: 30px; font-size: 13px; text-align: center; }
 @media (max-width: 540px) { .pagination { gap: 6px; flex-wrap: wrap; } .pagination > div { order: -1; flex-basis: 100%; } }
+.productTools { display: flex; flex-wrap: wrap; gap: 16px; }
+.accountToolLinks { display: flex; flex-wrap: wrap; gap: 12px 25px; margin-bottom: 30px; padding: 18px 0; border-block: 1px solid var(--line); font-size: 13px; color: #5d684e; }
+.headerActions { gap: 16px; }
+@media (max-width: 1150px) { .headerActions a span { display: none; } }
+@media (max-width: 540px) { .headerActions { gap: 10px; } .headerActions a > svg { width: 20px; height: 20px; } .header { gap: 12px; } .logo { font-size: 21px; } }

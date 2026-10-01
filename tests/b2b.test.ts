@@ -489,7 +489,7 @@ describe("catalog without a Search index", () => {
     });
     if (statusCode === 404) {
       expect(await catalogCandidates(store)).toEqual([{ id: "candidate" }]);
-      expect(query).toHaveBeenCalledWith({ queryArgs: { staged: false, limit: 100 } });
+      expect(query).toHaveBeenCalledWith({ queryArgs: { staged: false, limit: 100, sort: "id asc", withTotal: false } });
     } else {
       await expect(catalogCandidates(store)).rejects.toEqual(failure);
       expect(query).not.toHaveBeenCalled();

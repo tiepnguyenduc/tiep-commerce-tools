@@ -71,10 +71,11 @@ function NavigationContent() {
         {categories.slice(0, 4).map((category) => <div key={category.id}>{trigger(category.id, category.name, false, active(category))}</div>)}
       </div>
       <div className={s.allMenu}>{trigger("all", "All categories", true)}</div>
-      <Link className={s.accountLink} href="/b2b/account" onClick={close} aria-current={pathname === "/b2b/account" ? "page" : undefined}>Your business <span aria-hidden="true">↗</span></Link>
+      <Link className={s.accountLink} href="/b2b/quick-order" onClick={close} aria-current={pathname === "/b2b/quick-order" ? "page" : undefined}>Quick order <span aria-hidden="true">↗</span></Link>
     </div>
     <div id={panelId} className={s.panel} hidden={!openMenu} onFocus={() => intent.current.cancel()} onPointerEnter={() => intent.current.cancel()} onPointerLeave={hoverClose}>
       <div className={s.panelIntro}>
+        <div className={s.toolLinks}><Link href="/b2b/categories" onClick={close}>Category directory →</Link><Link href="/b2b/search" onClick={close}>Search equipment →</Link><Link href="/b2b/quick-order" onClick={close}>Quick order by SKU →</Link><Link href="/b2b/wishlist" onClick={close}>Saved products →</Link></div>
         <span className={s.panelEyebrow}>BUSINESS COLLECTION</span>
         <h2>{selected?.name || "Find the right equipment"}</h2>
         <Link className={s.shopAll} href={selected ? categoryUrl(selected) : "/b2b/products"} onClick={close}>Shop all{selected ? ` ${selected.name}` : " products"} <span aria-hidden="true">↗</span></Link>

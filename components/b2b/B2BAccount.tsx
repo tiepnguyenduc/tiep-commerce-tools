@@ -27,6 +27,7 @@ export function B2BAccount() {
             : "Your account connects your team, stores and business pricing."}
         </p>
       </div>
+      <nav className={s.accountToolLinks} aria-label="Business shopping tools"><Link href="/b2b/quick-order">Quick order by SKU →</Link><Link href="/b2b/wishlist">Saved products →</Link><Link href="/b2b/compare">Compare equipment →</Link><Link href="/b2b/categories">Browse categories →</Link></nav>
       {success && (
         <p role="status" className={s.success}>
           {success}

@@ -11,6 +11,7 @@ import {
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useB2B } from "./B2BProvider";
 import { B2BHeaderNavigation, B2BHeaderSearch } from "./B2BHeaderNavigation";
+import { B2BHeaderWishlistLink } from "./B2BWishlist";
 import { B2BHeaderCompareLink } from "./B2BCompare";
 import s from "./B2B.module.css";
 export function B2BShell({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
             <UserIcon />
             <span><small>{state?.customer ? "Welcome back" : "Business account"}</small><strong>{state?.customer?.firstName || (state?.customer ? "Your account" : "Sign in / Register")}</strong></span>
           </Link>
-          <B2BHeaderCompareLink />
+          <B2BHeaderCompareLink /><B2BHeaderWishlistLink />
           <Link
             href="/b2b/cart"
             aria-label={`Business bag, ${state?.cart?.itemCount ?? 0} items`}
@@ -158,6 +159,10 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
           <Link href="/b2b/products">Explore the catalog</Link>
           <Link href="/b2b/account">Manage your business</Link>
           <Link href="/b2b/cart">Your purchasing bag</Link>
+          <Link href="/b2b/search">Search equipment</Link>
+          <Link href="/b2b/categories">All categories</Link>
+          <Link href="/b2b/wishlist">Saved products</Link>
+          <Link href="/b2b/quick-order">Quick order by SKU</Link>
         </div>
         <div>
           <strong>One business. Your prices.</strong>

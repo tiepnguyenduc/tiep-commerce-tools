@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "@/components/commercetools-ui/atoms/image";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useB2B } from "./B2BProvider";
+import { B2BSaveButton } from "./B2BWishlist";
 import { B2BCompareButton } from "./B2BCompare";
 import s from "./B2B.module.css";
 export function B2BProductDetail({ id }: { id: string }) {
@@ -124,7 +125,7 @@ export function B2BProductDetail({ id }: { id: string }) {
             >
               Add to business bag
             </Button>
-            <B2BCompareButton productId={p.id} />
+            <B2BCompareButton productId={p.id} /><B2BSaveButton productId={p.id} />
           </form>
           {added && (
             <p role="status" className={s.success}>

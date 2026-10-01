@@ -9,8 +9,9 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
 import { businessPage, canSortBusinessPrices, normalizeBusinessSort, sortBusinessProducts, updateBusinessQuery } from "@/lib/b2b/catalog-browsing";
+import { B2BSaveButton } from "./B2BWishlist";
 import { B2BCompareButton } from "./B2BCompare";
-function CatalogContent({ home = false }: { home?: boolean }) {
+function CatalogContent({ home = false, search = false }: { home?: boolean; search?: boolean }) {
   const { state, busy } = useB2B();
   const params = useSearchParams();
   const pathname = usePathname();
@@ -133,8 +134,8 @@ function CatalogContent({ home = false }: { home?: boolean }) {
       ) : (
         <div className={s.pageTitle}>
           <span className={s.eyebrow}>BUSINESS COLLECTION</span>
-          <h1>Products with purpose.</h1>
-          <p>Discover the right pieces for your next project.</p>
+          <h1>{search ? (query ? `Results for “${query}”` : "Find your next piece of equipment.") : "Products with purpose."}</h1>
+          <p>{search ? "Search your current business assortment by product name or SKU." : "Discover the right pieces for your next project."}</p>
         </div>
       )}
       <section id="business-products" className={s.catalogSection}>
@@ -221,7 +222,7 @@ function CatalogContent({ home = false }: { home?: boolean }) {
                       ? "Price unavailable"
                       : "Sign in & select a store for pricing")}
                 </div>
-                <B2BCompareButton productId={p.id} />
+                <div className={s.productTools}><B2BCompareButton productId={p.id} /><B2BSaveButton productId={p.id} /></div>
               </article>
             ))}
           </div>
@@ -246,6 +247,6 @@ function CatalogContent({ home = false }: { home?: boolean }) {
   );
 }
 
-export function B2BCatalog({ home = false }: { home?: boolean }) {
-  return <Suspense fallback={<main className={s.main}><div className={s.empty}>Loading your collection…</div></main>}><CatalogContent home={home} /></Suspense>;
+export function B2BCatalog({ home = false, search = false }: { home?: boolean; search?: boolean }) {
+  return <Suspense fallback={<main className={s.main}><div className={s.empty}>Loading your collection…</div></main>}><CatalogContent home={home} search={search} /></Suspense>;
 }
