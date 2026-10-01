@@ -30,7 +30,7 @@ describe("shared storefront announcement", () => {
     expect(html).toContain(`href="${otherStore}"`);
     expect(html).toContain("Explore this season’s");
     expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain("Country and language: United States, English");
+    expect(html).toContain("Country and language: Country, Language");
     expect(html).not.toContain("/de-DE");
     expect(html).not.toContain('type="radio"');
   });

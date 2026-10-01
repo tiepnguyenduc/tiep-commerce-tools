@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { Bars3Icon, ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import type { B2BNavigationCategory } from "@/lib/b2b/types";
 import { businessCatalogUrl } from "@/lib/b2b/catalog-navigation";
 import { createHoverIntent } from "@/lib/hover-intent";
@@ -97,20 +97,4 @@ export function B2BHeaderNavigation() {
   return <Suspense fallback={<nav className={s.navigation} aria-label="Business navigation"><div className={s.inner}><Link href="/b2b">Overview</Link><Link href="/b2b/products">Shop all</Link></div></nav>}><NavigationContent /></Suspense>;
 }
 
-function SearchContent() {
-  const params = useSearchParams();
-  const pathname = usePathname();
-  const query = pathname === "/b2b/products" ? params.get("q") || "" : "";
-  const category = pathname === "/b2b/products" ? params.get("category") || "" : "";
-  const categoryId = pathname === "/b2b/products" ? params.get("categoryId") || "" : "";
-  return <form action="/b2b/products" className={s.search} role="search">
-    {categoryId && <input type="hidden" name="categoryId" value={categoryId} />}
-    {category && <input type="hidden" name="category" value={category} />}
-    <MagnifyingGlassIcon aria-hidden="true" />
-    <input key={`${pathname}-${query}`} name="q" defaultValue={query} aria-label="Search business catalog" placeholder="Search equipment, parts or SKU…" />
-    <button type="submit">Search</button>
-  </form>;
-}
-export function B2BHeaderSearch() {
-  return <Suspense fallback={<div className={s.searchFallback}>Search equipment, parts or SKU…</div>}><SearchContent /></Suspense>;
-}
+export { B2BHeaderSearch } from "./B2BHeaderSearch";

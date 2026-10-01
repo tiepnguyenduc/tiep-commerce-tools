@@ -65,3 +65,9 @@ Merchant Center project `tiep-b2b-project` is hosted in `us-central1.gcp`. Its e
 The portal derives these references from the selected Store and checks customer Business Unit membership. Legacy `CTP_B2B_ASSOCIATE_ID`, `CTP_B2B_BUSINESS_UNIT_KEY`, and channel context variables belong to the older checkout example, which uses the main project; leave them unset when connecting a separate B2B project. An Associate ID must be an actual Customer ID, never a project key. Current portal market configuration is global (`CTP_B2B_COUNTRY`, `CTP_B2B_CURRENCY`); selecting a Store outside the configured country is rejected.
 
 The prepared application client uses `manage_customers`, `manage_business_units`, `manage_orders`, `view_products`, `view_categories`, `view_stores`, and `view_associate_roles`, each suffixed with `:tiep-b2b-project`. Its credentials must stay in the ignored `.env.local`, never in frontend variables or documentation.
+
+### Project languages permission
+
+The header loads configured languages from the B2B project through `/api/b2b/languages`. Its server API client requires `view_project_settings:<b2b-project-key>` in addition to its existing B2B scopes. For example, append `view_project_settings:your-b2b-project` to `CTP_B2B_SCOPES` without removing the existing customer, Business Unit, Store, product, and cart scopes. The API client itself must be authorized for this scope; changing the requested scope string alone does not grant permission. Restart the development server after updating the authorized credentials/configuration.
+
+If this permission is missing, the language selector shows an unavailable state and retry action. It does not substitute B2C project languages or fabricated language options. The endpoint returns only the configured language codes, never the rest of the project configuration.

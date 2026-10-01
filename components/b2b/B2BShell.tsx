@@ -11,6 +11,7 @@ import {
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useB2B } from "./B2BProvider";
 import { B2BHeaderNavigation, B2BHeaderSearch } from "./B2BHeaderNavigation";
+import { B2BHeaderCompareLink } from "./B2BCompare";
 import s from "./B2B.module.css";
 export function B2BShell({ children }: { children: React.ReactNode }) {
   const { state, busy, error, reload, act } = useB2B();
@@ -34,6 +35,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
             <UserIcon />
             <span><small>{state?.customer ? "Welcome back" : "Business account"}</small><strong>{state?.customer?.firstName || (state?.customer ? "Your account" : "Sign in / Register")}</strong></span>
           </Link>
+          <B2BHeaderCompareLink />
           <Link
             href="/b2b/cart"
             aria-label={`Business bag, ${state?.cart?.itemCount ?? 0} items`}

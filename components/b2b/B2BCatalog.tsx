@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { businessCategories, filterBusinessProducts } from "@/lib/b2b/catalog-navigation";
 import Image from "@/components/commercetools-ui/atoms/image";
@@ -8,6 +8,8 @@ import Button from "@/components/commercetools-ui/atoms/button";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
+import { businessPage, canSortBusinessPrices, normalizeBusinessSort, sortBusinessProducts, updateBusinessQuery } from "@/lib/b2b/catalog-browsing";
+import { B2BCompareButton } from "./B2BCompare";
 function CatalogContent({ home = false }: { home?: boolean }) {
   const { state, busy } = useB2B();
   const params = useSearchParams();
@@ -18,13 +20,26 @@ function CatalogContent({ home = false }: { home?: boolean }) {
   const products = state?.products ?? [];
   const categories = businessCategories(products);
   const filtered = filterBusinessProducts(products, category, query, categoryId);
-  function updateFilters(changes: { q?: string; category?: string }) {
-    const next = new URLSearchParams(params.toString());
-    if ("category" in changes) next.delete("categoryId");
-    for (const [key, value] of Object.entries(changes)) {
-      if (value) next.set(key, value); else next.delete(key);
-    }
+  const pricesAllowed = canSortBusinessPrices(products, Boolean(state?.context));
+  const sort = normalizeBusinessSort(params.get("sort"), pricesAllowed);
+  const sorted = sortBusinessProducts(filtered, sort);
+  const pagination = businessPage(sorted.length, home ? null : params.get("page"), home ? 8 : 12);
+  const visible = sorted.slice(pagination.start, pagination.end);
+  const paramsString = params.toString();
+  useEffect(() => {
+    if (!state || home) return;
+    const next = new URLSearchParams(paramsString);
+    if (sort === "recommended") next.delete("sort"); else next.set("sort", sort);
+    if (pagination.page === 1) next.delete("page"); else next.set("page", String(pagination.page));
+    if (next.toString() !== paramsString) window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`);
+  }, [state, home, pathname, paramsString, pagination.page, sort]);
+  function updateFilters(changes: Record<string, string>) {
+    const next = updateBusinessQuery(params.toString(), changes);
     window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}${window.location.hash}`);
+  }
+  function pageUrl(page: number) {
+    const next = updateBusinessQuery(params.toString(), { page: String(page) });
+    return `${pathname}${next.size ? `?${next}` : ""}#business-products`;
   }
   return (
     <main className={s.main}>
@@ -152,6 +167,12 @@ function CatalogContent({ home = false }: { home?: boolean }) {
               <option key={c}>{c}</option>
             ))}
           </select>
+          {!home && <select aria-label="Sort products" value={sort} onChange={(event) => updateFilters({ sort: event.target.value })}>
+            <option value="recommended">Recommended</option>
+            <option value="name-asc">Name: A–Z</option>
+            <option value="name-desc">Name: Z–A</option>
+            {pricesAllowed && <><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></>}
+          </select>}
           {(category || categoryId || query) && (
             <Button
               variant="underlined"
@@ -163,6 +184,7 @@ function CatalogContent({ home = false }: { home?: boolean }) {
             </Button>
           )}
         </div>
+        {!home && state && filtered.length > 0 && <p className={s.resultRange} role="status">Showing {pagination.start + 1}–{pagination.end} of {filtered.length} {filtered.length === 1 ? "product" : "products"}</p>}
         {!state ? (
           <div className={s.empty}>
             {busy
@@ -171,7 +193,7 @@ function CatalogContent({ home = false }: { home?: boolean }) {
           </div>
         ) : filtered.length ? (
           <div className={s.products}>
-            {filtered.slice(0, home ? 8 : undefined).map((p) => (
+            {visible.map((p) => (
               <article key={p.id} className={s.product}>
                 <Link
                   href={`/b2b/products/${encodeURIComponent(p.id)}`}
@@ -199,6 +221,7 @@ function CatalogContent({ home = false }: { home?: boolean }) {
                       ? "Price unavailable"
                       : "Sign in & select a store for pricing")}
                 </div>
+                <B2BCompareButton productId={p.id} />
               </article>
             ))}
           </div>
@@ -212,6 +235,12 @@ function CatalogContent({ home = false }: { home?: boolean }) {
             </p>
           </div>
         )}
+        {!home && state && pagination.pageCount > 1 && <nav className={s.pagination} aria-label="Product pages">
+          {pagination.page > 1 ? <Link href={pageUrl(pagination.page - 1)}>← Previous</Link> : <span aria-disabled="true">← Previous</span>}
+          <div>{Array.from({ length: pagination.pageCount }, (_, index) => index + 1).map((page) => <Link key={page} href={pageUrl(page)} aria-current={pagination.page === page ? "page" : undefined} aria-label={`Page ${page}`}>{page}</Link>)}</div>
+          {pagination.page < pagination.pageCount ? <Link href={pageUrl(pagination.page + 1)}>Next →</Link> : <span aria-disabled="true">Next →</span>}
+        </nav>}
+        {home && filtered.length > 8 && <div className={s.previewLink}><Link href="/b2b/products">View the full collection →</Link></div>}
       </section>
     </main>
   );

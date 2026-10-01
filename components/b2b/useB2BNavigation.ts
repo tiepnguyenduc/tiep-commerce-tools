@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { useStorefrontLanguages } from "../useStorefrontLanguages";
 import type { B2BNavigationCategory } from "@/lib/b2b/types";
 
 function isCategory(value: unknown): value is B2BNavigationCategory {
@@ -21,6 +22,7 @@ export async function loadBusinessNavigation(url: string): Promise<B2BNavigation
 }
 
 export function useB2BNavigation() {
-  const { data, error, isLoading, mutate } = useSWR<B2BNavigationCategory[]>("/api/b2b/navigation", loadBusinessNavigation, { shouldRetryOnError: false, revalidateOnFocus: false });
+  const language = useStorefrontLanguages("b2b");
+  const { data, error, isLoading, mutate } = useSWR<B2BNavigationCategory[]>(language.locale ? `/api/b2b/navigation?locale=${encodeURIComponent(language.locale)}` : "/api/b2b/navigation", loadBusinessNavigation, { shouldRetryOnError: false, revalidateOnFocus: false });
   return { categories: data ?? [], loading: isLoading, error: Boolean(error), retry: () => { void mutate(); } };
 }

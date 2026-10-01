@@ -9,7 +9,7 @@
 .trigger svg { width: 12px; height: 12px; transition: transform .15s; }
 .trigger svg[data-open='true'] { transform: rotate(180deg); }
 .flag { font-size: 19px; line-height: 1; }
-.panel { position: absolute; right: 0; top: calc(100% + 6px); width: 270px; max-width: calc(100vw - 32px); padding: 20px; background: #fff; color: #252c27; border: 1px solid #e4e5e1; box-shadow: 0 8px 28px #17201826; font-size: 13px; letter-spacing: 0; }
+.panel { position: absolute; right: 0; top: calc(100% + 6px); width: 310px; max-width: calc(100vw - 32px); padding: 20px; max-height: 75dvh; overflow-y: auto; overscroll-behavior: contain; background: #fff; color: #252c27; border: 1px solid #e4e5e1; box-shadow: 0 8px 28px #17201826; font-size: 13px; letter-spacing: 0; }
 .panel fieldset { padding: 0; margin: 0 0 16px; border: 0; min-width: 0; }
 .panel legend { padding: 0; margin-bottom: 7px; font-weight: 600; font-size: 13px; }
 .option { display: flex; align-items: center; gap: 9px; min-height: 36px; cursor: pointer; }
@@ -20,3 +20,19 @@
 @media (max-width: 1000px) { .inner { padding: 0 24px; grid-template-columns: 1fr auto; gap: 16px; } .otherStore { display: none; } .announcement { justify-self: start; } }
 @media (max-width: 540px) { .inner { padding: 0 16px; gap: 12px; min-height: 46px; } .announcement { text-align: left; font-size: 9px; max-width: 200px; } .trigger { min-height: 46px; font-size: 11px; gap: 6px; } }
 @media (prefers-reduced-motion: reduce) { .trigger svg { transition: none; } }
+
+.activeLanguage { display: block; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.languageOptions { max-height: 280px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; margin: -4px; }
+.languageOptions .option { min-height: 48px; padding: 5px 0; }
+.languageText { display: grid; gap: 3px; line-height: 1.4; }
+.languageText small { color: #71796f; font-size: 10px; }
+.languageStatus { font-size: 12px; line-height: 1.5; margin: 8px 0; }
+.languageStatus p { margin: 0 0 8px; }
+.retry { padding: 7px 12px; background: #f5f5f0; border: 1px solid #c9cdc5; color: #303633; cursor: pointer; }
+.panel .retry:focus-visible { outline-color: #a43f22; }
+@media (max-width: 540px) { .activeLanguage { max-width: 100px; } .languageOptions { max-height: 220px; } }
+
+.countryOptions { max-height: 220px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; margin: -4px; }
+.countryOptions .option { min-height: 48px; padding: 5px 0; }
+.flag svg { width: 18px; height: 18px; }
+@media (max-width: 540px) { .countryOptions { max-height: 180px; } }

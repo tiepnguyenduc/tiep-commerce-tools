@@ -4,8 +4,9 @@ import { businessCatalogUrl, businessCategories, filterBusinessProducts } from "
 import type { B2BProduct } from "../lib/b2b/types";
 
 const navigation = vi.hoisted(() => ({ pathname: "/b2b/products", query: new URLSearchParams(), categories: [] as any[], loading: false, error: false }));
-vi.mock("next/navigation", () => ({ usePathname: () => navigation.pathname, useSearchParams: () => navigation.query }));
+vi.mock("next/navigation", () => ({ usePathname: () => navigation.pathname, useSearchParams: () => navigation.query, useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("../components/b2b/useB2BNavigation", () => ({ useB2BNavigation: () => ({ ...navigation, retry: () => {} }) }));
+vi.mock("../components/b2b/B2BProvider", () => ({ useB2B: () => ({ state: null, error: "", busy: false }) }));
 import { B2BHeaderNavigation, B2BHeaderSearch } from "../components/b2b/B2BHeaderNavigation";
 
 const products = [

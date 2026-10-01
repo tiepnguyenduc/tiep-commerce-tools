@@ -1310,3 +1310,15 @@
   .context > div { min-width: 70%; }
   .context > svg { align-self: flex-start; margin-top: 2px; }
 }
+
+.filters { flex-wrap: wrap; }
+.filters input { flex: 1; min-width: 200px; }
+.resultRange { margin: -12px 0 22px; font-size: 12px; color: #6c7062; }
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; }
+.pagination > div { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.pagination a, .pagination > span { display: flex; align-items: center; justify-content: center; min-width: 40px; min-height: 44px; padding: 8px; color: var(--ink); }
+.pagination a:hover { background: #eae6da; }
+.pagination a[aria-current='page'] { background: #30362d; color: #fff; }
+.pagination [aria-disabled='true'] { color: #929487; }
+.previewLink { margin-top: 30px; font-size: 13px; text-align: center; }
+@media (max-width: 540px) { .pagination { gap: 6px; flex-wrap: wrap; } .pagination > div { order: -1; flex-basis: 100%; } }
