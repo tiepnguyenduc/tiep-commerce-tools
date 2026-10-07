@@ -1,5 +1,8 @@
 import "server-only";
-import { ClientBuilder } from "@commercetools/sdk-client-v2";
+import {
+  ClientBuilder,
+  createQueueMiddleware,
+} from "@commercetools/sdk-client-v2";
 import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
 import { getB2BApiEnv, getEnvReadiness } from "../env";
 
@@ -7,6 +10,9 @@ function createApiRoot(env: Record<string, string | undefined> = process.env) {
   return createApiBuilderFromCtpClient(
     new ClientBuilder()
       .withProjectKey(env.CTP_PROJECT_KEY!)
+      // Place the queue before auth so a complete SDK execution (OAuth and
+      // response parsing included) finishes before the next one starts.
+      .withMiddleware(createQueueMiddleware({ concurrency: 1 }))
       .withClientCredentialsFlow({
         host: env.CTP_AUTH_URL!,
         projectKey: env.CTP_PROJECT_KEY!,

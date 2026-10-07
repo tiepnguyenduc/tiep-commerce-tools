@@ -204,7 +204,7 @@ function NavigationContent() {
               {t("Quick order by SKU →")}
             </Link>
             <Link href="/b2b/wishlist" onClick={close}>
-              {t("Saved products →")}
+              {t("My Wishlist →")}
             </Link>
           </div>
           <span className={s.panelEyebrow}>{t("BUSINESS COLLECTION")}</span>

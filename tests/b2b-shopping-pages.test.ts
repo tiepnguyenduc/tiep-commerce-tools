@@ -1,24 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { parseSavedProducts, savedProductsKey } from "../lib/b2b/saved-products";
 import { duplicateQuickOrderRows, resolveQuickOrderRow, runQuickOrderBatch } from "../lib/b2b/quick-order";
-import type { B2BProduct, B2BState } from "../lib/b2b/types";
+import type { B2BProduct } from "../lib/b2b/types";
 const products = [{ id: "p1", name: "Loader", variants: [{ id: 1, sku: "QL-100" }, { id: 2, sku: "QL-200" }] }] as B2BProduct[];
 
-describe("saved business products", () => {
-  it("stores only distinct valid IDs and handles malformed storage", () => {
-    expect(parseSavedProducts('["p1","p1",{"price":123},"",null,"p2"]')).toEqual(["p1", "p2"]);
-    expect(parseSavedProducts("bad JSON")).toEqual([]);
-    expect(parseSavedProducts(null)).toEqual([]);
-  });
-  it("isolates customers, business units, stores and guests", () => {
-    const state = { customer: { id: "c1" }, context: { businessUnitKey: "bu1", storeKey: "s1" } } as B2BState;
-    const key = savedProductsKey(state);
-    expect(savedProductsKey({ ...state, customer: null })).not.toBe(key);
-    expect(savedProductsKey({ ...state, context: { ...state.context!, storeKey: "s2" } })).not.toBe(key);
-    expect(savedProductsKey({ ...state, context: { ...state.context!, businessUnitKey: "bu2" } })).not.toBe(key);
-    expect(key).not.toContain("b2b-compare");
-  });
-});
 describe("quick order review", () => {
   it("resolves exact case-insensitive SKU with the selected variant", () => {
     const result = resolveQuickOrderRow({ id: "1", sku: " ql-200 ", quantity: "3" }, products);

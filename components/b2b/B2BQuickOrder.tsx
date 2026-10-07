@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { duplicateQuickOrderRows, resolveQuickOrderRow, runQuickOrderBatch, type QuickOrderRow } from "@/lib/b2b/quick-order";
-import { savedProductsKey } from "@/lib/b2b/saved-products";
 import { useB2B } from "./B2BProvider";
 import s from "./B2BTools.module.css";
 export function B2BQuickOrderPage() {
@@ -13,7 +12,13 @@ export function B2BQuickOrderPage() {
   const [pending, setPending] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, "added" | "uncertain">>({});
   const [feedback, setFeedback] = useState("");
-  const scope = state ? savedProductsKey(state) : "";
+  const scope = state
+    ? JSON.stringify([
+        state.customer?.id || "guest",
+        state.context?.businessUnitKey || "",
+        state.context?.storeKey || "",
+      ])
+    : "";
   const currentScope = useRef(scope); currentScope.current = scope;
   const mounted = useRef(true);
   const batchLock = useRef(false);

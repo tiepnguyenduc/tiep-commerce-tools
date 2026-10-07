@@ -297,7 +297,10 @@ function CatalogContent({
                 </div>
                 <div className={s.productTools}>
                   <B2BCompareButton productId={p.id} />
-                  <B2BSaveButton productId={p.id} />
+                  <B2BSaveButton
+                    productId={p.id}
+                    variantId={p.variants[0]?.id}
+                  />
                 </div>
               </article>
             ))}

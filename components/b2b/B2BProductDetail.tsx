@@ -125,7 +125,8 @@ export function B2BProductDetail({ id }: { id: string }) {
             >
               Add to business bag
             </Button>
-            <B2BCompareButton productId={p.id} /><B2BSaveButton productId={p.id} />
+            <B2BCompareButton productId={p.id} />
+            <B2BSaveButton productId={p.id} variantId={variant?.id} />
           </form>
           {added && (
             <p role="status" className={s.success}>

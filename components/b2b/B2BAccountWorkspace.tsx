@@ -33,7 +33,7 @@ const links = [
     label: "My company",
     icon: BuildingOffice2Icon,
   },
-  { href: "/b2b/wishlist", label: "Saved products", icon: HeartIcon },
+  { href: "/b2b/wishlist", label: "My Wishlist", icon: HeartIcon },
 ];
 export function B2BAccountWorkspace({
   title,
@@ -141,8 +141,8 @@ export function B2BAccountDashboard() {
     },
     {
       href: "/b2b/wishlist",
-      title: "Saved products",
-      description: "Return to the equipment you saved on this browser.",
+      title: "My Wishlist",
+      description: "Return to products saved to your personal wishlist.",
       icon: HeartIcon,
     },
     {

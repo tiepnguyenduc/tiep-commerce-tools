@@ -190,7 +190,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
           <Link href="/b2b/cart">Your purchasing bag</Link>
           <Link href="/b2b/search">Search equipment</Link>
           <Link href="/b2b/categories">{t("All categories")}</Link>
-          <Link href="/b2b/wishlist">{t("Saved products")}</Link>
+          <Link href="/b2b/wishlist">{t("My Wishlist")}</Link>
           <Link href="/b2b/quick-order">Quick order by SKU</Link>
         </div>
         <div>
