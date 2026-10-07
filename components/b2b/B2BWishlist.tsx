@@ -1,38 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { HeartIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  CheckIcon,
+  HeartIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
+  type FormEvent,
   type ReactNode,
 } from "react";
+import Button from "@/components/commercetools-ui/atoms/button";
+import Input from "@/components/commercetools-ui/atoms/input";
+import { WishlistModal } from "@/components/WishlistModal";
 import { useToast } from "@/components/Toast";
-import type { Wishlist, WishlistLine } from "@/lib/types";
+import type { Wishlist } from "@/lib/types";
 import { useB2B } from "./B2BProvider";
+import { B2BAccountWorkspace } from "./B2BAccountWorkspace";
 import { useB2BTranslations } from "./useB2BTranslations";
 import s from "./B2BTools.module.css";
 
 type WishlistContext = {
-  wishlist: Wishlist | null;
+  wishlists: Wishlist[];
   ready: boolean;
   pending: string | null;
   error: string;
-  reload: () => Promise<void>;
-  toggle: (productId: string, variantId?: number) => Promise<void>;
+  reload: () => Promise<Wishlist[]>;
+  create: (name: string) => Promise<Wishlist>;
+  rename: (id: string, name: string) => Promise<Wishlist>;
+  removeList: (id: string) => Promise<void>;
+  toggle: (wishlistId: string, productId: string, variantId?: number) => Promise<void>;
+  removeLine: (wishlistId: string, lineItemId: string) => Promise<void>;
 };
 
 const Context = createContext<WishlistContext | null>(null);
 
-function matchingLine(
-  wishlist: Wishlist | null,
-  productId: string,
-  variantId?: number,
-) {
-  return wishlist?.lines.find(
+function matchingLine(wishlist: Wishlist, productId: string, variantId?: number) {
+  return wishlist.lines.find(
     (line) =>
       line.productId === productId &&
       (variantId === undefined || line.variantId === variantId),
@@ -57,130 +70,142 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
   const customerIdRef = useRef(customerId);
   customerIdRef.current = customerId;
   const [ownerId, setOwnerId] = useState("");
-  const [wishlist, setWishlist] = useState<Wishlist | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">(
-    "loading",
-  );
+  const [wishlists, setWishlists] = useState<Wishlist[]>([]);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
   const [pending, setPending] = useState<string | null>(null);
-  const showToast = useToast();
+
+  function upsert(wishlist: Wishlist) {
+    setWishlists((current) =>
+      current.some((entry) => entry.id === wishlist.id)
+        ? current.map((entry) => (entry.id === wishlist.id ? wishlist : entry))
+        : [...current, wishlist],
+    );
+    return wishlist;
+  }
 
   async function load(owner = customerId) {
     setPending(null);
     if (!owner) {
       setOwnerId("");
-      setWishlist(null);
+      setWishlists([]);
       setStatus("ready");
       setError("");
-      return;
+      return [];
     }
-
     setOwnerId(owner);
     setStatus("loading");
     setError("");
     try {
-      const data = await readJson<{ wishlist: Wishlist }>(
-        await fetch("/api/b2b/wishlist", { cache: "no-store" }),
+      const data = await readJson<{ wishlists: Wishlist[] }>(
+        await fetch("/api/b2b/wishlists", { cache: "no-store" }),
       );
-      if (customerIdRef.current !== owner) return;
-      setWishlist(data.wishlist);
-      setStatus("ready");
+      if (customerIdRef.current === owner) {
+        setWishlists(data.wishlists);
+        setStatus("ready");
+      }
+      return data.wishlists;
     } catch (requestError) {
-      if (customerIdRef.current !== owner) return;
-      setWishlist(null);
-      setStatus("error");
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Wishlist request failed.",
-      );
+      if (customerIdRef.current === owner) {
+        setWishlists([]);
+        setStatus("error");
+        setError(requestError instanceof Error ? requestError.message : "Wishlist request failed.");
+      }
+      throw requestError;
     }
   }
 
   useEffect(() => {
     if (state === null) return;
-    void load(customerId);
+    void load(customerId).catch(() => undefined);
   }, [customerId, state === null]);
 
-  const ready =
-    state !== null && ownerId === customerId && status === "ready";
+  const ready = state !== null && ownerId === customerId && status === "ready";
 
-  async function toggle(productId: string, variantId?: number) {
-    if (!state?.customer) {
-      window.location.assign("/b2b/account");
+  async function create(name: string) {
+    const data = await readJson<{ wishlist: Wishlist }>(
+      await fetch("/api/b2b/wishlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      }),
+    );
+    return upsert(data.wishlist);
+  }
+
+  async function rename(id: string, name: string) {
+    const data = await readJson<{ wishlist: Wishlist }>(
+      await fetch(`/api/b2b/wishlists/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      }),
+    );
+    return upsert(data.wishlist);
+  }
+
+  async function removeList(id: string) {
+    const data = await readJson<{ deletedId: string }>(
+      await fetch(`/api/b2b/wishlists/${encodeURIComponent(id)}`, { method: "DELETE" }),
+    );
+    setWishlists((current) => current.filter((entry) => entry.id !== data.deletedId));
+  }
+
+  async function removeLine(wishlistId: string, lineItemId: string) {
+    const operationKey = `${wishlistId}:${lineItemId}`;
+    setPending(operationKey);
+    try {
+      const data = await readJson<{ wishlist: Wishlist }>(
+        await fetch(
+          `/api/b2b/wishlists/${encodeURIComponent(wishlistId)}/items?lineItemId=${encodeURIComponent(lineItemId)}`,
+          { method: "DELETE" },
+        ),
+      );
+      upsert(data.wishlist);
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function toggle(wishlistId: string, productId: string, variantId?: number) {
+    const wishlist = wishlists.find((entry) => entry.id === wishlistId);
+    if (pending) return;
+    const line = wishlist
+      ? matchingLine(wishlist, productId, variantId)
+      : undefined;
+    if (line) {
+      await removeLine(wishlistId, line.id);
       return;
     }
-    if (!ready || !wishlist || pending) return;
-
-    const owner = state.customer.id;
-    const operationKey = `${productId}:${variantId ?? "default"}`;
-    const previous = wishlist;
-    const line = matchingLine(wishlist, productId, variantId);
-    const product = state.products.find((entry) => entry.id === productId);
-    const variant = variantId
-      ? product?.variants.find((entry) => entry.id === variantId)
-      : product?.variants[0];
-    const optimisticLine: WishlistLine = {
-      id: `pending-${operationKey}`,
-      productId,
-      variantId,
-      sku: variant?.sku || productId,
-      name: product?.name || "Wishlist item",
-      image: variant?.image || product?.image || "",
-      quantity: 1,
-    };
-
+    const operationKey = `${wishlistId}:${productId}:${variantId ?? "default"}`;
     setPending(operationKey);
-    setWishlist({
-      ...wishlist,
-      lines: line
-        ? wishlist.lines.filter((entry) => entry.id !== line.id)
-        : [...wishlist.lines, optimisticLine],
-    });
-
     try {
-      const response = line
-        ? await fetch(
-            `/api/b2b/wishlist/items?lineItemId=${encodeURIComponent(line.id)}`,
-            { method: "DELETE" },
-          )
-        : await fetch("/api/b2b/wishlist/items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, variantId }),
-          });
-      const data = await readJson<{ wishlist: Wishlist }>(response);
-      if (customerIdRef.current !== owner) return;
-      setWishlist(data.wishlist);
-      showToast(
-        line ? "Removed from My Wishlist." : "Added to My Wishlist.",
-        "success",
+      const data = await readJson<{ wishlist: Wishlist }>(
+        await fetch(`/api/b2b/wishlists/${encodeURIComponent(wishlistId)}/items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId, variantId }),
+        }),
       );
-    } catch (requestError) {
-      if (customerIdRef.current !== owner) return;
-      setWishlist(previous);
-      showToast(
-        requestError instanceof Error
-          ? requestError.message
-          : "Could not update My Wishlist.",
-        "error",
-      );
+      upsert(data.wishlist);
     } finally {
-      if (customerIdRef.current === owner) setPending(null);
+      setPending(null);
     }
   }
 
   return (
-    <Context.Provider
-      value={{
-        wishlist,
-        ready,
-        pending,
-        error,
-        reload: () => load(customerId),
-        toggle,
-      }}
-    >
+    <Context.Provider value={{
+      wishlists,
+      ready,
+      pending,
+      error,
+      reload: () => load(customerId),
+      create,
+      rename,
+      removeList,
+      toggle,
+      removeLine,
+    }}>
       {children}
     </Context.Provider>
   );
@@ -192,203 +217,273 @@ function useB2BWishlist() {
   return context;
 }
 
-export function B2BSaveButton({
-  productId,
-  variantId,
-}: {
-  productId: string;
-  variantId?: number;
-}) {
+export function B2BSaveButton({ productId, variantId }: { productId: string; variantId?: number }) {
   const { t } = useB2BTranslations();
-  const { wishlist, ready, pending, toggle } = useB2BWishlist();
-  const saved = Boolean(matchingLine(wishlist, productId, variantId));
-  const operationKey = `${productId}:${variantId ?? "default"}`;
+  const { state } = useB2B();
+  const { wishlists, ready, pending, reload, create, toggle } = useB2BWishlist();
+  const [open, setOpen] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const showToast = useToast();
+  const saved = wishlists.some((wishlist) => Boolean(matchingLine(wishlist, productId, variantId)));
+
+  async function openPicker() {
+    if (!state?.customer) {
+      window.location.assign("/b2b/account");
+      return;
+    }
+    try {
+      if (!ready) await reload();
+      setOpen(true);
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not load wishlists.", "error");
+    }
+  }
+
+  async function toggleList(wishlist: Wishlist) {
+    try {
+      const wasSaved = Boolean(matchingLine(wishlist, productId, variantId));
+      await toggle(wishlist.id, productId, variantId);
+      showToast(wasSaved ? `Removed from ${wishlist.name}.` : `Saved to ${wishlist.name}.`, "success");
+      setOpen(false);
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not update the wishlist.", "error");
+    }
+  }
+
+  async function createAndSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextName = name.trim();
+    if (!nextName || busy) return;
+    setBusy(true);
+    try {
+      const wishlist = await create(nextName);
+      await toggle(wishlist.id, productId, variantId);
+      showToast(`Created ${wishlist.name} and saved the product.`, "success");
+      setName("");
+      setShowCreate(false);
+      setOpen(false);
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not create the wishlist.", "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
-    <button
-      type="button"
-      className={s.toggle}
-      disabled={!ready || pending !== null}
-      aria-pressed={saved}
-      onClick={() => void toggle(productId, variantId)}
-    >
-      <HeartIcon aria-hidden="true" />
-      {pending === operationKey
-        ? t("Updating wishlist…")
-        : saved
-          ? t("In My Wishlist")
-          : t("Add to My Wishlist")}
-    </button>
+    <>
+      <button type="button" className={s.toggle} aria-pressed={saved} disabled={busy} onClick={() => void openPicker()}>
+        <HeartIcon aria-hidden="true" />
+        {pending ? t("Updating wishlist…") : saved ? t("In My Wishlist") : t("Add to My Wishlist")}
+      </button>
+      {open && (
+        <WishlistModal onClose={() => setOpen(false)} title={showCreate ? "Create new wishlist" : "Add to wishlist"}>
+          {showCreate ? (
+            <form className="wishlist-create-form" onSubmit={createAndSave}>
+              <Button variant="ghost" size="fit" type="button" onClick={() => setShowCreate(false)}>
+                <ArrowLeftIcon aria-hidden="true" width={16} /> Back to wishlists
+              </Button>
+              <label htmlFor={`b2b-wishlist-${productId}`}>Wishlist name</label>
+              <Input id={`b2b-wishlist-${productId}`} value={name} maxLength={100} required autoFocus onChange={(event) => setName(event.target.value)} />
+              <div className="wishlist-modal-actions">
+                <Button variant="secondary" type="button" onClick={() => setShowCreate(false)}>Cancel</Button>
+                <Button variant="primary" type="submit" disabled={!name.trim() || busy}>{busy ? "Creating…" : "Create and save"}</Button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <p className="wishlist-picker-intro">Choose a list to save this product. Select a saved list to remove it.</p>
+              <div className="wishlist-picker-list">
+                {wishlists.map((wishlist) => {
+                  const inList = Boolean(matchingLine(wishlist, productId, variantId));
+                  return (
+                    <Button variant={inList ? "primary" : "secondary"} size="s" className={`wishlist-picker-option${inList ? " saved" : ""}`} aria-pressed={inList} disabled={pending !== null} key={wishlist.id} onClick={() => void toggleList(wishlist)} type="button">
+                      <span><strong>{wishlist.name}</strong>{wishlist.isDefault && <small>Default</small>}</span>
+                      <span className="wishlist-picker-count">{wishlist.lines.length} item{wishlist.lines.length === 1 ? "" : "s"}{inList && <CheckIcon aria-hidden="true" width={16} />}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+              <div className="wishlist-picker-footer">
+                <Button variant="secondary" type="button" onClick={() => setShowCreate(true)}><PlusIcon aria-hidden="true" width={16} /> Create new wishlist</Button>
+                <Link className="wishlist-manage-link" href="/b2b/wishlist" onClick={() => setOpen(false)}>Manage wishlists</Link>
+              </div>
+            </>
+          )}
+        </WishlistModal>
+      )}
+    </>
   );
 }
 
 export function B2BHeaderWishlistLink() {
   const { t } = useB2BTranslations();
-  const { wishlist } = useB2BWishlist();
-  const count = wishlist?.lines.length ?? 0;
+  const { wishlists } = useB2BWishlist();
+  const count = wishlists.reduce((total, wishlist) => total + wishlist.lines.length, 0);
   return (
-    <Link
-      href="/b2b/wishlist"
-      aria-label={`${t("My Wishlist")}, ${count} items`}
-    >
+    <Link href="/b2b/wishlist" aria-label={`${t("My Wishlist")}, ${count} items`}>
       <HeartIcon aria-hidden="true" />
-      <span>
-        {t("My Wishlist")}
-        {count ? ` (${count})` : ""}
-      </span>
+      <span>{t("My Wishlist")}{count ? ` (${count})` : ""}</span>
     </Link>
   );
 }
 
 export function B2BWishlistPage() {
   const { state, busy, act } = useB2B();
-  const { wishlist, ready, error, reload, pending, toggle } = useB2BWishlist();
+  const { wishlists, ready, error, reload, pending, create, rename, removeList, removeLine } = useB2BWishlist();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [renameTarget, setRenameTarget] = useState<Wishlist | null>(null);
+  const [renameName, setRenameName] = useState("");
+  const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [uncertain, setUncertain] = useState<string[]>([]);
+  const showToast = useToast();
+  const selected = useMemo(() => wishlists.find((entry) => entry.id === selectedId) ?? null, [selectedId, wishlists]);
 
   useEffect(() => {
+    setSelectedId(null);
     setFeedback("");
-    setUncertain([]);
-  }, [
-    state?.customer?.id,
-    state?.context?.businessUnitKey,
-    state?.context?.storeKey,
-  ]);
+  }, [state?.customer?.id]);
 
-  const lines = wishlist?.lines ?? [];
+  async function submitCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!newName.trim() || saving) return;
+    setSaving(true);
+    try {
+      const wishlist = await create(newName.trim());
+      setSelectedId(wishlist.id);
+      setNewName("");
+      setShowCreate(false);
+      showToast(`${wishlist.name} was created.`, "success");
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not create the wishlist.", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function submitRename(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!renameTarget || !renameName.trim() || saving) return;
+    setSaving(true);
+    try {
+      const updated = await rename(renameTarget.id, renameName.trim());
+      setRenameTarget(null);
+      showToast(`Wishlist renamed to ${updated.name}.`, "success");
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not rename the wishlist.", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteList(wishlist: Wishlist) {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await removeList(wishlist.id);
+      if (selectedId === wishlist.id) setSelectedId(null);
+      showToast(`${wishlist.name} was deleted.`, "success");
+    } catch (requestError) {
+      showToast(requestError instanceof Error ? requestError.message : "Could not delete the wishlist.", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const modal = renameTarget ? (
+    <WishlistModal title="Rename wishlist" onClose={() => !saving && setRenameTarget(null)}>
+      <form className="wishlist-create-form" onSubmit={submitRename}>
+        <label htmlFor="b2b-wishlist-rename">Wishlist name</label>
+        <Input id="b2b-wishlist-rename" value={renameName} maxLength={100} required autoFocus onChange={(event) => setRenameName(event.target.value)} />
+        <div className="wishlist-modal-actions">
+          <Button variant="secondary" type="button" disabled={saving} onClick={() => setRenameTarget(null)}>Cancel</Button>
+          <Button variant="primary" type="submit" disabled={saving || !renameName.trim()}>{saving ? "Saving…" : "Save name"}</Button>
+        </div>
+      </form>
+    </WishlistModal>
+  ) : null;
+
   return (
-    <main className={s.page}>
-      <div className={s.heading}>
-        <div>
-          <p className={s.eyebrow}>MY WISHLIST</p>
-          <h1>My Wishlist</h1>
-          <p>
-            Your personal wishlist follows your account, so you can return to
-            these products from either the home or business storefront.
-          </p>
-        </div>
-        <Link href="/b2b/products">Continue browsing →</Link>
-      </div>
-      {feedback && (
-        <p className={s.feedback} role="status">
-          {feedback} <Link href="/b2b/cart">View business bag →</Link>
-        </p>
-      )}
-      {!state || (state.customer && !ready) ? (
+    <B2BAccountWorkspace title="My Wishlist" description="Organise products into personal lists and return to them from either storefront.">
+      {!state?.customer || !ready ? (
         <div className={s.empty} role="status">
-          {error ? (
-            <>
-              <p>My Wishlist is temporarily unavailable.</p>
-              <button
-                className={s.button}
-                type="button"
-                onClick={() => void reload()}
-              >
-                Try again
-              </button>
-            </>
-          ) : (
-            "Loading My Wishlist…"
-          )}
+          {error ? <><p>My Wishlist is temporarily unavailable.</p><button className={s.button} type="button" onClick={() => void reload()}>Try again</button></> : "Loading My Wishlist…"}
         </div>
-      ) : !state.customer ? (
-        <section className={s.empty}>
-          <h2>Sign in to use My Wishlist.</h2>
-          <p>Your saved products will be available anywhere you use this account.</p>
-          <Link href="/b2b/account">Sign in to your business →</Link>
-        </section>
-      ) : !lines.length ? (
-        <section className={s.empty}>
-          <h2>Your wishlist is ready.</h2>
-          <p>Choose Add to My Wishlist while browsing to save products here.</p>
-          <Link href="/b2b/products">Explore equipment →</Link>
-        </section>
-      ) : (
-        <>
-          <p className={s.note}>
-            {lines.length} wishlist {lines.length === 1 ? "item" : "items"}
-          </p>
-          <div className={s.grid}>
-            {lines.map((line) => {
-              const product = state.products.find(
-                (item) => item.id === line.productId,
-              );
-              const variant =
-                product?.variants.find((item) => item.id === line.variantId) ??
-                product?.variants[0];
-              return (
-                <article className={s.product} key={line.id}>
-                  {product ? (
-                    <>
-                      <Link
-                        href={`/b2b/products/${encodeURIComponent(product.id)}`}
-                      >
-                        {(line.image || product.image) && (
-                          <img src={line.image || product.image} alt="" />
-                        )}
-                        <h2>{line.name || product.name}</h2>
-                      </Link>
-                      <p>{product.category}</p>
-                      <p>
-                        {state.context
-                          ? variant?.price?.formatted || "Price unavailable"
-                          : "Sign in and select a store for pricing"}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      {line.image && <img src={line.image} alt="" />}
-                      <h2>{line.name || "Product unavailable"}</h2>
-                      <p>
-                        This wishlist item is not in your current business
-                        assortment.
-                      </p>
-                    </>
-                  )}
-                  <div className={s.actions}>
-                    <button
-                      type="button"
-                      disabled={pending !== null}
-                      onClick={() => void toggle(line.productId, line.variantId)}
-                    >
-                      Remove
-                    </button>
-                    {product && variant && (
-                      <button
-                        className={s.primary}
-                        type="button"
-                        disabled={
-                          busy ||
-                          !state.context ||
-                          !variant.price ||
-                          uncertain.includes(line.id)
-                        }
-                        onClick={async () => {
-                          const success = await act({
-                            action: "add-to-cart",
-                            productId: product.id,
-                            variantId: variant.id,
-                            quantity: 1,
-                          });
-                          setFeedback(
-                            success
-                              ? `${product.name} added to your bag.`
-                              : "The result could not be confirmed. Check your bag before adding this product again.",
-                          );
-                          if (!success) {
-                            setUncertain((current) => [...current, line.id]);
-                          }
-                        }}
-                      >
-                        Add 1 to bag
-                      </button>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
+      ) : selected ? (
+        <div className={s.wishlistStack}>
+          <div className={s.wishlistToolbar}>
+            <button type="button" onClick={() => setSelectedId(null)}><ArrowLeftIcon aria-hidden="true" /> All wishlists</button>
+            <div>
+              <button type="button" onClick={() => { setRenameTarget(selected); setRenameName(selected.name); }}><PencilIcon aria-hidden="true" /> Rename</button>
+              {!selected.isDefault && <button type="button" className={s.danger} onClick={() => void deleteList(selected)}><TrashIcon aria-hidden="true" /> Delete</button>}
+            </div>
           </div>
-        </>
+          <div className={s.wishlistTitle}>
+            <div><h2>{selected.name}</h2><p>{selected.lines.length} item{selected.lines.length === 1 ? "" : "s"}</p></div>
+            {selected.isDefault && <span>Default</span>}
+          </div>
+          {!selected.lines.length ? (
+            <div className={s.empty}><h2>This wishlist is empty.</h2><p>Use “Add to My Wishlist” while browsing to save products here.</p><Link href="/b2b/products">Explore equipment →</Link></div>
+          ) : (
+            <div className={s.grid}>
+              {selected.lines.map((line) => {
+                const product = state.products.find((entry) => entry.id === line.productId);
+                const variant = product?.variants.find((entry) => entry.id === line.variantId) ?? product?.variants[0];
+                return (
+                  <article className={s.product} key={line.id}>
+                    {line.image && <img src={line.image} alt="" />}
+                    <h2>{line.name}</h2>
+                    <p>SKU: {line.sku}</p>
+                    <p>{state.context ? variant?.price?.formatted || "Price unavailable" : "Select a store for pricing"}</p>
+                    <div className={s.actions}>
+                      <button type="button" disabled={pending !== null} onClick={async () => { try { await removeLine(selected.id, line.id); showToast("Item removed from the wishlist.", "success"); } catch (requestError) { showToast(requestError instanceof Error ? requestError.message : "Could not remove the item.", "error"); } }}>Remove</button>
+                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); setFeedback(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again."); }}>Add 1 to bag</button>}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+          {feedback && <p className={s.feedback} role="status">{feedback} <Link href="/b2b/cart">View business bag →</Link></p>}
+          {modal}
+        </div>
+      ) : (
+        <div className={s.wishlistStack}>
+          <div className={s.wishlistOverview}>
+            <p>Create separate lists for projects, teams, or future purchases.</p>
+            <button className={s.primaryAction} type="button" onClick={() => setShowCreate(true)}><PlusIcon aria-hidden="true" /> Create new wishlist</button>
+          </div>
+          <div className={s.wishlistCards}>
+            {wishlists.map((wishlist) => (
+              <article className={s.wishlistCard} key={wishlist.id}>
+                <button className={s.wishlistOpen} type="button" onClick={() => setSelectedId(wishlist.id)}>
+                  <span className={s.wishlistCardTitle}><strong>{wishlist.name}</strong>{wishlist.isDefault && <small>Default</small>}</span>
+                  <span>{wishlist.lines.length} item{wishlist.lines.length === 1 ? "" : "s"}</span>
+                  <span className={s.wishlistImages}>{wishlist.lines.slice(0, 3).map((line) => <img src={line.image} alt="" key={line.id} />)}{!wishlist.lines.length && <i>No saved items yet</i>}</span>
+                </button>
+                <div className={s.wishlistCardActions}>
+                  <button type="button" aria-label={`Rename ${wishlist.name}`} onClick={() => { setRenameTarget(wishlist); setRenameName(wishlist.name); }}><PencilIcon aria-hidden="true" /></button>
+                  {!wishlist.isDefault && <button type="button" className={s.danger} aria-label={`Delete ${wishlist.name}`} onClick={() => void deleteList(wishlist)}><TrashIcon aria-hidden="true" /></button>}
+                </div>
+              </article>
+            ))}
+          </div>
+          {showCreate && <WishlistModal title="Create new wishlist" onClose={() => !saving && setShowCreate(false)}>
+            <form className="wishlist-create-form" onSubmit={submitCreate}>
+              <label htmlFor="b2b-wishlist-name">Wishlist name</label>
+              <Input id="b2b-wishlist-name" value={newName} maxLength={100} required autoFocus placeholder="e.g. Site equipment" onChange={(event) => setNewName(event.target.value)} />
+              <div className="wishlist-modal-actions">
+                <Button variant="secondary" type="button" disabled={saving} onClick={() => setShowCreate(false)}>Cancel</Button>
+                <Button variant="primary" type="submit" disabled={saving || !newName.trim()}>{saving ? "Creating…" : "Create wishlist"}</Button>
+              </div>
+            </form>
+          </WishlistModal>}
+          {modal}
+        </div>
       )}
-    </main>
+    </B2BAccountWorkspace>
   );
 }

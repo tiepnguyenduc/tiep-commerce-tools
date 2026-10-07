@@ -78,6 +78,7 @@ vi.mock("../components/b2b/useB2BAccountProfile", () => ({
 }));
 import {
   addressFormPayload,
+  B2BAccountWorkspace,
   B2BAccountDashboard,
   B2BAddressEditor,
   B2BAddressesPage,
@@ -120,6 +121,20 @@ function exportPreview(name: string, html: string) {
   );
 }
 describe("B2B account UI", () => {
+  it("renders My Wishlist inside the account sidebar shell", () => {
+    fixture.path = "/b2b/wishlist";
+    const html = renderToStaticMarkup(
+      <B2BAccountWorkspace title="My Wishlist">
+        <div>Wishlist management</div>
+      </B2BAccountWorkspace>,
+    );
+    expect(html).toContain('aria-label="Account navigation"');
+    expect(html).toMatch(
+      /<a(?=[^>]*href="\/b2b\/wishlist")(?=[^>]*aria-current="page")[^>]*>/,
+    );
+    expect(html).toContain("Wishlist management");
+  });
+
   it("renders working dashboard routes and preserves guest authentication", () => {
     const html = renderToStaticMarkup(<B2BAccountDashboard />);
     for (const path of [
