@@ -217,7 +217,15 @@ function useB2BWishlist() {
   return context;
 }
 
-export function B2BSaveButton({ productId, variantId }: { productId: string; variantId?: number }) {
+export function B2BSaveButton({
+  productId,
+  variantId,
+  compact = false,
+}: {
+  productId: string;
+  variantId?: number;
+  compact?: boolean;
+}) {
   const { t } = useB2BTranslations();
   const { state } = useB2B();
   const { wishlists, ready, pending, reload, create, toggle } = useB2BWishlist();
@@ -273,9 +281,23 @@ export function B2BSaveButton({ productId, variantId }: { productId: string; var
 
   return (
     <>
-      <button type="button" className={s.toggle} aria-pressed={saved} disabled={busy} onClick={() => void openPicker()}>
+      <button
+        type="button"
+        className={compact ? s.iconToggle : s.toggle}
+        aria-label={
+          pending
+            ? t("Updating wishlist…")
+            : saved
+              ? t("Manage product wishlists")
+              : t("Add product to wishlist")
+        }
+        aria-pressed={saved}
+        title={saved ? t("Manage wishlists") : t("Add to wishlist")}
+        disabled={busy || pending !== null}
+        onClick={() => void openPicker()}
+      >
         <HeartIcon aria-hidden="true" />
-        {pending ? t("Updating wishlist…") : saved ? t("In My Wishlist") : t("Add to My Wishlist")}
+        {!compact && (pending ? t("Updating wishlist…") : saved ? t("In My Wishlist") : t("Add to My Wishlist"))}
       </button>
       {open && (
         <WishlistModal onClose={() => setOpen(false)} title={showCreate ? "Create new wishlist" : "Add to wishlist"}>

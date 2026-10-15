@@ -9,6 +9,13 @@
 .toggle:disabled { opacity:.55; cursor:wait; }
 .toggle svg { width:17px; height:17px; }
 .toggle:hover { background:#e7ebdf; }
+.iconToggle { display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; padding:0; border:1px solid #d2cec1; border-radius:50%; background:rgba(255,255,255,.96); color:#30382d; box-shadow:0 3px 12px rgba(35,42,31,.12); cursor:pointer; transition:color .16s,background .16s,border-color .16s,transform .16s,box-shadow .16s; }
+.iconToggle svg { width:19px; height:19px; }
+.iconToggle:hover:not(:disabled) { border-color:#8e866f; background:#f8f5ed; transform:translateY(-1px); box-shadow:0 5px 15px rgba(35,42,31,.17); }
+.iconToggle:active:not(:disabled) { transform:translateY(0) scale(.96); }
+.iconToggle:focus-visible { outline:2px solid #9a712e; outline-offset:3px; }
+.iconToggle[aria-pressed="true"] { border-color:#69745e; background:#30382d; color:#fff; }
+.iconToggle:disabled { opacity:.55; cursor:not-allowed; transform:none; }
 .page button:focus-visible,.page a:focus-visible,.toggle:focus-visible,.tableWrap:focus-visible { outline:2px solid #81672c; outline-offset:4px; }
 .toolbar { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:16px 0; font-size:13px; }
 .toolbar button,.remove { color:#535a4f; background:transparent; border:0; text-decoration:underline; cursor:pointer; padding:8px 0; }

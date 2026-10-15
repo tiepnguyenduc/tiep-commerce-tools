@@ -21,6 +21,7 @@ import { countryDisplayName } from "@/lib/storefront-countries";
 import { useStorefrontCountries } from "../useStorefrontCountries";
 import { useB2B } from "./B2BProvider";
 import { B2BAccount } from "./B2BAccount";
+import { B2BCompanyWorkspace } from "./B2BCompanyWorkspace";
 import { useB2BAccountProfile } from "./useB2BAccountProfile";
 import s from "./B2BAccountWorkspace.module.css";
 
@@ -857,9 +858,7 @@ export function B2BCompanyPage() {
       title="My company"
       description="Manage your business units and the people authorized to purchase with you."
     >
-      <div className={s.legacy}>
-        <B2BAccount embedded />
-      </div>
+      <B2BCompanyWorkspace />
     </B2BAccountWorkspace>
   );
 }

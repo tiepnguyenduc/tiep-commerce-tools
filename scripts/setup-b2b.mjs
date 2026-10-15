@@ -11,6 +11,8 @@ const plans = [
     name: "Business administrator",
     buyerAssignable: true,
     permissions: [
+      "AddChildUnits",
+      "UpdateBusinessUnitDetails",
       "UpdateAssociates",
       "CreateMyCarts",
       "ViewMyCarts",

@@ -25,6 +25,14 @@
 .toggle svg { width: 16px; height: 16px; }
 .toggle[aria-pressed='true'] { color: #906d31; }
 .toggle:disabled { opacity: .5; }
+.iconToggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: 1px solid #d2cec1; border-radius: 50%; background: rgba(255,255,255,.96); color: #30382d; box-shadow: 0 3px 12px rgba(35,42,31,.12); cursor: pointer; transition: color .16s, background .16s, border-color .16s, transform .16s, box-shadow .16s; }
+.iconToggle svg { width: 19px; height: 19px; }
+.iconToggle:hover { border-color: #8e866f; background: #f8f5ed; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(35,42,31,.17); }
+.iconToggle:active { transform: translateY(0) scale(.96); }
+.iconToggle:focus-visible { outline: 2px solid #9a712e; outline-offset: 3px; }
+.iconToggle[aria-pressed='true'] { border-color: #8a682d; background: #30382d; color: #fff; }
+.iconToggle[aria-pressed='true'] svg { fill: currentColor; }
+.iconToggle:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 .primary { background: #303b2b !important; border-color: #303b2b !important; color: #fff !important; }
 .note { margin: 20px 0; color: #646e59; font-size: 12px; line-height: 1.7; }
 .order { background: #fff; border: 1px solid #dedbcf; padding: 26px; }

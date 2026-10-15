@@ -110,20 +110,28 @@ function useCompare() {
   if (!context) throw new Error("B2BCompareProvider required");
   return context;
 }
-export function B2BCompareButton({ productId }: { productId: string }) {
+export function B2BCompareButton({
+  productId,
+  compact = false,
+}: {
+  productId: string;
+  compact?: boolean;
+}) {
   const { t } = useB2BTranslations();
   const { ids, ready, toggle } = useCompare();
   const selected = ids.includes(productId);
   return (
     <button
-      className={s.toggle}
+      className={compact ? s.iconToggle : s.toggle}
       type="button"
       aria-pressed={selected}
+      aria-label={selected ? t("Remove product from compare") : t("Add product to compare")}
+      title={selected ? t("Remove from compare") : t("Add to compare")}
       disabled={!ready}
       onClick={() => toggle(productId)}
     >
       <ScaleIcon aria-hidden="true" />
-      {selected ? t("Added to compare") : t("Compare")}
+      {!compact && (selected ? t("Added to compare") : t("Compare"))}
     </button>
   );
 }

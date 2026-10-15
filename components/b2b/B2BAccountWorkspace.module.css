@@ -358,6 +358,42 @@
   width: 18px;
   height: 18px;
 }
+
+:global(#launchpad-storefront) .workspace .companyUnitSelect { display:grid; gap:8px; max-width:380px; margin-bottom:20px; color:#526242; font-size:12px; }
+:global(#launchpad-storefront) .workspace .companyUnitSelect select,
+:global(#launchpad-storefront) .workspace .companySearch input { min-height:44px; border:1px solid #c9cbbf; background:#fff; padding:10px 12px; color:#333; }
+:global(#launchpad-storefront) .workspace .companyTabs { display:flex; gap:28px; border-bottom:1px solid #d9d8cf; margin-bottom:20px; overflow-x:auto; }
+:global(#launchpad-storefront) .workspace .companyTabs button { border:0; border-bottom:2px solid transparent; background:transparent; padding:12px 0 10px; color:#4d5148; cursor:pointer; white-space:nowrap; }
+:global(#launchpad-storefront) .workspace .companyTabs button[aria-selected="true"] { border-color:#64734d; color:#35402d; font-weight:600; }
+:global(#launchpad-storefront) .workspace .companyToolbar { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-bottom:20px; }
+:global(#launchpad-storefront) .workspace .companyToolbar > button { min-height:42px; padding:10px 18px; border:1px solid #65774d; cursor:pointer; }
+:global(#launchpad-storefront) .workspace .companyToolbar > button:disabled { opacity:.48; cursor:not-allowed; }
+:global(#launchpad-storefront) .workspace .companySearch { flex:0 1 380px; }
+:global(#launchpad-storefront) .workspace .companySearch input { width:100%; }
+:global(#launchpad-storefront) .workspace .companyTable { border:1px solid #dddcd3; background:#fff; overflow-x:auto; }
+:global(#launchpad-storefront) .workspace .companyTableHead,
+:global(#launchpad-storefront) .workspace .companyTableRow { display:grid; grid-template-columns:minmax(200px,1.3fr) minmax(200px,1fr) 90px; min-width:620px; align-items:center; }
+:global(#launchpad-storefront) .workspace .companyTableHead { background:#ebe9e1; color:#65685f; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+:global(#launchpad-storefront) .workspace .companyTableHead span,
+:global(#launchpad-storefront) .workspace .companyTableRow > span { padding:14px 16px; overflow-wrap:anywhere; }
+:global(#launchpad-storefront) .workspace .companyTableRow { border-top:1px solid #e6e5df; font-size:12px; color:#43483f; }
+:global(#launchpad-storefront) .workspace .companyTableRow:first-of-type { border-top:0; }
+:global(#launchpad-storefront) .workspace .companyTableRow > span:last-child { display:flex; justify-content:flex-end; gap:8px; }
+:global(#launchpad-storefront) .workspace .companyTableRow button { border:0; background:transparent; color:#7b5a35; padding:4px; cursor:pointer; }
+:global(#launchpad-storefront) .workspace .companyTableRow .removeLink { color:#a74637; }
+:global(#launchpad-storefront) .workspace .addressGrid { grid-template-columns:minmax(160px,1.3fr) minmax(170px,1.3fr) minmax(110px,.8fr) minmax(110px,.8fr) 100px 100px 120px; min-width:1040px; }
+:global(#launchpad-storefront) .workspace .associateGrid { grid-template-columns:minmax(180px,1fr) minmax(240px,1.4fr) minmax(180px,1fr) 130px; min-width:760px; }
+:global(#launchpad-storefront) .workspace .unitGrid { grid-template-columns:minmax(170px,1fr) minmax(220px,1.3fr) minmax(150px,.8fr) minmax(200px,1fr) 80px; min-width:900px; }
+:global(#launchpad-storefront) .workspace .modalBackdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:24px; background:rgb(20 24 18 / .55); }
+:global(#launchpad-storefront) .workspace .companyModal { width:min(650px,100%); max-height:90vh; overflow:auto; background:#fff; padding:24px; box-shadow:0 22px 70px rgb(0 0 0 / .25); }
+:global(#launchpad-storefront) .workspace .modalHead { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e0e0d8; padding-bottom:16px; margin-bottom:20px; }
+:global(#launchpad-storefront) .workspace .modalHead h2 { margin:0; font-size:22px; font-weight:500; }
+:global(#launchpad-storefront) .workspace .modalHead button { border:0; background:transparent; font-size:28px; cursor:pointer; }
+:global(#launchpad-storefront) .workspace .roleChoices { display:grid; gap:10px; border:1px solid #d7dacd; padding:16px; }
+:global(#launchpad-storefront) .workspace .roleChoices legend { padding:0 6px; color:#526242; font-size:12px; }
+:global(#launchpad-storefront) .workspace .roleChoices label { display:grid; grid-template-columns:18px 1fr; font-size:13px; }
+:global(#launchpad-storefront) .workspace .roleChoices small { grid-column:2; color:#7c8176; }
+@media (max-width:700px) { :global(#launchpad-storefront) .workspace .companyToolbar { align-items:stretch; flex-direction:column; } :global(#launchpad-storefront) .workspace .companySearch { flex-basis:auto; } }
 :global(#launchpad-storefront) .workspace .logout:disabled {
   opacity: 0.5;
   cursor: not-allowed;
