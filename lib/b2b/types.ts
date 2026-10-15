@@ -19,6 +19,19 @@ export type B2BContext = {
   country: string;
   distributionChannelId: string;
 };
+export type B2BProductVariant = {
+  id: number;
+  sku: string;
+  image: string;
+  /** Every variant image, master image first; falls back to `image` when absent. */
+  images?: string[];
+  price: Money | null;
+  /** The undiscounted contract price, present only while a discount applies. */
+  originalPrice?: Money | null;
+  attributes: { name: string; label?: string; value: string }[];
+  /** Absent when inventory is not tracked for the variant. */
+  availability?: { isOnStock: boolean; availableQuantity?: number };
+};
 export type B2BProduct = {
   id: string;
   slug: string;
@@ -28,13 +41,7 @@ export type B2BProduct = {
   categoryIds?: string[];
   image: string;
   images: string[];
-  variants: {
-    id: number;
-    sku: string;
-    image: string;
-    price: Money | null;
-    attributes: { name: string; value: string }[];
-  }[];
+  variants: B2BProductVariant[];
   price: Money | null;
 };
 export type B2BState = {

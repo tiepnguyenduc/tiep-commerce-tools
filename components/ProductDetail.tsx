@@ -21,6 +21,14 @@ import {
 } from "@/components/ProductReviews";
 import { productsToProductItems } from "@/components/ProductItemData";
 import { ProductStickyBar } from "@/components/ProductStickyBar";
+import {
+  colorValue,
+  isColorGroup,
+  optionGroupsFor,
+  selectedAttributeValue,
+  variantColor,
+  variantForOption,
+} from "@/lib/variant-options";
 import type {
   Product,
   ProductRatingSummary,
@@ -28,12 +36,6 @@ import type {
   ProductSpecification,
   ProductVariant,
 } from "@/lib/types";
-
-type OptionGroup = {
-  name: string;
-  label: string;
-  values: string[];
-};
 
 function fallbackVariant(product: Product): ProductVariant {
   return {
@@ -55,54 +57,8 @@ function fallbackVariant(product: Product): ProductVariant {
   };
 }
 
-function dedupeValues(values: string[]) {
-  return Array.from(new Set(values.filter(Boolean)));
-}
-
-function optionGroupsFor(variants: ProductVariant[]): OptionGroup[] {
-  const attributesByName = new Map<string, ProductSpecification[]>();
-
-  for (const variant of variants) {
-    for (const attribute of variant.attributes) {
-      const list = attributesByName.get(attribute.name) ?? [];
-      list.push(attribute);
-      attributesByName.set(attribute.name, list);
-    }
-  }
-
-  return Array.from(attributesByName.entries())
-    .map(([name, attributes]) => ({
-      name,
-      label: attributes[0]?.label ?? name,
-      values: dedupeValues(attributes.map((attribute) => attribute.value)),
-    }))
-    .filter(
-      (group) =>
-        group.values.length > 1 &&
-        group.values.length <= 12 &&
-        group.values.every((value) => value.length <= 36) &&
-        !/(code|specification|description|arrival|sku)/i.test(group.label),
-    );
-}
-
-function selectedAttributeValue(variant: ProductVariant, name: string) {
-  return variant.attributes.find((attribute) => attribute.name === name)?.value ?? "";
-}
-
 function variantLabel(variant: ProductVariant) {
   return variant.key || variant.sku || `Variant ${variant.id}`;
-}
-
-function variantColor(variant: ProductVariant) {
-  return (
-    variant.attributes.find((attribute) =>
-      /color label|search color/i.test(attribute.label),
-    )?.value ?? ""
-  );
-}
-
-function colorValue(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 function specificationRows(product: Product, variant: ProductVariant) {
@@ -214,27 +170,7 @@ export function ProductDetail({
     .join(" · ");
 
   function selectVariantOption(name: string, value: string) {
-    const nextSelections = new Map(
-      optionGroups.map((group) => [
-        group.name,
-        group.name === name
-          ? value
-          : selectedAttributeValue(selectedVariant, group.name),
-      ]),
-    );
-    const nextVariant =
-      variants.find((variant) =>
-        Array.from(nextSelections).every(
-          ([attributeName, selectedValue]) =>
-            !selectedValue ||
-            selectedAttributeValue(variant, attributeName) === selectedValue,
-        ),
-      ) ??
-      variants.find(
-        (variant) => selectedAttributeValue(variant, name) === value,
-      ) ??
-      selectedVariant;
-    setVariantId(nextVariant.id);
+    setVariantId(variantForOption(variants, optionGroups, selectedVariant, name, value).id);
   }
 
   function variantCards() {
@@ -354,7 +290,7 @@ export function ProductDetail({
                           onClick={() => selectVariantOption(group.name, value)}
                           type="button"
                         >
-                          {/(color|colour)/i.test(group.label) ? (
+                          {isColorGroup(group) ? (
                             <span
                               aria-hidden="true"
                               className="color-swatch"

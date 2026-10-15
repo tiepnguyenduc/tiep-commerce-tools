@@ -21,19 +21,30 @@ export function reviewQueryString({ offset = 0, search = "", ratings = [], withM
   return params.toString();
 }
 
-export async function loadProductReviews(productId: string, query: ProductReviewQuery = {}) {
+/** B2C reviews live under `/api/products`; the business storefront passes `/api/b2b/products`. */
+export const DEFAULT_REVIEWS_BASE_PATH = "/api/products";
+
+export async function loadProductReviews(
+  productId: string,
+  query: ProductReviewQuery = {},
+  basePath = DEFAULT_REVIEWS_BASE_PATH,
+) {
   const search = reviewQueryString(query);
 
   return readJson<ProductReviewPage>(await fetch(
-    `/api/products/${encodeURIComponent(productId)}/reviews${search ? `?${search}` : ""}`,
+    `${basePath}/${encodeURIComponent(productId)}/reviews${search ? `?${search}` : ""}`,
     { cache: "no-store" },
   ));
 }
 
 export type ReviewSubmission = Omit<ProductReviewInput, "media"> & { files?: File[] };
 
-export async function submitProductReview(productId: string, { files = [], ...input }: ReviewSubmission) {
-  const url = `/api/products/${encodeURIComponent(productId)}/reviews`;
+export async function submitProductReview(
+  productId: string,
+  { files = [], ...input }: ReviewSubmission,
+  basePath = DEFAULT_REVIEWS_BASE_PATH,
+) {
+  const url = `${basePath}/${encodeURIComponent(productId)}/reviews`;
 
   // Media has to travel as multipart; a plain draft stays JSON.
   if (!files.length) {

@@ -11,7 +11,7 @@ import type {
   ProductReviewQuery,
   ReviewSortOrder,
 } from "../types";
-import { getApiRoot } from "./client";
+import { getApiRoot, getB2BApiRoot } from "./client";
 import { sanitizeStoredMedia } from "./review-media";
 
 const PAGE_SIZE = 5;
@@ -26,6 +26,13 @@ const SCAN_LIMIT = 500;
 /** Custom type carrying the media a shopper attached to a review. */
 export const REVIEW_MEDIA_TYPE_KEY = "storefront-review-media";
 const MEDIA_FIELD = "media";
+
+/** B2C and B2B storefronts read and write reviews in their own commercetools project. */
+export type ReviewCatalog = "b2c" | "b2b";
+
+function apiRootFor(catalog: ReviewCatalog) {
+  return catalog === "b2b" ? getB2BApiRoot() : getApiRoot();
+}
 
 declare global {
   var __trainingProductReviews: Map<string, ProductReview[]> | undefined;
@@ -80,8 +87,8 @@ function trainingReviews(productId: string) {
 }
 
 /** Every review of a product, newest first, capped at {@link SCAN_LIMIT}. */
-async function scanProductReviews(productId: string): Promise<ProductReview[]> {
-  const apiRoot = getApiRoot();
+async function scanProductReviews(productId: string, catalog: ReviewCatalog): Promise<ProductReview[]> {
+  const apiRoot = apiRootFor(catalog);
   if (!apiRoot) return trainingReviews(productId).reviews;
 
   const { body } = await apiRoot.reviews().get({
@@ -173,8 +180,9 @@ function summarize(reviews: ProductReview[]): ProductRatingSummary {
 export async function readProductReviews(
   productId: string,
   query: ProductReviewQuery = {},
+  catalog: ReviewCatalog = "b2c",
 ): Promise<ProductReviewPage> {
-  const all = await scanProductReviews(productId);
+  const all = await scanProductReviews(productId, catalog);
   const offset = Math.max(0, query.offset ?? 0);
   const matching = sortReviews(all.filter((review) => matchesQuery(review, query)), query.sort ?? "newest");
 
@@ -192,17 +200,20 @@ export async function readProductReviews(
  * reviews rather than commercetools' asynchronously recalculated statistics, so a
  * review a shopper just wrote counts immediately.
  */
-export async function readProductReviewSummary(productId: string): Promise<ProductRatingSummary> {
-  return summarize(await scanProductReviews(productId));
+export async function readProductReviewSummary(
+  productId: string,
+  catalog: ReviewCatalog = "b2c",
+): Promise<ProductRatingSummary> {
+  return summarize(await scanProductReviews(productId, catalog));
 }
 
 type ApiRoot = NonNullable<ReturnType<typeof getApiRoot>>;
 
-let mediaTypeReady = false;
+const mediaTypeReady = new Set<ReviewCatalog>();
 
-/** Creates the custom type holding review media once per process. */
-async function ensureReviewMediaType(apiRoot: ApiRoot) {
-  if (mediaTypeReady) return;
+/** Creates the custom type holding review media once per process and project. */
+async function ensureReviewMediaType(apiRoot: ApiRoot, catalog: ReviewCatalog) {
+  if (mediaTypeReady.has(catalog)) return;
 
   try {
     await apiRoot.types().withKey({ key: REVIEW_MEDIA_TYPE_KEY }).get().execute();
@@ -231,16 +242,17 @@ async function ensureReviewMediaType(apiRoot: ApiRoot) {
     }
   }
 
-  mediaTypeReady = true;
+  mediaTypeReady.add(catalog);
 }
 
 export async function createProductReview(
   productId: string,
   input: ProductReviewInput,
+  catalog: ReviewCatalog = "b2c",
 ): Promise<ProductReview> {
   const media = input.media ?? [];
   const { media: _ignored, ...fields } = input;
-  const apiRoot = getApiRoot();
+  const apiRoot = apiRootFor(catalog);
 
   if (!apiRoot) {
     const { store, reviews } = trainingReviews(productId);
@@ -258,7 +270,7 @@ export async function createProductReview(
   await apiRoot.productProjections().withId({ ID: productId }).get({
     queryArgs: { staged: false },
   }).execute();
-  if (media.length) await ensureReviewMediaType(apiRoot);
+  if (media.length) await ensureReviewMediaType(apiRoot, catalog);
 
   const { body } = await apiRoot.reviews().post({
     body: {

@@ -1,0 +1,543 @@
+/*
+  The B2B shell carries `.ct-ui`, whose global reset (`#launchpad-storefront .ct-ui *`)
+  zeroes borders, and Tailwind utilities are scoped to the same ID. Rules are therefore
+  scoped to `#launchpad-storefront` too, as in B2BAccountWorkspace.module.css.
+*/
+:global(#launchpad-storefront) .gallery {
+  min-width: 0;
+  background: #fff;
+}
+
+/* ---------- Identity ---------- */
+:global(#launchpad-storefront) .meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .sku {
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: #6b6f62;
+  text-transform: uppercase;
+}
+:global(#launchpad-storefront) .sku strong {
+  margin-left: 4px;
+  color: var(--ink);
+  font-weight: 650;
+}
+:global(#launchpad-storefront) .brand {
+  margin: -14px 0 14px;
+  font-size: 12px;
+  color: #6b6f62;
+}
+:global(#launchpad-storefront) .brand strong {
+  margin-left: 4px;
+  color: var(--ink);
+}
+:global(#launchpad-storefront) .rating {
+  margin: -10px 0 14px;
+}
+:global(#launchpad-storefront) .summary {
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #5a5e54;
+}
+
+/* ---------- Price ---------- */
+:global(#launchpad-storefront) .priceBlock {
+  display: grid;
+  gap: 8px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+:global(#launchpad-storefront) .priceBlock p {
+  margin: 0;
+}
+:global(#launchpad-storefront) .price {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+}
+:global(#launchpad-storefront) .onSale span {
+  color: #a2442a;
+}
+:global(#launchpad-storefront) .wasPrice {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #8a8d82;
+}
+:global(#launchpad-storefront) .noPrice {
+  font-size: 15px;
+  font-weight: 650;
+  color: #5b6053;
+}
+:global(#launchpad-storefront) .priceMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: #6b6f62;
+}
+:global(#launchpad-storefront) .inStock,
+:global(#launchpad-storefront) .outOfStock {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 650;
+}
+:global(#launchpad-storefront) .inStock {
+  color: #4f6b3a;
+}
+:global(#launchpad-storefront) .inStock svg {
+  width: 15px;
+  height: 15px;
+}
+:global(#launchpad-storefront) .outOfStock {
+  color: #a2442a;
+}
+
+/* ---------- Variants ---------- */
+:global(#launchpad-storefront) .variants {
+  display: grid;
+  gap: 20px;
+  padding: 22px 0 2px;
+}
+:global(#launchpad-storefront) .variants fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+:global(#launchpad-storefront) .variants legend {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 650;
+}
+:global(#launchpad-storefront) .variants legend span {
+  font-weight: 400;
+  color: #6b6f62;
+}
+:global(#launchpad-storefront) .variantCards {
+  display: grid;
+  gap: 8px;
+  max-height: 290px;
+  overflow-y: auto;
+}
+:global(#launchpad-storefront) .variantCard {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+:global(#launchpad-storefront) .variantCard:hover {
+  border-color: #9a9c90;
+}
+:global(#launchpad-storefront) .variantCard[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+:global(#launchpad-storefront) .variantMedia {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  background: #f7f6f2;
+}
+:global(#launchpad-storefront) .variantMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+:global(#launchpad-storefront) .variantMedia .swatch {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+}
+:global(#launchpad-storefront) .variantCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+:global(#launchpad-storefront) .variantCopy strong,
+:global(#launchpad-storefront) .variantCopy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .variantCopy strong {
+  font-size: 12px;
+}
+:global(#launchpad-storefront) .variantCopy small {
+  font-size: 11px;
+  color: #6b6f62;
+}
+:global(#launchpad-storefront) .variantState {
+  font-size: 11px;
+  color: #6b6f62;
+}
+:global(#launchpad-storefront) .variantCard[aria-pressed="true"] .variantState {
+  color: var(--ink);
+  font-weight: 650;
+}
+:global(#launchpad-storefront) .optionList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:global(#launchpad-storefront) .option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+:global(#launchpad-storefront) .option:hover {
+  border-color: #9a9c90;
+}
+:global(#launchpad-storefront) .option[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+:global(#launchpad-storefront) .swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+}
+
+/* ---------- Buy box ---------- */
+:global(#launchpad-storefront) .buyBox {
+  display: grid;
+  gap: 12px;
+  padding-top: 22px;
+}
+:global(#launchpad-storefront) .purchase {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "label ."
+    "stepper add";
+  gap: 8px 12px;
+  align-items: stretch;
+}
+:global(#launchpad-storefront) .quantityLabel {
+  grid-area: label;
+  font-size: 12px;
+  font-weight: 650;
+}
+/* Quantity stepper: same height and frame as the primary action beside it. */
+:global(#launchpad-storefront) .buyBox .purchase .stepper,
+:global(#launchpad-storefront) .stickyPurchase .stepper.stepper {
+  grid-area: stepper;
+  gap: 0;
+  height: 48px;
+  border: 1px solid #c9cabe;
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+}
+:global(#launchpad-storefront) .buyBox .purchase .stepper:hover,
+:global(#launchpad-storefront) .stickyPurchase .stepper.stepper:hover {
+  border-color: var(--ink);
+}
+:global(#launchpad-storefront) .stepper button {
+  width: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+:global(#launchpad-storefront) .stepper button:hover:not(:disabled) {
+  background: #f1efe8;
+}
+:global(#launchpad-storefront) .stepper button:disabled {
+  background: transparent;
+  color: #b9bbb1;
+  cursor: not-allowed;
+}
+:global(#launchpad-storefront) .stepper input,
+:global(#launchpad-storefront) .stepper output {
+  width: 52px;
+  height: 100%;
+  border: 0;
+  border-left: 1px solid #e3e1d8;
+  border-right: 1px solid #e3e1d8;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+  text-align: center;
+}
+:global(#launchpad-storefront) .stepper input:focus-visible {
+  outline: 2px solid #9a712e;
+  outline-offset: -2px;
+}
+:global(#launchpad-storefront) .buyBox .purchase .stepper[class*="cursor-not-allowed"] {
+  background: #f1efe8;
+}
+:global(#launchpad-storefront) .purchase .addButton {
+  grid-area: add;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+:global(#launchpad-storefront) .purchase .addButton:hover:not(:disabled) {
+  background: #1f291e;
+  box-shadow: 0 7px 20px rgba(35, 42, 31, 0.22);
+}
+:global(#launchpad-storefront) .purchase .addButton:disabled {
+  border-color: #b5b7ad;
+  background: #b5b7ad;
+  opacity: 1;
+}
+:global(#launchpad-storefront) .purchase .addButton svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .inBag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  color: #4f6b3a;
+}
+:global(#launchpad-storefront) .inBag svg {
+  width: 15px;
+  height: 15px;
+}
+:global(#launchpad-storefront) .inBag a {
+  margin-left: auto;
+  color: var(--ink);
+  font-weight: 650;
+}
+/* Compare and wishlist: two equal outlined buttons under the primary action. */
+:global(#launchpad-storefront) .secondaryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+:global(#launchpad-storefront) .secondaryActions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #c9cabe;
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+:global(#launchpad-storefront) .secondaryActions > button:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: #faf9f5;
+}
+:global(#launchpad-storefront) .secondaryActions > button[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: #f1efe8;
+  color: var(--ink);
+}
+:global(#launchpad-storefront) .secondaryActions > button[aria-pressed="true"] svg {
+  color: #a2442a;
+  fill: currentColor;
+}
+:global(#launchpad-storefront) .secondaryActions > button:first-child[aria-pressed="true"] svg {
+  color: var(--ink);
+  fill: none;
+}
+:global(#launchpad-storefront) .secondaryActions > button svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .notice {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5a5e54;
+}
+
+/* ---------- Delivery ---------- */
+:global(#launchpad-storefront) .shipping {
+  margin-top: 28px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 12px;
+}
+:global(#launchpad-storefront) .shipping > strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .shipping dl {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+:global(#launchpad-storefront) .shipping dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .shipping dt {
+  font-weight: 650;
+}
+:global(#launchpad-storefront) .shipping dd {
+  margin: 0;
+  color: #62665a;
+}
+:global(#launchpad-storefront) .shipping p {
+  margin: 0;
+  color: #6b6f62;
+  line-height: 1.6;
+}
+:global(#launchpad-storefront) .shipping .shippingNote {
+  display: grid;
+  gap: 2px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+:global(#launchpad-storefront) .shippingNote strong {
+  color: var(--ink);
+}
+
+/* ---------- Below the fold ---------- */
+:global(#launchpad-storefront) .tabs {
+  margin-top: 64px;
+}
+:global(#launchpad-storefront) .description {
+  max-width: 860px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #555a50;
+  white-space: pre-line;
+}
+:global(#launchpad-storefront) .section {
+  margin-top: 72px;
+}
+:global(#launchpad-storefront) .section h2 {
+  margin: 10px 0 28px;
+  font-size: 28px;
+  letter-spacing: -0.8px;
+}
+
+/* ---------- Sticky bar ---------- */
+:global(#launchpad-storefront) .stickyInner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding-left: var(--content-gutter);
+  padding-right: var(--content-gutter);
+}
+:global(#launchpad-storefront) .stickyPurchase .stepper.stepper {
+  height: 44px;
+}
+:global(#launchpad-storefront) .stickyPurchase .stepper button {
+  width: 38px;
+}
+:global(#launchpad-storefront) .stickyPurchase .stepper input,
+:global(#launchpad-storefront) .stickyPurchase .stepper output {
+  width: 46px;
+}
+:global(#launchpad-storefront) .stickyAdd {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .stickyAdd:hover:not(:disabled) {
+  background: #1f291e;
+}
+:global(#launchpad-storefront) .stickyAdd:disabled {
+  border-color: #b5b7ad;
+  background: #b5b7ad;
+  opacity: 1;
+}
+:global(#launchpad-storefront) .stickyAdd[data-state="added"] {
+  border-color: #536040;
+  background: #536040;
+}
+:global(#launchpad-storefront) .stickyAdd svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 1000px) {
+  :global(#launchpad-storefront) .tabs,
+  :global(#launchpad-storefront) .section {
+    margin-top: 48px;
+  }
+}
+@media (max-width: 700px) {
+  :global(#launchpad-storefront) .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  :global(#launchpad-storefront) .price {
+    font-size: 26px;
+  }
+  :global(#launchpad-storefront) .secondaryActions > button {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  :global(#launchpad-storefront) .stickyAdd span {
+    display: none;
+  }
+}

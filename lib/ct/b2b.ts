@@ -11,7 +11,7 @@ import type {
 } from "@commercetools/platform-sdk";
 import { getB2BApiRoot as getApiRoot } from "./client";
 import { mapCommercetoolsCart, mapMoney } from "./mappers";
-import { formatAttributeValue } from "./catalog-mappers";
+import { attributeLabel, formatAttributeValue } from "./catalog-mappers";
 import type {
   B2BAction,
   B2BContext,
@@ -167,19 +167,35 @@ export function mapB2BProduct(
       v.price.value.currencyCode === context.currency
         ? v.price
         : undefined;
+    const images = (v.images ?? []).map((i) => i.url).filter(Boolean);
     return {
       id: v.id,
       sku: v.sku || "",
-      image: v.images?.[0]?.url || "",
+      image: images[0] || "",
+      images,
       price: selected
         ? mapMoney(selected.discounted?.value ?? selected.value, locale)
+        : null,
+      originalPrice: selected?.discounted
+        ? mapMoney(selected.value, locale)
         : null,
       attributes: (v.attributes ?? [])
         .map((a) => ({
           name: a.name,
+          label: attributeLabel(a.name),
           value: formatAttributeValue(a.value, locale),
         }))
         .filter((a) => a.value !== ""),
+      ...(typeof v.availability?.isOnStock === "boolean"
+        ? {
+            availability: {
+              isOnStock: v.availability.isOnStock,
+              ...(typeof v.availability.availableQuantity === "number"
+                ? { availableQuantity: v.availability.availableQuantity }
+                : {}),
+            },
+          }
+        : {}),
     };
   };
   const variants = [product.masterVariant, ...product.variants].map(variant);

@@ -11,7 +11,7 @@ import type { Product, ProductVariant } from "@/lib/types";
  * Publishes the bar's height so the document can reserve the strip it covers at the
  * bottom of the viewport. Nothing the shopper needs ever ends up behind the bar.
  */
-function useReservedSpace(barRef: RefObject<HTMLDivElement | null>) {
+export function useReservedSpace(barRef: RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const bar = barRef.current;
     if (!bar) return;

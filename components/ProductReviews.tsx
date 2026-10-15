@@ -86,6 +86,8 @@ export function ProductReviewsProvider({
   initialSummary = null,
   initialError = "",
   onRevealReviews,
+  apiBasePath,
+  onBeforeWrite,
   children,
 }: {
   productId: string;
@@ -95,6 +97,10 @@ export function ProductReviewsProvider({
   initialError?: string;
   /** Lets the page open the tab holding the reviews before we scroll to them. */
   onRevealReviews?: () => void;
+  /** Review API root for this storefront; defaults to the B2C `/api/products`. */
+  apiBasePath?: string;
+  /** Return false to keep the review form closed, e.g. to send a guest to sign in. */
+  onBeforeWrite?: () => boolean;
   children: ReactNode;
 }) {
   const showToast = useToast();
@@ -133,7 +139,7 @@ export function ProductReviewsProvider({
     setLoading(true);
     setListError("");
 
-    loadProductReviews(productId, query)
+    loadProductReviews(productId, query, apiBasePath)
       .then((result) => !cancelled && setPage(result))
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -144,7 +150,7 @@ export function ProductReviewsProvider({
     return () => {
       cancelled = true;
     };
-  }, [productId, query]);
+  }, [productId, query, apiBasePath]);
 
   // Typing filters the list without a request per keystroke.
   useEffect(() => {
@@ -187,7 +193,7 @@ export function ProductReviewsProvider({
           text: values.text,
           rating: values.rating,
           files: values.media.map((item) => item.file),
-        });
+        }, apiBasePath);
 
         setSummary((current) => withReview(current, review));
         setHighlightedReviewId(review.id);
@@ -209,7 +215,7 @@ export function ProductReviewsProvider({
         setSubmitting(false);
       }
     },
-    [productId, revealReviews, showToast, submitting],
+    [productId, revealReviews, showToast, submitting, apiBasePath],
   );
 
   /**
@@ -244,6 +250,7 @@ export function ProductReviewsProvider({
       query,
       searchValue,
       openForm: () => {
+        if (onBeforeWrite?.() === false) return;
         setSubmitError("");
         setFormOpen(true);
       },
@@ -265,6 +272,7 @@ export function ProductReviewsProvider({
       changeQuery,
       resetFilters,
       revealReviews,
+      onBeforeWrite,
     ],
   );
 
