@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import useSWR from "swr";
 import type { CompanyAddress, CompanyAssociate, CompanyWorkspace } from "@/lib/b2b/company-types";
 import { countryDisplayName } from "@/lib/storefront-countries";
+import { useToast } from "@/components/Toast";
 import { useB2B } from "./B2BProvider";
 import { useB2BTranslations } from "./useB2BTranslations";
 import s from "./B2BAccountWorkspace.module.css";
@@ -29,8 +30,7 @@ export function B2BCompanyWorkspace() {
   const [search, setSearch] = useState("");
   const [editor, setEditor] = useState<Editor>(null);
   const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const [actionError, setActionError] = useState("");
+  const showToast = useToast();
   const company = data?.company;
   useEffect(() => {
     if (!company?.units.length) return;
@@ -46,7 +46,7 @@ export function B2BCompanyWorkspace() {
 
   async function submit(body: Record<string, unknown>, success: string) {
     if (busy) return false;
-    setBusy(true); setActionError(""); setFeedback("");
+    setBusy(true);
     try {
       const response = await fetch("/api/b2b/company", {
         method: "PATCH", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -55,9 +55,9 @@ export function B2BCompanyWorkspace() {
       if (!response.ok) throw new Error(result.error || "The change could not be completed.");
       await mutate(result, { revalidate: false });
       await reload();
-      setEditor(null); setFeedback(success); return true;
+      setEditor(null); showToast(success, "success"); return true;
     } catch (problem) {
-      setActionError(problem instanceof Error ? problem.message : "The change could not be completed.");
+      showToast(problem instanceof Error ? problem.message : "The change could not be completed.", "error");
       return false;
     } finally { setBusy(false); }
   }
@@ -80,8 +80,6 @@ export function B2BCompanyWorkspace() {
     <div className={s.companyTabs} role="tablist" aria-label="Company sections">
       {tabs.map((item) => <button key={item.id} role="tab" aria-selected={tab === item.id} onClick={() => { setTab(item.id); setSearch(""); setEditor(null); }}>{t(item.label)}</button>)}
     </div>
-    {feedback && <p className={s.feedback} role="status">{feedback}</p>}
-    {actionError && <p className={`${s.feedback} ${s.error}`} role="alert">{actionError}</p>}
 
     {tab !== "company" && <div className={s.companyToolbar}>
       <label className={s.companySearch}><span className="sr-only">Search</span><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search…" /></label>

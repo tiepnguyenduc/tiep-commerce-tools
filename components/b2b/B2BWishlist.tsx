@@ -360,13 +360,11 @@ export function B2BWishlistPage() {
   const [renameTarget, setRenameTarget] = useState<Wishlist | null>(null);
   const [renameName, setRenameName] = useState("");
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState("");
   const showToast = useToast();
   const selected = useMemo(() => wishlists.find((entry) => entry.id === selectedId) ?? null, [selectedId, wishlists]);
 
   useEffect(() => {
     setSelectedId(null);
-    setFeedback("");
   }, [state?.customer?.id]);
 
   async function submitCreate(event: FormEvent<HTMLFormElement>) {
@@ -462,14 +460,13 @@ export function B2BWishlistPage() {
                     <p>{state.context ? variant?.price?.formatted || "Price unavailable" : "Select a store for pricing"}</p>
                     <div className={s.actions}>
                       <button type="button" disabled={pending !== null} onClick={async () => { try { await removeLine(selected.id, line.id); showToast("Item removed from the wishlist.", "success"); } catch (requestError) { showToast(requestError instanceof Error ? requestError.message : "Could not remove the item.", "error"); } }}>Remove</button>
-                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); setFeedback(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again."); }}>Add 1 to bag</button>}
+                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); showToast(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again.", success ? "success" : "error"); }}>Add 1 to bag</button>}
                     </div>
                   </article>
                 );
               })}
             </div>
           )}
-          {feedback && <p className={s.feedback} role="status">{feedback} <Link href="/b2b/cart">View business bag →</Link></p>}
           {modal}
         </div>
       ) : (

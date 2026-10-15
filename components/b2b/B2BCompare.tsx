@@ -16,6 +16,7 @@ import {
   resolveBusinessCompare,
   toggleBusinessCompare,
 } from "@/lib/b2b/compare";
+import { useToast } from "@/components/Toast";
 import { useB2B } from "./B2BProvider";
 import s from "./B2BCompare.module.css";
 const Context = createContext<{
@@ -28,7 +29,8 @@ export function B2BCompareProvider({ children }: { children: ReactNode }) {
   const { state } = useB2B();
   const key = state ? businessCompareKey(state) : "";
   const [selection, setSelection] = useState({ key: "", ids: [] as string[] });
-  const [message, setMessage] = useState("");
+  const { t } = useB2BTranslations();
+  const showToast = useToast();
   const ready = Boolean(key && selection.key === key);
   const ids = ready ? selection.ids : [];
   useEffect(() => {
@@ -41,7 +43,6 @@ export function B2BCompareProvider({ children }: { children: ReactNode }) {
         /* Storage is optional. */
       }
       setSelection({ key, ids });
-      setMessage("");
     };
     read();
     const onStorage = (event: StorageEvent) => {
@@ -57,21 +58,24 @@ export function B2BCompareProvider({ children }: { children: ReactNode }) {
     } catch {
       /* Keep the selection available for this visit. */
     }
-    setMessage(feedback);
+    showToast(feedback, "success");
   }
   function toggle(id: string) {
     if (!ready) return;
     if (!ids.includes(id) && ids.length >= B2B_COMPARE_LIMIT) {
-      setMessage(
-        `Compare up to ${B2B_COMPARE_LIMIT} products. Remove a product before adding another.`,
+      showToast(
+        t("Compare up to {count} products. Remove a product before adding another.", {
+          count: B2B_COMPARE_LIMIT,
+        }),
+        "error",
       );
       return;
     }
     save(
       toggleBusinessCompare(ids, id),
       ids.includes(id)
-        ? "Product removed from comparison."
-        : "Product added to comparison.",
+        ? t("Product removed from comparison.")
+        : t("Product added to comparison."),
     );
   }
   return (
@@ -80,28 +84,10 @@ export function B2BCompareProvider({ children }: { children: ReactNode }) {
         ids,
         ready,
         toggle,
-        clear: () => save([], "Comparison cleared."),
+        clear: () => save([], t("Comparison cleared.")),
       }}
     >
       {children}
-      <div
-        className={message ? s.feedback : s.srOnly}
-        role="status"
-        aria-live="polite"
-      >
-        {message && (
-          <>
-            <span>{message}</span>
-            <button
-              type="button"
-              aria-label="Dismiss comparison notification"
-              onClick={() => setMessage("")}
-            >
-              ×
-            </button>
-          </>
-        )}
-      </div>
     </Context.Provider>
   );
 }

@@ -535,11 +535,6 @@ function ProductView({
                 <B2BSaveButton productId={p.id} variantId={variant.id} />
               </div>
             </form>
-            {status === "added" && (
-              <p role="status" className={d.notice}>
-                {t("Added to your bag.")} <Link href="/b2b/cart">{t("View bag →")}</Link>
-              </p>
-            )}
             {!state?.context && (
               <p className={d.notice}>
                 <Link href="/b2b/account" className={s.textLink}>

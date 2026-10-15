@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
+import { useToast } from "@/components/Toast";
 import { useB2B } from "./B2BProvider";
 import type { B2BAccountProfile } from "@/lib/b2b/account-types";
 export function useB2BAccountProfile() {
@@ -25,13 +26,8 @@ export function useB2BAccountProfile() {
     { shouldRetryOnError: false, revalidateOnFocus: false },
   );
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
-  const [actionError, setActionError] = useState("");
+  const showToast = useToast();
   const lock = useRef(false);
-  useEffect(() => {
-    setMessage("");
-    setActionError("");
-  }, [customerId]);
   async function submit(
     body: Record<string, unknown>,
     success: string,
@@ -40,8 +36,6 @@ export function useB2BAccountProfile() {
     if (lock.current || !customerId) return false;
     lock.current = true;
     setBusy(true);
-    setMessage("");
-    setActionError("");
     try {
       const response = await fetch("/api/b2b/account", {
         method,
@@ -77,13 +71,14 @@ export function useB2BAccountProfile() {
       }
       await mutate(result, { revalidate: false });
       await reload();
-      setMessage(success);
+      showToast(success, "success");
       return true;
     } catch (error) {
-      setActionError(
+      showToast(
         error instanceof Error
           ? error.message
           : "The change could not be completed.",
+        "error",
       );
       return false;
     } finally {
@@ -96,8 +91,6 @@ export function useB2BAccountProfile() {
     loading: isLoading,
     error: error?.message as string | undefined,
     busy,
-    message,
-    actionError,
     submit,
     retry: () => {
       void mutate();

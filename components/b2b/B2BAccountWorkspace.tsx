@@ -201,26 +201,6 @@ export function AccountAddress({ address }: { address?: B2BAccountAddress }) {
     </address>
   );
 }
-function Feedback({
-  account,
-}: {
-  account: ReturnType<typeof useB2BAccountProfile>;
-}) {
-  return (
-    <>
-      {account.message && (
-        <p className={s.feedback} role="status">
-          {account.message}
-        </p>
-      )}
-      {account.actionError && (
-        <p className={`${s.feedback} ${s.error}`} role="alert">
-          {account.actionError}
-        </p>
-      )}
-    </>
-  );
-}
 function AccountLoad({
   account,
   children,
@@ -243,7 +223,6 @@ function AccountLoad({
     </div>
   ) : (
     <>
-      <Feedback account={account} />
       {children}
     </>
   );

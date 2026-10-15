@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/commercetools-ui/atoms/button";
 import Input from "@/components/commercetools-ui/atoms/input";
+import { useToast } from "@/components/Toast";
 import { useB2B } from "./B2BProvider";
 import s from "./B2B.module.css";
 export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
@@ -11,7 +12,7 @@ export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
   const Container = embedded ? "div" : "main";
   const { state, busy, act } = useB2B();
   const [register, setRegister] = useState(false);
-  const [success, setSuccess] = useState("");
+  const showToast = useToast();
   const [managedUnit, setManagedUnit] = useState("");
   const unit =
     state?.businessUnits.find(
@@ -42,11 +43,6 @@ export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
         <Link href="/b2b/compare">Compare equipment →</Link>
         <Link href="/b2b/categories">Browse categories →</Link>
       </nav>
-      {success && (
-        <p role="status" className={s.success}>
-          {success}
-        </p>
-      )}
       {!state ? (
         <p className={s.empty}>Loading your account…</p>
       ) : !state.customer ? (
@@ -208,8 +204,9 @@ export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
                         name: String(d.get("name")),
                       })
                     ) {
-                      setSuccess(
+                      showToast(
                         "Company created. Your business is ready for store assignment.",
+                        "success",
                       );
                       f.reset();
                     }
@@ -260,8 +257,9 @@ export function B2BAccount({ embedded = false }: { embedded?: boolean }) {
                         email: String(d.get("email")),
                       })
                     ) {
-                      setSuccess(
+                      showToast(
                         "The account has been assigned to your business unit.",
+                        "success",
                       );
                       f.reset();
                     }

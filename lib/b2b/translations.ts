@@ -1458,6 +1458,38 @@ const messages: Record<
     "Galeria de {name}",
     "Galerij van {name}",
   ],
+  "Product added to comparison.": [
+    "Produkt zum Vergleich hinzugefügt.",
+    "Producto añadido a la comparación.",
+    "Produit ajouté à la comparaison.",
+    "Prodotto aggiunto al confronto.",
+    "Produto adicionado à comparação.",
+    "Product toegevoegd aan vergelijking.",
+  ],
+  "Product removed from comparison.": [
+    "Produkt aus dem Vergleich entfernt.",
+    "Producto eliminado de la comparación.",
+    "Produit retiré de la comparaison.",
+    "Prodotto rimosso dal confronto.",
+    "Produto removido da comparação.",
+    "Product verwijderd uit vergelijking.",
+  ],
+  "Comparison cleared.": [
+    "Vergleich geleert.",
+    "Comparación vaciada.",
+    "Comparaison effacée.",
+    "Confronto svuotato.",
+    "Comparação limpa.",
+    "Vergelijking gewist.",
+  ],
+  "Compare up to {count} products. Remove a product before adding another.": [
+    "Vergleichen Sie bis zu {count} Produkte. Entfernen Sie ein Produkt, bevor Sie ein weiteres hinzufügen.",
+    "Compara hasta {count} productos. Elimina uno antes de añadir otro.",
+    "Comparez jusqu’à {count} produits. Retirez-en un avant d’en ajouter un autre.",
+    "Confronta fino a {count} prodotti. Rimuovine uno prima di aggiungerne un altro.",
+    "Compare até {count} produtos. Remova um antes de adicionar outro.",
+    "Vergelijk maximaal {count} producten. Verwijder er een voordat u een ander toevoegt.",
+  ],
 };
 const languages = ["de", "es", "fr", "it", "pt", "nl"];
 export function translateBusiness(

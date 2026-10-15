@@ -35,7 +35,5 @@
 .empty h2 { font-size:24px; }.empty p { max-width:470px; margin:16px auto 24px; color:#58604f; line-height:1.65; }
 .empty a { font-size:14px; font-weight:600; }
 .note,.unavailable p { font-size:12px; color:#606658; line-height:1.65; }
-.feedback { position:fixed; z-index:200; bottom:calc(24px + var(--product-sticky-bar, 0px)); right:24px; display:flex; align-items:center; gap:20px; padding:16px 20px; max-width:min(420px,calc(100vw - 32px)); background:#27332b; color:white; box-shadow:0 8px 28px #0002; font-size:13px; }
-.feedback button { border:0; background:transparent; color:white; font-size:22px; cursor:pointer; min-width:32px; }
 .srOnly { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
-@media(max-width:700px) { .page { padding:32px 16px 60px; }.heading { display:block; }.heading > a { display:inline-block; margin-top:12px; }.table th,.table td { min-width:220px; padding:14px; }.table tr > :first-child { min-width:125px; }.feedback { bottom:calc(16px + var(--product-sticky-bar, 0px)); right:16px; } }
+@media(max-width:700px) { .page { padding:32px 16px 60px; }.heading { display:block; }.heading > a { display:inline-block; margin-top:12px; }.table th,.table td { min-width:220px; padding:14px; }.table tr > :first-child { min-width:125px; }}

@@ -9,7 +9,7 @@ export type ShowToast = (message: string, tone?: ToastTone) => void;
 
 type ToastItem = { id: number; message: string; tone: ToastTone };
 
-const TOAST_TIMEOUT = 4500;
+const TOAST_TIMEOUT = 5000;
 
 /**
  * Default is a no-op so components stay renderable outside the provider
