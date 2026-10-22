@@ -57,6 +57,7 @@ const action = z.discriminatedUnion("action", [
     lineItemId: z.string().uuid(),
     quantity: z.number().int().min(0).max(10000),
   }),
+  z.object({ action: z.literal("clear-cart") }),
 ]);
 function failure(error: unknown) {
   if (error instanceof z.ZodError)

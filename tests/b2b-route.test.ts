@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+vi.mock("server-only", () => ({}));
 import { NextRequest } from "next/server";
 const mocks = vi.hoisted(() => ({
   b2bAction: vi.fn(),

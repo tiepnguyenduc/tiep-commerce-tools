@@ -1,0 +1,1055 @@
+/* Approval flows share the account workspace palette (olive on warm neutrals). */
+:global(#launchpad-storefront) .approvals {
+  --af-ink: #2f3829;
+  --af-muted: #747a65;
+  --af-line: #deded3;
+  --af-soft: #f6f5ef;
+  --af-olive: #65774d;
+  --af-olive-dark: #4f5f3a;
+  --af-pending: #9a6512;
+  --af-pending-bg: #fbf0d9;
+  --af-approved: #2c7046;
+  --af-approved-bg: #e2f1e6;
+  --af-rejected: #a3392c;
+  --af-rejected-bg: #f8e3df;
+  display: grid;
+  gap: 20px;
+  color: var(--af-ink);
+}
+:global(#launchpad-storefront) .approvals svg {
+  flex-shrink: 0;
+}
+:global(#launchpad-storefront) .approvals button {
+  font: inherit;
+}
+:global(#launchpad-storefront) .approvals .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+/* Status badge */
+:global(#launchpad-storefront) .approvals .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px 4px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .approvals .badge svg {
+  width: 14px;
+  height: 14px;
+}
+:global(#launchpad-storefront) .approvals .badgeLarge {
+  padding: 6px 12px 6px 9px;
+  font-size: 12px;
+}
+:global(#launchpad-storefront) .approvals .badgeLarge svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .approvals .badgePending {
+  color: var(--af-pending);
+  background: var(--af-pending-bg);
+}
+:global(#launchpad-storefront) .approvals .badgeApproved {
+  color: var(--af-approved);
+  background: var(--af-approved-bg);
+}
+:global(#launchpad-storefront) .approvals .badgeRejected {
+  color: var(--af-rejected);
+  background: var(--af-rejected-bg);
+}
+
+/* Toolbar & filters */
+:global(#launchpad-storefront) .approvals .toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .approvals .field {
+  display: grid;
+  gap: 8px;
+  flex: 0 1 380px;
+  font-size: 12px;
+  color: #526242;
+}
+:global(#launchpad-storefront) .approvals select,
+:global(#launchpad-storefront) .approvals .search input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #c9cbbf;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--af-ink);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .approvals select:focus-visible,
+:global(#launchpad-storefront) .approvals input:focus-visible,
+:global(#launchpad-storefront) .approvals textarea:focus-visible,
+:global(#launchpad-storefront) .approvals button:focus-visible,
+:global(#launchpad-storefront) .approvals a:focus-visible {
+  outline: 2px solid var(--af-olive);
+  outline-offset: 2px;
+}
+:global(#launchpad-storefront) .approvals .iconButton {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #c9cbbf;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--af-olive-dark);
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .approvals .iconButton:hover:not(:disabled) {
+  background: var(--af-soft);
+}
+:global(#launchpad-storefront) .approvals .iconButton:disabled {
+  cursor: progress;
+}
+:global(#launchpad-storefront) .approvals .iconButton svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .approvals .spin {
+  animation: af-spin 0.9s linear infinite;
+}
+@keyframes af-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* "Waiting for you" callout */
+:global(#launchpad-storefront) .approvals .callout {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #ecd6a6;
+  border-left: 4px solid #d39b33;
+  border-radius: 4px;
+  background: #fdf7ea;
+  color: #6a4a10;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+:global(#launchpad-storefront) .approvals .callout:hover {
+  background: #fbf0d9;
+}
+:global(#launchpad-storefront) .approvals .callout > svg {
+  width: 24px;
+  height: 24px;
+}
+:global(#launchpad-storefront) .approvals .callout > svg:last-child {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+}
+:global(#launchpad-storefront) .approvals .callout span {
+  display: grid;
+  gap: 2px;
+}
+:global(#launchpad-storefront) .approvals .callout strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .callout small {
+  font-size: 12px;
+  color: #8a6a2a;
+}
+
+/* Status tabs rendered as summary cards */
+:global(#launchpad-storefront) .approvals .tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+:global(#launchpad-storefront) .approvals .tab {
+  --tone: var(--af-pending);
+  --tone-bg: var(--af-pending-bg);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--af-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--af-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+:global(#launchpad-storefront) .approvals .tabApproved {
+  --tone: var(--af-approved);
+  --tone-bg: var(--af-approved-bg);
+}
+:global(#launchpad-storefront) .approvals .tabRejected {
+  --tone: var(--af-rejected);
+  --tone-bg: var(--af-rejected-bg);
+}
+:global(#launchpad-storefront) .approvals .tab:hover {
+  border-color: #b9bea8;
+  transform: translateY(-1px);
+}
+:global(#launchpad-storefront) .approvals .tab[aria-selected="true"] {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 1px var(--tone), 0 8px 22px rgb(47 56 41 / 0.08);
+}
+:global(#launchpad-storefront) .approvals .tabIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--tone);
+  background: var(--tone-bg);
+}
+:global(#launchpad-storefront) .approvals .tabIcon svg {
+  width: 20px;
+  height: 20px;
+}
+:global(#launchpad-storefront) .approvals .tabLabel {
+  font-size: 13px;
+  color: #4d5148;
+}
+:global(#launchpad-storefront) .approvals .tab[aria-selected="true"] .tabLabel {
+  color: var(--af-ink);
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .tabCount {
+  font-size: 24px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--tone);
+}
+
+:global(#launchpad-storefront) .approvals .filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .approvals .search {
+  position: relative;
+  flex: 0 1 420px;
+}
+:global(#launchpad-storefront) .approvals .search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--af-muted);
+  pointer-events: none;
+}
+:global(#launchpad-storefront) .approvals .search input {
+  padding-left: 40px;
+}
+:global(#launchpad-storefront) .approvals .search input::placeholder {
+  color: #8a8f7d;
+}
+:global(#launchpad-storefront) .approvals .sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--af-muted);
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .approvals .sort select {
+  width: auto;
+  min-width: 170px;
+}
+
+/* Table */
+:global(#launchpad-storefront) .approvals .table {
+  border: 1px solid var(--af-line);
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+:global(#launchpad-storefront) .approvals .row {
+  display: grid;
+  grid-template-columns: 128px minmax(220px, 1.6fr) minmax(110px, 0.8fr) 70px minmax(110px, 0.8fr) 110px;
+  align-items: center;
+  border-top: 1px solid #ecebe4;
+  font-size: 13px;
+  transition: background 0.12s ease;
+}
+:global(#launchpad-storefront) .approvals .row > span {
+  padding: 15px 16px;
+  min-width: 0;
+}
+:global(#launchpad-storefront) .approvals .row:not(.head):hover {
+  background: #fbfaf6;
+}
+:global(#launchpad-storefront) .approvals .head {
+  border-top: 0;
+  background: #efede5;
+  color: #65685f;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+:global(#launchpad-storefront) .approvals .head > span {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+:global(#launchpad-storefront) .approvals .rowAttention {
+  box-shadow: inset 3px 0 0 #d39b33;
+}
+:global(#launchpad-storefront) .approvals .flowCell {
+  display: grid;
+  gap: 3px;
+}
+:global(#launchpad-storefront) .approvals .flowCell a {
+  color: var(--af-ink);
+  text-decoration: none;
+}
+:global(#launchpad-storefront) .approvals .flowCell a:hover {
+  color: var(--af-olive);
+  text-decoration: underline;
+}
+:global(#launchpad-storefront) .approvals .flowCell small {
+  font-size: 11px;
+  color: var(--af-muted);
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .approvals .numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+:global(#launchpad-storefront) .approvals .total {
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .rowAction {
+  display: flex;
+  justify-content: flex-end;
+}
+:global(#launchpad-storefront) .approvals .viewLink,
+:global(#launchpad-storefront) .approvals .reviewLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .approvals .viewLink {
+  color: var(--af-olive-dark);
+}
+:global(#launchpad-storefront) .approvals .viewLink:hover {
+  background: #eef0e6;
+}
+:global(#launchpad-storefront) .approvals .reviewLink {
+  color: #fff;
+  background: var(--af-olive);
+}
+:global(#launchpad-storefront) .approvals .reviewLink:hover {
+  background: var(--af-olive-dark);
+}
+:global(#launchpad-storefront) .approvals .viewLink svg,
+:global(#launchpad-storefront) .approvals .reviewLink svg {
+  width: 14px;
+  height: 14px;
+}
+:global(#launchpad-storefront) .approvals .footnote {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--af-muted);
+}
+
+/* Loading & empty states */
+:global(#launchpad-storefront) .approvals .skeletonRow {
+  display: grid;
+  grid-template-columns: 100px 2fr 1fr 1fr;
+  gap: 24px;
+  padding: 20px 16px;
+  border-top: 1px solid #ecebe4;
+}
+:global(#launchpad-storefront) .approvals .skeletonRow:first-of-type {
+  border-top: 0;
+}
+:global(#launchpad-storefront) .approvals .skeletonRow span,
+:global(#launchpad-storefront) .approvals .detailSkeleton span {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #efeee8 0%, #f8f7f2 50%, #efeee8 100%);
+  background-size: 200% 100%;
+  animation: af-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes af-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+:global(#launchpad-storefront) .approvals .detailSkeleton {
+  display: grid;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .approvals .detailSkeleton span {
+  height: 120px;
+  border-radius: 6px;
+}
+:global(#launchpad-storefront) .approvals .detailSkeleton span:first-child {
+  height: 160px;
+}
+:global(#launchpad-storefront) .approvals .state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border: 1px dashed #cfd0c3;
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+}
+:global(#launchpad-storefront) .approvals .state > svg {
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--af-soft);
+  color: var(--af-muted);
+  box-sizing: content-box;
+}
+:global(#launchpad-storefront) .approvals .state h2 {
+  margin: 8px 0 0;
+  font-size: 17px;
+  font-weight: 500;
+}
+:global(#launchpad-storefront) .approvals .state p {
+  max-width: 420px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .secondary {
+  min-height: 40px;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border: 1px solid #c7cdb9;
+  border-radius: 4px;
+  background: #fff;
+  color: #485b34;
+  font-size: 12px;
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .approvals .secondary:hover:not(:disabled) {
+  background: var(--af-soft);
+}
+
+/* Detail page */
+:global(#launchpad-storefront) .approvals .backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  margin-top: -8px;
+  font-size: 13px;
+  color: var(--af-olive-dark);
+  text-decoration: none;
+}
+:global(#launchpad-storefront) .approvals .backLink:hover {
+  text-decoration: underline;
+}
+:global(#launchpad-storefront) .approvals .backLink svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .approvals .hero {
+  --tone: var(--af-pending);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px 28px;
+  padding: 26px 28px;
+  border: 1px solid var(--af-line);
+  border-top: 4px solid var(--tone);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #fff 0%, #fdfcf8 100%);
+}
+:global(#launchpad-storefront) .approvals .heroApproved {
+  --tone: var(--af-approved);
+}
+:global(#launchpad-storefront) .approvals .heroRejected {
+  --tone: var(--af-rejected);
+}
+:global(#launchpad-storefront) .approvals .heroMain {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+:global(#launchpad-storefront) .approvals .heroMain h2 {
+  margin: 4px 0 0;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .approvals .heroMain p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .heroTotal {
+  display: grid;
+  align-content: start;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+:global(#launchpad-storefront) .approvals .heroTotal span {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .heroTotal strong {
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+:global(#launchpad-storefront) .approvals .heroTotal small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .decision {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ecebe4;
+}
+:global(#launchpad-storefront) .approvals .decision > p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: #4d5148;
+}
+:global(#launchpad-storefront) .approvals .decision > p svg {
+  width: 20px;
+  height: 20px;
+  color: var(--af-pending);
+}
+:global(#launchpad-storefront) .approvals .decisionActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+:global(#launchpad-storefront) .approvals .decisionActions .secondary {
+  margin-top: 0;
+}
+:global(#launchpad-storefront) .approvals .approveButton,
+:global(#launchpad-storefront) .approvals .rejectButton,
+:global(#launchpad-storefront) .approvals .rejectSolid {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+:global(#launchpad-storefront) .approvals .approveButton svg,
+:global(#launchpad-storefront) .approvals .rejectButton svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .approvals .approveButton {
+  border: 1px solid var(--af-olive);
+  background: var(--af-olive);
+  color: #fff;
+}
+:global(#launchpad-storefront) .approvals .approveButton:hover:not(:disabled) {
+  background: var(--af-olive-dark);
+}
+:global(#launchpad-storefront) .approvals .rejectButton {
+  border: 1px solid #e2b5ad;
+  background: #fff;
+  color: var(--af-rejected);
+}
+:global(#launchpad-storefront) .approvals .rejectButton:hover:not(:disabled) {
+  background: var(--af-rejected-bg);
+}
+:global(#launchpad-storefront) .approvals .rejectSolid {
+  border: 1px solid var(--af-rejected);
+  background: var(--af-rejected);
+  color: #fff;
+}
+:global(#launchpad-storefront) .approvals .secondary:disabled,
+:global(#launchpad-storefront) .approvals .decision button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+:global(#launchpad-storefront) .approvals .rejectForm {
+  display: grid;
+  gap: 12px;
+  flex: 1 1 100%;
+}
+:global(#launchpad-storefront) .approvals .rejectForm label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #526242;
+}
+:global(#launchpad-storefront) .approvals .rejectForm textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px;
+  border: 1px solid #c9cbbf;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--af-ink);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+:global(#launchpad-storefront) .approvals .rejection {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid #efc9c1;
+  border-radius: 6px;
+  background: #fdf3f1;
+  color: #7b2c22;
+}
+:global(#launchpad-storefront) .approvals .rejection > svg {
+  width: 24px;
+  height: 24px;
+  color: var(--af-rejected);
+}
+:global(#launchpad-storefront) .approvals .rejection h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .rejection p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+:global(#launchpad-storefront) .approvals .rejection small {
+  font-size: 12px;
+  color: #9a5a50;
+}
+:global(#launchpad-storefront) .approvals .card {
+  padding: 22px 24px;
+  border: 1px solid var(--af-line);
+  border-radius: 6px;
+  background: #fff;
+}
+:global(#launchpad-storefront) .approvals .cardTitle {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .muted {
+  margin: 0;
+  font-size: 13px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 24px;
+  margin: 0;
+}
+:global(#launchpad-storefront) .approvals .facts dt {
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .facts dd {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .approvals .facts dd small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .copyable {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+}
+:global(#launchpad-storefront) .approvals .copyable button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--af-muted);
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .approvals .copyable button:hover {
+  background: var(--af-soft);
+  color: var(--af-ink);
+}
+:global(#launchpad-storefront) .approvals .copyable svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .approvals .detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+:global(#launchpad-storefront) .approvals .sideColumn {
+  display: grid;
+  gap: 20px;
+}
+:global(#launchpad-storefront) .approvals .lines {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .approvals .lines li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid #ecebe4;
+}
+:global(#launchpad-storefront) .approvals .lines li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+:global(#launchpad-storefront) .approvals .thumb {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid #ecebe4;
+  border-radius: 4px;
+  background: var(--af-soft);
+  color: #b0b3a5;
+}
+:global(#launchpad-storefront) .approvals .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+:global(#launchpad-storefront) .approvals .thumb svg {
+  width: 24px;
+  height: 24px;
+}
+:global(#launchpad-storefront) .approvals .lineInfo {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+:global(#launchpad-storefront) .approvals .lineInfo strong {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .approvals .lineInfo small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .lineTotal {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+:global(#launchpad-storefront) .approvals .totals {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--af-line);
+}
+:global(#launchpad-storefront) .approvals .totals div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #4d5148;
+}
+:global(#launchpad-storefront) .approvals .totals dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+:global(#launchpad-storefront) .approvals .totals .grandTotal {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--af-line);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--af-ink);
+}
+
+/* Timeline */
+:global(#launchpad-storefront) .approvals .timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .approvals .timeline li {
+  --tone: var(--af-olive);
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  padding-bottom: 18px;
+}
+:global(#launchpad-storefront) .approvals .timeline li:last-child {
+  padding-bottom: 0;
+}
+:global(#launchpad-storefront) .approvals .timeline li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 30px;
+  bottom: 0;
+  width: 2px;
+  background: #e3e4da;
+}
+:global(#launchpad-storefront) .approvals .timeline .stepCurrent {
+  --tone: var(--af-pending);
+}
+:global(#launchpad-storefront) .approvals .timeline .stepRejected {
+  --tone: var(--af-rejected);
+}
+:global(#launchpad-storefront) .approvals .timeline .stepApproved {
+  --tone: var(--af-approved);
+}
+:global(#launchpad-storefront) .approvals .dot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--tone);
+  color: var(--tone);
+}
+:global(#launchpad-storefront) .approvals .stepCurrent .dot {
+  box-shadow: 0 0 0 4px var(--af-pending-bg);
+}
+:global(#launchpad-storefront) .approvals .dot svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .approvals .timeline li > div {
+  display: grid;
+  gap: 3px;
+  padding-top: 5px;
+}
+:global(#launchpad-storefront) .approvals .timeline strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .timeline small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+:global(#launchpad-storefront) .approvals .roles em {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--af-pending-bg);
+  color: var(--af-pending);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .rules {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .approvals .rules li {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: var(--af-soft);
+}
+:global(#launchpad-storefront) .approvals .rules strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .approvals .rules small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .approvals .address {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.6;
+  color: #4d5148;
+}
+:global(#launchpad-storefront) .approvals .address strong {
+  color: var(--af-ink);
+  font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+  :global(#launchpad-storefront) .approvals .detailGrid {
+    grid-template-columns: 1fr;
+  }
+  :global(#launchpad-storefront) .approvals .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :global(#launchpad-storefront) .approvals .tab {
+    grid-template-columns: auto 1fr;
+  }
+  :global(#launchpad-storefront) .approvals .tabCount {
+    grid-column: 2;
+    font-size: 20px;
+  }
+}
+@media (max-width: 760px) {
+  :global(#launchpad-storefront) .approvals .tabs {
+    grid-template-columns: 1fr;
+  }
+  :global(#launchpad-storefront) .approvals .tab {
+    grid-template-columns: auto 1fr auto;
+    padding: 12px 14px;
+  }
+  :global(#launchpad-storefront) .approvals .tabCount {
+    grid-column: auto;
+  }
+  :global(#launchpad-storefront) .approvals .filters,
+  :global(#launchpad-storefront) .approvals .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :global(#launchpad-storefront) .approvals .toolbar .iconButton {
+    display: none;
+  }
+  :global(#launchpad-storefront) .approvals .field,
+  :global(#launchpad-storefront) .approvals .search {
+    flex-basis: auto;
+  }
+  :global(#launchpad-storefront) .approvals .sort select {
+    flex: 1;
+  }
+  /* Rows become stacked cards on narrow screens. */
+  :global(#launchpad-storefront) .approvals .head {
+    display: none;
+  }
+  :global(#launchpad-storefront) .approvals .row {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 4px;
+  }
+  :global(#launchpad-storefront) .approvals .row > span {
+    padding: 6px 12px;
+  }
+  :global(#launchpad-storefront) .approvals .row > .flowCell {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+  :global(#launchpad-storefront) .approvals .row > span[data-label]:not(.flowCell)::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--af-muted);
+  }
+  :global(#launchpad-storefront) .approvals .numeric {
+    text-align: left;
+  }
+  :global(#launchpad-storefront) .approvals .rowAction {
+    justify-content: flex-start;
+    align-self: end;
+  }
+  :global(#launchpad-storefront) .approvals .hero {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  :global(#launchpad-storefront) .approvals .heroTotal {
+    justify-items: start;
+    text-align: left;
+  }
+  :global(#launchpad-storefront) .approvals .decision,
+  :global(#launchpad-storefront) .approvals .decisionActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :global(#launchpad-storefront) .approvals .decisionActions button {
+    justify-content: center;
+  }
+  :global(#launchpad-storefront) .approvals .facts {
+    grid-template-columns: 1fr;
+  }
+  :global(#launchpad-storefront) .approvals .card {
+    padding: 18px;
+  }
+  :global(#launchpad-storefront) .approvals .lines li {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+  :global(#launchpad-storefront) .approvals .thumb {
+    width: 52px;
+    height: 52px;
+  }
+  :global(#launchpad-storefront) .approvals .lineTotal {
+    grid-column: 2;
+  }
+  :global(#launchpad-storefront) .approvals select,
+  :global(#launchpad-storefront) .approvals .search input,
+  :global(#launchpad-storefront) .approvals .rejectForm textarea {
+    font-size: 16px;
+  }
+}

@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { duplicateQuickOrderRows, resolveQuickOrderRow, runQuickOrderBatch, type QuickOrderRow } from "@/lib/b2b/quick-order";
 import { useToast } from "@/components/Toast";
 import { useB2B } from "./B2BProvider";
+import { useB2BMiniCart } from "./B2BMiniCart";
 import s from "./B2BTools.module.css";
 export function B2BQuickOrderPage() {
   const { state, busy, act, error, reload } = useB2B();
+  const { openCart } = useB2BMiniCart();
   const [rows, setRows] = useState<QuickOrderRow[]>([{ id: "1", sku: "", quantity: "1" }]);
   const sequence = useRef(1);
   const [review, setReview] = useState(false);
@@ -47,7 +49,10 @@ export function B2BQuickOrderPage() {
     setPending(false);
     if (outcome.uncertain) showToast(`${outcome.completed} rows confirmed added. The last result could not be confirmed; the batch has stopped. Check your bag before starting another order. Remaining rows have not been submitted.`, "error");
     else if (outcome.stopped) showToast("Your purchasing context changed. Review the remaining rows for this store.", "info");
-    else showToast(`${outcome.completed} ${outcome.completed === 1 ? "row" : "rows"} added to your business bag.`, "success");
+    else {
+      showToast(`${outcome.completed} ${outcome.completed === 1 ? "row" : "rows"} added to your business bag.`, "success");
+      if (outcome.completed > 0) openCart();
+    }
   }
   return <main className={s.page}><div className={s.heading}><div><p className={s.eyebrow}>ORDER BY SKU</p><h1>Know what you need?</h1><p>Enter exact SKUs and quantities, review the matching options, then add them to your business bag.</p></div><Link href="/b2b/cart">View business bag →</Link></div>
     {!state && <div className={s.empty} role="status">{error ? <><p>Your assortment could not be loaded.</p><button className={s.button} disabled={busy} type="button" onClick={() => void reload()}>Try again</button></> : "Loading your assortment…"}</div>}

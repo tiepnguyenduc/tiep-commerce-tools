@@ -41,6 +41,7 @@ import { B2BCompareButton } from "./B2BCompare";
 import { B2BProductCard } from "./B2BProductCard";
 import { B2BSaveButton } from "./B2BWishlist";
 import { useB2BTranslations } from "./useB2BTranslations";
+import { useB2BMiniCart } from "./B2BMiniCart";
 import s from "./B2B.module.css";
 import d from "./B2BProductDetail.module.css";
 
@@ -91,6 +92,7 @@ function specificationRows(product: B2BProduct, variant: B2BProductVariant, t: T
 /** Adds a variant to the business bag, with toast feedback shared by the buy box and sticky bar. */
 function useAddToBag(product: B2BProduct) {
   const { act } = useB2B();
+  const { openCart } = useB2BMiniCart();
   const { t } = useB2BTranslations();
   const showToast = useToast();
   const [status, setStatus] = useState<"idle" | "pending" | "added">("idle");
@@ -110,7 +112,10 @@ function useAddToBag(product: B2BProduct) {
         : t("The result could not be confirmed. Check your bag before trying again."),
       success ? "success" : "error",
     );
-    if (success) reset.current = setTimeout(() => setStatus("idle"), 2500);
+    if (success) {
+      openCart();
+      reset.current = setTimeout(() => setStatus("idle"), 2500);
+    }
     return success;
   }
 

@@ -8,6 +8,8 @@ import {
   UserIcon,
   MapPinIcon,
   BuildingOffice2Icon,
+  ClipboardDocumentCheckIcon,
+  ShieldCheckIcon,
   HeartIcon,
   ListBulletIcon,
   ScaleIcon,
@@ -33,6 +35,16 @@ const links = [
     href: "/b2b/account/company",
     label: "My company",
     icon: BuildingOffice2Icon,
+  },
+  {
+    href: "/b2b/account/approval-flows",
+    label: "Approval flows",
+    icon: ClipboardDocumentCheckIcon,
+  },
+  {
+    href: "/b2b/account/approval-rules",
+    label: "Approval rules",
+    icon: ShieldCheckIcon,
   },
   { href: "/b2b/wishlist", label: "My Wishlist", icon: HeartIcon },
 ];
@@ -139,6 +151,18 @@ export function B2BAccountDashboard() {
       title: "My company",
       description: "Your business units, assigned stores and team access.",
       icon: BuildingOffice2Icon,
+    },
+    {
+      href: "/b2b/account/approval-flows",
+      title: "Approval flows",
+      description: "Review, approve or reject orders that need company sign-off.",
+      icon: ClipboardDocumentCheckIcon,
+    },
+    {
+      href: "/b2b/account/approval-rules",
+      title: "Approval rules",
+      description: "Set which orders need sign-off and who approves them.",
+      icon: ShieldCheckIcon,
     },
     {
       href: "/b2b/wishlist",

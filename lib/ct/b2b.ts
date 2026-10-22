@@ -711,6 +711,16 @@ export async function b2bAction(session: B2BSession, input: B2BAction) {
       lineItemId: input.lineItemId,
       quantity: input.quantity,
     });
+  } else if (input.action === "clear-cart") {
+    if (cart && cart.lineItems.length) {
+      for (const item of cart.lineItems) {
+        actions.push({
+          action: "changeLineItemQuantity",
+          lineItemId: item.id,
+          quantity: 0,
+        });
+      }
+    }
   }
   if (cart && actions.length)
     await cartRoot(session)

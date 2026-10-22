@@ -9,6 +9,7 @@ import { useB2B } from "./B2BProvider";
 import { B2BCompareButton } from "./B2BCompare";
 import { B2BSaveButton } from "./B2BWishlist";
 import { useB2BTranslations } from "./useB2BTranslations";
+import { useB2BMiniCart } from "./B2BMiniCart";
 import s from "./B2B.module.css";
 
 function CatalogCartButton({
@@ -23,6 +24,7 @@ function CatalogCartButton({
   hasPrice: boolean;
 }) {
   const { state, busy, act } = useB2B();
+  const { openCart } = useB2BMiniCart();
   const { t } = useB2BTranslations();
   const showToast = useToast();
   const [status, setStatus] = useState<"idle" | "pending" | "added">("idle");
@@ -61,6 +63,7 @@ function CatalogCartButton({
             : t("The result could not be confirmed. Check your bag before trying again."),
           success ? "success" : "error",
         );
+        if (success) openCart();
       }}
     >
       {status === "added" ? (

@@ -25,6 +25,7 @@ import { WishlistModal } from "@/components/WishlistModal";
 import { useToast } from "@/components/Toast";
 import type { Wishlist } from "@/lib/types";
 import { useB2B } from "./B2BProvider";
+import { useB2BMiniCart } from "./B2BMiniCart";
 import { B2BAccountWorkspace } from "./B2BAccountWorkspace";
 import { useB2BTranslations } from "./useB2BTranslations";
 import s from "./B2BTools.module.css";
@@ -353,6 +354,7 @@ export function B2BHeaderWishlistLink() {
 
 export function B2BWishlistPage() {
   const { state, busy, act } = useB2B();
+  const { openCart } = useB2BMiniCart();
   const { wishlists, ready, error, reload, pending, create, rename, removeList, removeLine } = useB2BWishlist();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -460,7 +462,7 @@ export function B2BWishlistPage() {
                     <p>{state.context ? variant?.price?.formatted || "Price unavailable" : "Select a store for pricing"}</p>
                     <div className={s.actions}>
                       <button type="button" disabled={pending !== null} onClick={async () => { try { await removeLine(selected.id, line.id); showToast("Item removed from the wishlist.", "success"); } catch (requestError) { showToast(requestError instanceof Error ? requestError.message : "Could not remove the item.", "error"); } }}>Remove</button>
-                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); showToast(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again.", success ? "success" : "error"); }}>Add 1 to bag</button>}
+                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); showToast(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again.", success ? "success" : "error"); if (success) openCart(); }}>Add 1 to bag</button>}
                     </div>
                   </article>
                 );

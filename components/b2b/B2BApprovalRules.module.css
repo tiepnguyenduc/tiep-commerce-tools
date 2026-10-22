@@ -1,0 +1,736 @@
+/* Layered on top of B2BApprovalFlows.module.css (.approvals supplies tokens and shared pieces). */
+:global(#launchpad-storefront) .rules {
+  --af-inactive: #6c6f66;
+  --af-inactive-bg: #ecebe6;
+}
+:global(#launchpad-storefront) .rules .badgeInactive {
+  color: var(--af-inactive);
+  background: var(--af-inactive-bg);
+}
+:global(#launchpad-storefront) .rules .statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+:global(#launchpad-storefront) .rules .primaryLink,
+:global(#launchpad-storefront) .rules .save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--af-olive);
+  border-radius: 4px;
+  background: var(--af-olive);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+:global(#launchpad-storefront) .rules .primaryLink:hover,
+:global(#launchpad-storefront) .rules .save:hover:not(:disabled) {
+  background: var(--af-olive-dark);
+}
+:global(#launchpad-storefront) .rules .save:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+:global(#launchpad-storefront) .rules .primaryLink svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* List */
+:global(#launchpad-storefront) .rules .listFilters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .rules .segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--af-line);
+  border-radius: 6px;
+  background: #fff;
+}
+:global(#launchpad-storefront) .rules .segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #4d5148;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .rules .segmented button span {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--af-soft);
+  color: var(--af-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .rules .segmented button[aria-selected="true"],
+:global(#launchpad-storefront) .rules .segmented button[aria-pressed="true"] {
+  background: #eef0e6;
+  color: var(--af-ink);
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .rules .segmented button[aria-selected="true"] span {
+  background: var(--af-olive);
+  color: #fff;
+}
+:global(#launchpad-storefront) .rules .ruleList {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .rules .ruleCard {
+  padding: 20px 22px;
+  border: 1px solid var(--af-line);
+  border-left: 4px solid var(--af-approved);
+  border-radius: 6px;
+  background: #fff;
+  transition: box-shadow 0.15s ease;
+}
+:global(#launchpad-storefront) .rules .ruleCard:hover {
+  box-shadow: 0 8px 22px rgb(47 56 41 / 0.07);
+}
+:global(#launchpad-storefront) .rules .ruleInactive {
+  border-left-color: #c3c4bb;
+}
+:global(#launchpad-storefront) .rules .ruleHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .rules .ruleHead > div {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  min-width: 0;
+}
+:global(#launchpad-storefront) .rules .ruleHead h3 {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+:global(#launchpad-storefront) .rules .ruleHead p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .editLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #c7cdb9;
+  border-radius: 4px;
+  color: var(--af-olive-dark);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+:global(#launchpad-storefront) .rules .editLink:hover {
+  background: #eef0e6;
+}
+:global(#launchpad-storefront) .rules .editLink svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .rules .ruleFacts {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #ecebe4;
+}
+:global(#launchpad-storefront) .rules .ruleFacts > div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+}
+:global(#launchpad-storefront) .rules .ruleFacts dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .ruleFacts dt svg {
+  width: 15px;
+  height: 15px;
+}
+:global(#launchpad-storefront) .rules .ruleFacts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+:global(#launchpad-storefront) .rules .factGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+:global(#launchpad-storefront) .rules .chip {
+  padding: 4px 10px;
+  border: 1px solid #e0e1d6;
+  border-radius: 999px;
+  background: var(--af-soft);
+  font-size: 12px;
+  color: #3d4536;
+}
+:global(#launchpad-storefront) .rules .joiner {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .tierPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 999px;
+  background: #eef0e6;
+  font-size: 12px;
+  color: #3d4536;
+}
+:global(#launchpad-storefront) .rules .tierPill b {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--af-olive);
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+:global(#launchpad-storefront) .rules .arrow {
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .code {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #2f3829;
+  color: #e8ecd9;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* Editor */
+:global(#launchpad-storefront) .rules .notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: #eef0e6;
+  color: #46553a;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .rules .notice svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .rules .editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: start;
+}
+:global(#launchpad-storefront) .rules .main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+:global(#launchpad-storefront) .rules .section {
+  display: grid;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .rules .sectionError {
+  border-color: #e3b4ab;
+  box-shadow: 0 0 0 1px #f3d9d3;
+}
+:global(#launchpad-storefront) .rules .sectionHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+:global(#launchpad-storefront) .rules .sectionHead h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .rules .sectionHead p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .fieldError {
+  margin: 0;
+  font-size: 12px;
+  color: var(--af-rejected);
+}
+:global(#launchpad-storefront) .rules .detailsGrid {
+  display: grid;
+  gap: 14px;
+}
+:global(#launchpad-storefront) .rules .input {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  color: #526242;
+}
+:global(#launchpad-storefront) .rules input,
+:global(#launchpad-storefront) .rules textarea,
+:global(#launchpad-storefront) .rules .conditionRow select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #c9cbbf;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--af-ink);
+  font: inherit;
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .rules textarea {
+  resize: vertical;
+}
+:global(#launchpad-storefront) .rules input[aria-invalid="true"] {
+  border-color: var(--af-rejected);
+}
+:global(#launchpad-storefront) .rules input:disabled,
+:global(#launchpad-storefront) .rules textarea:disabled,
+:global(#launchpad-storefront) .rules select:disabled {
+  background: #f3f3ee;
+  color: #6f7369;
+}
+:global(#launchpad-storefront) .rules .codeInput {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  background: #fbfbf8;
+}
+:global(#launchpad-storefront) .rules .statusRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: var(--af-soft);
+}
+:global(#launchpad-storefront) .rules .statusRow > div {
+  display: grid;
+  gap: 2px;
+}
+:global(#launchpad-storefront) .rules .statusRow strong {
+  font-size: 13px;
+}
+:global(#launchpad-storefront) .rules .statusRow small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #c5c7bc;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+:global(#launchpad-storefront) .rules .switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 0.2s ease;
+}
+:global(#launchpad-storefront) .rules .switch[aria-checked="true"] {
+  background: var(--af-olive);
+}
+:global(#launchpad-storefront) .rules .switch[aria-checked="true"] span {
+  transform: translateX(20px);
+}
+:global(#launchpad-storefront) .rules .rolePicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:global(#launchpad-storefront) .rules .rolePicker button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 14px;
+  border: 1px solid #cfd2c4;
+  border-radius: 999px;
+  background: #fff;
+  color: #4d5148;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+:global(#launchpad-storefront) .rules .rolePicker button:hover:not(:disabled) {
+  border-color: var(--af-olive);
+}
+:global(#launchpad-storefront) .rules .rolePicker button[aria-pressed="true"] {
+  border-color: var(--af-olive);
+  background: var(--af-olive);
+  color: #fff;
+  font-weight: 600;
+}
+:global(#launchpad-storefront) .rules .rolePicker button[aria-pressed="true"]::before {
+  content: "✓";
+  font-size: 11px;
+}
+:global(#launchpad-storefront) .rules .ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--af-olive-dark);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .rules .ghost:hover {
+  background: #eef0e6;
+}
+:global(#launchpad-storefront) .rules .ghost svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .rules .combinator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .conditions {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .rules .conditions li {
+  display: grid;
+  gap: 8px;
+}
+:global(#launchpad-storefront) .rules .conditions .joiner {
+  padding-left: 12px;
+}
+:global(#launchpad-storefront) .rules .conditionRow {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.9fr) minmax(130px, 1fr) 40px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e6e6dd;
+  border-radius: 6px;
+  background: #fcfcf9;
+}
+:global(#launchpad-storefront) .rules .conditionRow .textValue {
+  grid-column: span 2;
+}
+:global(#launchpad-storefront) .rules .amount {
+  display: flex;
+  align-items: stretch;
+}
+:global(#launchpad-storefront) .rules .amount b {
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+  border: 1px solid #c9cbbf;
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
+  background: var(--af-soft);
+  color: var(--af-muted);
+  font-size: 11px;
+}
+:global(#launchpad-storefront) .rules .amount b + input {
+  border-radius: 0 4px 4px 0;
+}
+:global(#launchpad-storefront) .rules .iconRemove {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #8a8d82;
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .rules .iconRemove:hover:not(:disabled) {
+  background: var(--af-rejected-bg);
+  color: var(--af-rejected);
+}
+:global(#launchpad-storefront) .rules .iconRemove:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+:global(#launchpad-storefront) .rules .iconRemove svg {
+  width: 18px;
+  height: 18px;
+}
+:global(#launchpad-storefront) .rules .addButton,
+:global(#launchpad-storefront) .rules .addLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--af-olive-dark);
+  cursor: pointer;
+}
+:global(#launchpad-storefront) .rules .addButton {
+  padding: 9px 14px;
+  border: 1px dashed #b6bba5;
+  border-radius: 4px;
+  background: #fff;
+}
+:global(#launchpad-storefront) .rules .addButton:hover {
+  border-style: solid;
+  background: #f4f5ee;
+}
+:global(#launchpad-storefront) .rules .addLink {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+}
+:global(#launchpad-storefront) .rules .addLink:hover {
+  text-decoration: underline;
+}
+:global(#launchpad-storefront) .rules .addButton svg,
+:global(#launchpad-storefront) .rules .addLink svg {
+  width: 16px;
+  height: 16px;
+}
+:global(#launchpad-storefront) .rules .tiers {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: tier;
+}
+:global(#launchpad-storefront) .rules .tier {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  margin-left: 14px;
+  padding: 0 0 22px 26px;
+  border-left: 2px solid #dfe2d4;
+}
+:global(#launchpad-storefront) .rules .tier:last-child {
+  padding-bottom: 6px;
+  border-left-color: transparent;
+}
+:global(#launchpad-storefront) .rules .tier::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: -9px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--af-olive);
+  border-radius: 50%;
+  background: #fff;
+}
+:global(#launchpad-storefront) .rules .tierHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+:global(#launchpad-storefront) .rules .tierHead small {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+:global(#launchpad-storefront) .rules .tierBadge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--af-olive);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+:global(#launchpad-storefront) .rules .group {
+  display: grid;
+  gap: 8px;
+}
+:global(#launchpad-storefront) .rules .groupBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border: 1px solid #e6e6dd;
+  border-radius: 6px;
+  background: #fcfcf9;
+}
+:global(#launchpad-storefront) .rules .groupLabel {
+  font-size: 12px;
+  color: var(--af-muted);
+}
+
+/* Sticky summary */
+:global(#launchpad-storefront) .rules .summary {
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 14px;
+}
+:global(#launchpad-storefront) .rules .summaryCard {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 6px;
+  background: #2f3829;
+  color: #e9ecdf;
+}
+:global(#launchpad-storefront) .rules .summaryCard h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+:global(#launchpad-storefront) .rules .summaryUnit {
+  margin: -8px 0 0;
+  font-size: 12px;
+  color: #a9b096;
+}
+:global(#launchpad-storefront) .rules .summarySteps {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:global(#launchpad-storefront) .rules .summarySteps li {
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+:global(#launchpad-storefront) .rules .summarySteps b {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b9c39b;
+}
+:global(#launchpad-storefront) .rules .summarySteps i {
+  color: #8f977f;
+}
+:global(#launchpad-storefront) .rules .summarySteps .code {
+  background: #1f261b;
+}
+:global(#launchpad-storefront) .rules .summaryTier {
+  display: block;
+}
+:global(#launchpad-storefront) .rules .actions {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10px;
+}
+:global(#launchpad-storefront) .rules .actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+  :global(#launchpad-storefront) .rules .editor {
+    grid-template-columns: 1fr;
+  }
+  :global(#launchpad-storefront) .rules .summary {
+    position: static;
+  }
+}
+@media (max-width: 760px) {
+  :global(#launchpad-storefront) .rules .listFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  :global(#launchpad-storefront) .rules .segmented {
+    overflow-x: auto;
+  }
+  :global(#launchpad-storefront) .rules .ruleFacts > div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  :global(#launchpad-storefront) .rules .conditionRow {
+    grid-template-columns: 1fr 40px;
+  }
+  :global(#launchpad-storefront) .rules .conditionRow > :not(.iconRemove) {
+    grid-column: 1;
+  }
+  :global(#launchpad-storefront) .rules .conditionRow .textValue {
+    grid-column: 1;
+  }
+  :global(#launchpad-storefront) .rules .conditionRow .iconRemove {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  :global(#launchpad-storefront) .rules .sectionHead {
+    flex-direction: column;
+  }
+  :global(#launchpad-storefront) .rules input,
+  :global(#launchpad-storefront) .rules textarea,
+  :global(#launchpad-storefront) .rules .conditionRow select {
+    font-size: 16px;
+  }
+}

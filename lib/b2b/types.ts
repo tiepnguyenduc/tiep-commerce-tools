@@ -76,4 +76,5 @@ export type B2BAction =
       variantId: number;
       quantity: number;
     }
-  | { action: "set-quantity"; lineItemId: string; quantity: number };
+  | { action: "set-quantity"; lineItemId: string; quantity: number }
+  | { action: "clear-cart" };

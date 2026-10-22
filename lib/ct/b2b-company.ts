@@ -67,7 +67,7 @@ function api() {
   return root;
 }
 
-async function memberUnits(customerId: string) {
+export async function memberUnits(customerId: string) {
   const units: BusinessUnit[] = [];
   for (let offset = 0; ; offset += 100) {
     const { body } = await api().businessUnits().get({
@@ -85,7 +85,7 @@ async function memberUnits(customerId: string) {
   });
 }
 
-async function unitFor(session: B2BSession, key: string) {
+export async function unitFor(session: B2BSession, key: string) {
   const customer = requireCustomer(session);
   const { body } = await api().asAssociate()
     .withAssociateIdValue({ associateId: customer.id })
@@ -94,7 +94,7 @@ async function unitFor(session: B2BSession, key: string) {
   return body;
 }
 
-async function permissions(unit: BusinessUnit, customerId: string) {
+export async function permissions(unit: BusinessUnit, customerId: string) {
   const keys = [...unit.associates, ...(unit.inheritedAssociates ?? [])]
     .filter((associate) => associate.customer.id === customerId)
     .flatMap((associate) => associate.associateRoleAssignments.map((assignment) => assignment.associateRole.key));

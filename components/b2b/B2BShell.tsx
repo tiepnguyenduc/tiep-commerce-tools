@@ -14,6 +14,7 @@ import { useB2B } from "./B2BProvider";
 import { B2BHeaderNavigation, B2BHeaderSearch } from "./B2BHeaderNavigation";
 import { B2BHeaderWishlistLink } from "./B2BWishlist";
 import { B2BHeaderCompareLink } from "./B2BCompare";
+import { B2BHeaderCartButton } from "./B2BMiniCart";
 import s from "./B2B.module.css";
 export function B2BShell({ children }: { children: React.ReactNode }) {
   const { t, locale } = useB2BTranslations();
@@ -54,19 +55,7 @@ export function B2BShell({ children }: { children: React.ReactNode }) {
           </Link>
           <B2BHeaderCompareLink />
           <B2BHeaderWishlistLink />
-          <Link
-            href="/b2b/cart"
-            aria-label={`Business bag, ${t("{count} items", { count: state?.cart?.itemCount ?? 0 })}`}
-          >
-            <ShoppingBagIcon />
-            <span>
-              <small>{t("Purchasing bag")}</small>
-              <strong>
-                {t("{count} items", { count: state?.cart?.itemCount ?? 0 })}
-              </strong>
-            </span>
-            <b className={s.mobileBagCount}>{state?.cart?.itemCount ?? 0}</b>
-          </Link>
+          <B2BHeaderCartButton />
         </div>
       </header>
       <B2BHeaderNavigation />
