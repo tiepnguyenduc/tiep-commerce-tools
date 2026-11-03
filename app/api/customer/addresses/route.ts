@@ -11,34 +11,36 @@ import {
   upsertCustomerAddress,
 } from "@/lib/ct/account";
 
-const addressInput = z.object({
-  id: z.string().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  streetName: z.string().optional(),
-  streetNumber: z.string().optional(),
-  city: z.string().min(1),
-  region: z.string().min(1),
-  postalCode: z.string().min(1),
-  country: z.string().length(2),
-  phone: z.string().optional(),
-}).superRefine((address, context) => {
-  if (!findAddressLocationByPostalCode(address.postalCode)) {
-    context.addIssue({
-      code: "custom",
-      message: "Postal code was not found in the supported locations.",
-      path: ["postalCode"],
-    });
-    return;
-  }
-  if (!addressMatchesPostalCode(address)) {
-    context.addIssue({
-      code: "custom",
-      message: "City, state/region, and country must match the postal code.",
-      path: ["postalCode"],
-    });
-  }
-});
+const addressInput = z
+  .object({
+    id: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    streetName: z.string().optional(),
+    streetNumber: z.string().optional(),
+    city: z.string().min(1),
+    region: z.string().min(1),
+    postalCode: z.string().min(1),
+    country: z.string().length(2),
+    phone: z.string().optional(),
+  })
+  .superRefine((address, context) => {
+    if (!findAddressLocationByPostalCode(address.postalCode)) {
+      context.addIssue({
+        code: "custom",
+        message: "Postal code was not found in the supported locations.",
+        path: ["postalCode"],
+      });
+      return;
+    }
+    if (!addressMatchesPostalCode(address)) {
+      context.addIssue({
+        code: "custom",
+        message: "City, state/region, and country must match the postal code.",
+        path: ["postalCode"],
+      });
+    }
+  });
 
 export async function GET() {
   try {
@@ -81,7 +83,10 @@ export async function DELETE(request: Request) {
   const url = new URL(request.url);
   const addressId = url.searchParams.get("id");
   if (!addressId) {
-    return NextResponse.json({ error: "Address id is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Address id is required" },
+      { status: 400 },
+    );
   }
 
   try {

@@ -6,6 +6,11 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ businessUnitKey?: string }>;
 }) {
-  const [{ id }, { businessUnitKey }] = await Promise.all([params, searchParams]);
-  return <B2BApprovalFlowDetailPage id={id} businessUnitKey={businessUnitKey} />;
+  const [{ id }, { businessUnitKey }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  return (
+    <B2BApprovalFlowDetailPage id={id} businessUnitKey={businessUnitKey} />
+  );
 }

@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import { AccountPageView } from "../../account-page-content";
-import {
-  readCustomerOrderDetail,
-  readCustomerProfile,
-} from "@/lib/ct/account";
+import { readCustomerOrderDetail, readCustomerProfile } from "@/lib/ct/account";
 import type { CustomerOrderDetail, CustomerProfile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +17,8 @@ async function readOrder(orderId: string): Promise<CustomerOrderDetail | null> {
   try {
     return await readCustomerOrderDetail(orderId);
   } catch (error) {
-    if (error instanceof Error && error.message === "Order not found.") return null;
+    if (error instanceof Error && error.message === "Order not found.")
+      return null;
     throw error;
   }
 }

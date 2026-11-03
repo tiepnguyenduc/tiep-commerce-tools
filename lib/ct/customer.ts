@@ -1,5 +1,8 @@
 import "server-only";
-import type { CustomerDraft, CustomerSignin } from "@commercetools/platform-sdk";
+import type {
+  CustomerDraft,
+  CustomerSignin,
+} from "@commercetools/platform-sdk";
 import { getEnvReadiness } from "../env";
 import { getApiRoot } from "./client";
 import { getCartId, setCartId, setCustomerSession } from "./session";
@@ -20,7 +23,12 @@ function requireApiRoot() {
 }
 
 function mapCustomerResult(result: {
-  customer: { id: string; email: string; firstName?: string; lastName?: string };
+  customer: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  };
   cart?: { id: string };
 }) {
   setCustomerSession({
@@ -45,8 +53,14 @@ async function getAnonymousCartId() {
   const cartId = getCartId("b2c");
   if (!cartId) return undefined;
   try {
-    const { body: cart } = await requireApiRoot().carts().withId({ ID: cartId }).get().execute();
-    return !cart.customerId && cart.cartState === "Active" ? cart.id : undefined;
+    const { body: cart } = await requireApiRoot()
+      .carts()
+      .withId({ ID: cartId })
+      .get()
+      .execute();
+    return !cart.customerId && cart.cartState === "Active"
+      ? cart.id
+      : undefined;
   } catch (error) {
     if ((error as { statusCode?: number }).statusCode === 404) return undefined;
     throw error;

@@ -24,7 +24,9 @@ function localized(
   locale: string,
   fallback = "",
 ) {
-  return value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback;
+  return (
+    value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback
+  );
 }
 
 export function mapCustomerAddress(address: Address): CustomerAddress {
@@ -55,7 +57,12 @@ export function mapCustomerProfile(customer: Customer): CustomerProfile {
 export function mapCustomerOrder(
   order: Pick<
     Order,
-    "id" | "orderNumber" | "createdAt" | "orderState" | "lineItems" | "totalPrice"
+    | "id"
+    | "orderNumber"
+    | "createdAt"
+    | "orderState"
+    | "lineItems"
+    | "totalPrice"
   >,
   locale = "en-US",
 ): CustomerOrderSummary {
@@ -125,7 +132,10 @@ function lineVariant(line: ShoppingListLineItem) {
   return line.variant;
 }
 
-function mapWishlistLine(line: ShoppingListLineItem, locale: string): WishlistLine {
+function mapWishlistLine(
+  line: ShoppingListLineItem,
+  locale: string,
+): WishlistLine {
   const variant = lineVariant(line);
   return {
     id: line.id,

@@ -148,7 +148,11 @@ function BagLine({ line }: { line: CartLine }) {
               className={s.bagRemove}
               disabled={busy || pending}
               onClick={() => void update(0)}
-              style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
             >
               <FontAwesomeIcon icon={faTrashCan} aria-hidden="true" />
               <span>{t("Remove")}</span>
@@ -230,18 +234,21 @@ export function B2BCart() {
         <div>
           <span className={s.eyebrow}>{t("YOUR BUSINESS PURCHASE")}</span>
           <h1>
-            {t("Your bag")}<span>.</span>
+            {t("Your bag")}
+            <span>.</span>
           </h1>
           <p>{t("Review the essentials for your next project.")}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {cart && cart.lines.length > 0 && (
             <span className={s.bagCount}>
-              {cart.itemCount} {cart.itemCount === 1 ? t("item") : t("items")} {t("in your bag")}
+              {cart.itemCount} {cart.itemCount === 1 ? t("item") : t("items")}{" "}
+              {t("in your bag")}
             </span>
           )}
           <Link className={s.textLink} href="/b2b/products">
-            <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" /> {t("Continue shopping")}
+            <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" />{" "}
+            {t("Continue shopping")}
           </Link>
         </div>
       </header>
@@ -249,7 +256,9 @@ export function B2BCart() {
       {!state ? (
         <section className={s.bagEmpty} aria-busy={busy}>
           <h2>
-            {error ? t("We couldn’t load your bag.") : t("Getting your bag ready…")}
+            {error
+              ? t("We couldn’t load your bag.")
+              : t("Getting your bag ready…")}
           </h2>
           <p>
             {error
@@ -268,15 +277,21 @@ export function B2BCart() {
         </section>
       ) : !cart?.lines.length ? (
         <section className={s.bagEmpty}>
-          <div style={{ fontSize: "36px", color: "#61665a", marginBottom: "12px" }}>
+          <div
+            style={{ fontSize: "36px", color: "#61665a", marginBottom: "12px" }}
+          >
             <FontAwesomeIcon icon={faBagShopping} aria-hidden="true" />
           </div>
           <span className={s.eyebrow}>{t("ROOM FOR YOUR NEXT PROJECT")}</span>
           <h2>{t("Your essentials are waiting.")}</h2>
           <p>
             {state.context
-              ? t("Your bag is empty. Find the right tools, materials and equipment for the work ahead.")
-              : t("Choose your business and store to start building a bag for your team.")}
+              ? t(
+                  "Your bag is empty. Find the right tools, materials and equipment for the work ahead.",
+                )
+              : t(
+                  "Choose your business and store to start building a bag for your team.",
+                )}
           </p>
           <Link
             className={s.primaryLink}
@@ -291,13 +306,18 @@ export function B2BCart() {
           <div className={s.bagLayout}>
             <section aria-label="Items in your bag" className={s.bagItems}>
               <div className={s.bagSectionHeading}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
                   <h2>{t("Your items")}</h2>
                   <span style={{ fontSize: "12px", color: "#64665d" }}>
-                    ({cart.itemCount} {cart.itemCount === 1 ? t("item") : t("items")})
+                    ({cart.itemCount}{" "}
+                    {cart.itemCount === 1 ? t("item") : t("items")})
                   </span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "16px" }}
+                >
                   <span>PRICE IN {cart.total.currencyCode}</span>
                   <button
                     type="button"
@@ -374,9 +394,15 @@ export function B2BCart() {
                 <div className={s.bagCheckoutNotice}>
                   <strong>{t("Store selection required")}</strong>
                   <p>
-                    {t("Please sign in and select a store to proceed to checkout.")}
+                    {t(
+                      "Please sign in and select a store to proceed to checkout.",
+                    )}
                   </p>
-                  <Link href="/b2b/account" className={s.textLink} style={{ marginTop: "8px" }}>
+                  <Link
+                    href="/b2b/account"
+                    className={s.textLink}
+                    style={{ marginTop: "8px" }}
+                  >
                     {t("Select store →")}
                   </Link>
                 </div>
@@ -389,7 +415,10 @@ export function B2BCart() {
           </div>
 
           {suggestedProducts.length > 0 && (
-            <section className={s.bagSuggested} aria-label="Recommended equipment">
+            <section
+              className={s.bagSuggested}
+              aria-label="Recommended equipment"
+            >
               <div className={s.sectionTitle}>
                 <div>
                   <span className={s.eyebrow}>{t("POPULAR ADDITIONS")}</span>
@@ -399,7 +428,12 @@ export function B2BCart() {
                   {t("View full catalog →")}
                 </Link>
               </div>
-              <div className={s.categories} style={{ gridTemplateColumns: `repeat(${Math.min(4, suggestedProducts.length)}, 1fr)` }}>
+              <div
+                className={s.categories}
+                style={{
+                  gridTemplateColumns: `repeat(${Math.min(4, suggestedProducts.length)}, 1fr)`,
+                }}
+              >
                 {suggestedProducts.map((p) => (
                   <B2BProductCard key={p.id} product={p} />
                 ))}

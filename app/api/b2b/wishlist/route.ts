@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { readB2BSession } from "@/lib/b2b/session";
-import {
-  b2bWishlistErrorStatus,
-  readB2BWishlist,
-} from "@/lib/ct/b2b-wishlist";
+import { b2bWishlistErrorStatus, readB2BWishlist } from "@/lib/ct/b2b-wishlist";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,8 +16,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Wishlist read failed",
+        error: error instanceof Error ? error.message : "Wishlist read failed",
       },
       { status: b2bWishlistErrorStatus(error) },
     );

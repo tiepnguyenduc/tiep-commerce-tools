@@ -11,8 +11,12 @@ export function categoryUrl(category: Pick<HeaderCategory, "id" | "name">) {
  * returns a flat list. A category whose parent is missing from the response - or whose
  * parent chain loops - stays at the root instead of disappearing from the menu.
  */
-export function toLaunchpadCategoryTree(categories: HeaderCategory[]): Category[] {
-  const parents = new Map(categories.map((category) => [category.id, category.parentId]));
+export function toLaunchpadCategoryTree(
+  categories: HeaderCategory[],
+): Category[] {
+  const parents = new Map(
+    categories.map((category) => [category.id, category.parentId]),
+  );
   const nodes = new Map<string, Category>(
     categories.map((category) => [
       category.id,
@@ -30,12 +34,18 @@ export function toLaunchpadCategoryTree(categories: HeaderCategory[]): Category[
 
   const parentIdOf = (id: string) => {
     const parentId = parents.get(id);
-    return parentId && parentId !== id && nodes.has(parentId) ? parentId : undefined;
+    return parentId && parentId !== id && nodes.has(parentId)
+      ? parentId
+      : undefined;
   };
 
   const attachableParentId = (id: string) => {
     const seen = new Set([id]);
-    for (let parentId = parentIdOf(id); parentId; parentId = parentIdOf(parentId)) {
+    for (
+      let parentId = parentIdOf(id);
+      parentId;
+      parentId = parentIdOf(parentId)
+    ) {
       if (seen.has(parentId)) return undefined;
       seen.add(parentId);
     }

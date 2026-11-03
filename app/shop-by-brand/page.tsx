@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
-import {
-  listCatalogBrands,
-  listProductsByBrand,
-} from "@/lib/ct/catalog";
+import { listCatalogBrands, listProductsByBrand } from "@/lib/ct/catalog";
 import type { Product, ProductBrandSummary } from "@/lib/types";
 
 type BrandPageSearchParams = {
@@ -23,7 +20,9 @@ function brandKey(brand: string) {
 }
 
 function groupedProducts(products: Product[], brands: ProductBrandSummary[]) {
-  const order = new Map(brands.map((brand, index) => [brandKey(brand.name), index]));
+  const order = new Map(
+    brands.map((brand, index) => [brandKey(brand.name), index]),
+  );
   const groups = new Map<string, Product[]>();
 
   for (const product of products) {
@@ -95,7 +94,8 @@ export default async function Page({
           </div>
           <div className="brand-card-grid">
             {brands.map((brandItem) => {
-              const selected = brandKey(brandItem.name) === brandKey(selectedBrand);
+              const selected =
+                brandKey(brandItem.name) === brandKey(selectedBrand);
               return (
                 <Link
                   aria-current={selected ? "page" : undefined}
@@ -107,7 +107,8 @@ export default async function Page({
                   <span>
                     <strong>{brandItem.name}</strong>
                     <small>
-                      {brandItem.count} product{brandItem.count === 1 ? "" : "s"}
+                      {brandItem.count} product
+                      {brandItem.count === 1 ? "" : "s"}
                     </small>
                   </span>
                   <em>{brandItem.categories.slice(0, 2).join(" / ")}</em>
@@ -124,7 +125,10 @@ export default async function Page({
       )}
 
       {selectedBrand ? (
-        <section className="brand-results-section" aria-labelledby="brand-results">
+        <section
+          className="brand-results-section"
+          aria-labelledby="brand-results"
+        >
           <div className="results-toolbar">
             <div>
               <strong id="brand-results">
@@ -158,7 +162,10 @@ export default async function Page({
           )}
         </section>
       ) : (
-        <section className="brand-results-section" aria-label="Products by brand">
+        <section
+          className="brand-results-section"
+          aria-label="Products by brand"
+        >
           {grouped.map(([brandName, group]) => (
             <section className="brand-product-group" key={brandName}>
               <div className="section-head">

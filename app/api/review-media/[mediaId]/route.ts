@@ -11,7 +11,8 @@ export async function GET(_request: Request, context: Context) {
   const { mediaId } = await context.params;
   const file = await readStoredReviewMedia(mediaId);
 
-  if (!file) return NextResponse.json({ error: "Media not found." }, { status: 404 });
+  if (!file)
+    return NextResponse.json({ error: "Media not found." }, { status: 404 });
 
   return new NextResponse(new Uint8Array(file.body), {
     headers: {

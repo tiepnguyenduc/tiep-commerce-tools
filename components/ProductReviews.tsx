@@ -26,7 +26,13 @@ import type {
 } from "@/lib/types";
 import { loadProductReviews, submitProductReview } from "@/lib/reviews-api";
 
-const EMPTY_DISTRIBUTION: ProductRatingSummary["distribution"] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+const EMPTY_DISTRIBUTION: ProductRatingSummary["distribution"] = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
+};
 const DEFAULT_QUERY: ProductReviewQuery = {
   offset: 0,
   search: "",
@@ -37,21 +43,42 @@ const DEFAULT_QUERY: ProductReviewQuery = {
 const SEARCH_DEBOUNCE_MS = 300;
 
 /** Folds a freshly published review into the snapshot the server sent. */
-function withReview(summary: ProductRatingSummary | null, review: ProductReview): ProductRatingSummary {
-  const base = summary ?? { average: 0, count: 0, distribution: EMPTY_DISTRIBUTION, withMedia: 0 };
+function withReview(
+  summary: ProductRatingSummary | null,
+  review: ProductReview,
+): ProductRatingSummary {
+  const base = summary ?? {
+    average: 0,
+    count: 0,
+    distribution: EMPTY_DISTRIBUTION,
+    withMedia: 0,
+  };
   const rating = review.rating ?? 0;
   const count = base.count + 1;
 
   return {
     count,
     average: (base.average * base.count + rating) / count,
-    distribution: { ...base.distribution, [rating]: (base.distribution[rating] ?? 0) + 1 },
+    distribution: {
+      ...base.distribution,
+      [rating]: (base.distribution[rating] ?? 0) + 1,
+    },
     withMedia: base.withMedia + (review.media.length ? 1 : 0),
   };
 }
 
-const isDefaultQuery = ({ search, ratings, withMedia, sort, offset }: ProductReviewQuery) =>
-  !search?.trim() && !ratings?.length && !withMedia && (sort ?? "newest") === "newest" && !offset;
+const isDefaultQuery = ({
+  search,
+  ratings,
+  withMedia,
+  sort,
+  offset,
+}: ProductReviewQuery) =>
+  !search?.trim() &&
+  !ratings?.length &&
+  !withMedia &&
+  (sort ?? "newest") === "newest" &&
+  !offset;
 
 type ReviewsValue = {
   productName: string;
@@ -75,7 +102,10 @@ const ReviewsContext = createContext<ReviewsValue | null>(null);
 
 function useReviews() {
   const value = useContext(ReviewsContext);
-  if (!value) throw new Error("Product review components must be rendered inside ProductReviewsProvider.");
+  if (!value)
+    throw new Error(
+      "Product review components must be rendered inside ProductReviewsProvider.",
+    );
   return value;
 }
 
@@ -116,14 +146,18 @@ export function ProductReviewsProvider({
   const [query, setQuery] = useState<ProductReviewQuery>(DEFAULT_QUERY);
   const [searchValue, setSearchValue] = useState("");
   /** Review published in this session, kept until the server lists it itself. */
-  const [publishedReview, setPublishedReview] = useState<ProductReview | null>(null);
+  const [publishedReview, setPublishedReview] = useState<ProductReview | null>(
+    null,
+  );
   const serverRendered = useRef(true);
 
   const revealReviews = useCallback(() => {
     onRevealReviews?.();
     // The panel may only mount once the tab switch has rendered.
     requestAnimationFrame(() => {
-      const target = document.getElementById("product-tabs") ?? document.getElementById("product-reviews");
+      const target =
+        document.getElementById("product-tabs") ??
+        document.getElementById("product-reviews");
       target?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, [onRevealReviews]);
@@ -143,7 +177,9 @@ export function ProductReviewsProvider({
       .then((result) => !cancelled && setPage(result))
       .catch((error: unknown) => {
         if (cancelled) return;
-        setListError(error instanceof Error ? error.message : "Unable to load reviews.");
+        setListError(
+          error instanceof Error ? error.message : "Unable to load reviews.",
+        );
       })
       .finally(() => !cancelled && setLoading(false));
 
@@ -157,7 +193,8 @@ export function ProductReviewsProvider({
     if (searchValue.trim() === (query.search ?? "").trim()) return;
 
     const timer = setTimeout(
-      () => setQuery((current) => ({ ...current, search: searchValue, offset: 0 })),
+      () =>
+        setQuery((current) => ({ ...current, search: searchValue, offset: 0 })),
       SEARCH_DEBOUNCE_MS,
     );
     return () => clearTimeout(timer);
@@ -187,13 +224,17 @@ export function ProductReviewsProvider({
       setSubmitError("");
       setSubmitting(true);
       try {
-        const { review } = await submitProductReview(productId, {
-          authorName: values.authorName,
-          title: values.title,
-          text: values.text,
-          rating: values.rating,
-          files: values.media.map((item) => item.file),
-        }, apiBasePath);
+        const { review } = await submitProductReview(
+          productId,
+          {
+            authorName: values.authorName,
+            title: values.title,
+            text: values.text,
+            rating: values.rating,
+            files: values.media.map((item) => item.file),
+          },
+          apiBasePath,
+        );
 
         setSummary((current) => withReview(current, review));
         setHighlightedReviewId(review.id);
@@ -209,7 +250,9 @@ export function ProductReviewsProvider({
         revealReviews();
       } catch (error) {
         setSubmitError(
-          error instanceof Error ? error.message : "Unable to submit your review. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Unable to submit your review. Please try again.",
         );
       } finally {
         setSubmitting(false);
@@ -224,7 +267,8 @@ export function ProductReviewsProvider({
    */
   const visiblePage = useMemo(() => {
     if (!page || !publishedReview || !isDefaultQuery(query)) return page;
-    if (page.reviews.some((review) => review.id === publishedReview.id)) return page;
+    if (page.reviews.some((review) => review.id === publishedReview.id))
+      return page;
 
     return {
       ...page,
@@ -233,7 +277,8 @@ export function ProductReviewsProvider({
       facets: {
         ...page.facets,
         total: page.facets.total + 1,
-        withMedia: page.facets.withMedia + (publishedReview.media.length ? 1 : 0),
+        withMedia:
+          page.facets.withMedia + (publishedReview.media.length ? 1 : 0),
       },
     };
   }, [page, publishedReview, query]);
@@ -254,7 +299,8 @@ export function ProductReviewsProvider({
         setSubmitError("");
         setFormOpen(true);
       },
-      loadPage: (offset: number) => setQuery((current) => ({ ...current, offset })),
+      loadPage: (offset: number) =>
+        setQuery((current) => ({ ...current, offset })),
       changeQuery,
       changeSearch: setSearchValue,
       resetFilters,
@@ -299,7 +345,11 @@ export function useProductReviewCount() {
 }
 
 /** Compact stars + review count shown next to the product title. */
-export function ProductRatingSnippet({ className = "" }: { className?: string }) {
+export function ProductRatingSnippet({
+  className = "",
+}: {
+  className?: string;
+}) {
   const { summary, openForm, revealReviews } = useReviews();
   return (
     <RatingSnippet
@@ -311,7 +361,11 @@ export function ProductRatingSnippet({ className = "" }: { className?: string })
   );
 }
 
-export function ProductReviewsSection({ embedded = false }: { embedded?: boolean }) {
+export function ProductReviewsSection({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
   const {
     productName,
     page,

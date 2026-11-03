@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { isProductItemData, productToProductItem, type ProductItemData } from "@/components/ProductItemData";
+import {
+  isProductItemData,
+  productToProductItem,
+  type ProductItemData,
+} from "@/components/ProductItemData";
 import type { Product } from "@/lib/types";
 
 export type RecentlyViewedProduct = ProductItemData;

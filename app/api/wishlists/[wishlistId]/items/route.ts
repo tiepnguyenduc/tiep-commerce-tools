@@ -17,7 +17,10 @@ export async function POST(
 ) {
   const parsed = addInput.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid wishlist item" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid wishlist item" },
+      { status: 400 },
+    );
   }
   const { wishlistId } = await params;
 
@@ -27,7 +30,10 @@ export async function POST(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist update failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist update failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }
@@ -52,7 +58,10 @@ export async function DELETE(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist remove failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist remove failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }

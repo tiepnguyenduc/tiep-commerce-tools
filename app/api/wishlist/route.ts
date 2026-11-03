@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  readWishlists,
-  wishlistErrorStatus,
-} from "@/lib/ct/wishlist";
+import { readWishlists, wishlistErrorStatus } from "@/lib/ct/wishlist";
 
 export async function GET() {
   try {

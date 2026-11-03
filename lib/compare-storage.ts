@@ -1,8 +1,12 @@
-import { isCompareProductData, type CompareProductData } from "@/components/ProductCompareData";
+import {
+  isCompareProductData,
+  type CompareProductData,
+} from "@/components/ProductCompareData";
 
 export const compareChangeEvent = "launchpad-compare-products";
 let customerId: string | null = null;
-const storageKey = () => customerId ? `${compareChangeEvent}:${customerId}` : compareChangeEvent;
+const storageKey = () =>
+  customerId ? `${compareChangeEvent}:${customerId}` : compareChangeEvent;
 
 export function setCompareCustomer(id: string | null) {
   customerId = id;
@@ -25,9 +29,13 @@ export function setCompareCustomer(id: string | null) {
 export function readCompareProducts(): CompareProductData[] {
   if (typeof window === "undefined") return [];
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(storageKey()) ?? "[]");
+    const parsed = JSON.parse(
+      window.localStorage.getItem(storageKey()) ?? "[]",
+    );
     return Array.isArray(parsed) ? parsed.filter(isCompareProductData) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 export function writeCompareProducts(products: CompareProductData[]) {

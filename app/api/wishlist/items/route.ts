@@ -14,7 +14,10 @@ const addInput = z.object({
 export async function POST(request: Request) {
   const parsed = addInput.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid wishlist item" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid wishlist item" },
+      { status: 400 },
+    );
   }
 
   try {

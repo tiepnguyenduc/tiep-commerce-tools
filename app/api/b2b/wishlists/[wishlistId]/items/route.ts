@@ -25,16 +25,26 @@ async function customerId() {
 export async function POST(request: Request, { params }: Context) {
   const parsed = addInput.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid wishlist item" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid wishlist item" },
+      { status: 400 },
+    );
   }
   try {
     const { wishlistId } = await params;
     return NextResponse.json({
-      wishlist: await addB2BWishlistItem(await customerId(), parsed.data, wishlistId),
+      wishlist: await addB2BWishlistItem(
+        await customerId(),
+        parsed.data,
+        wishlistId,
+      ),
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist update failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist update failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }
@@ -51,11 +61,18 @@ export async function DELETE(request: Request, { params }: Context) {
   try {
     const { wishlistId } = await params;
     return NextResponse.json({
-      wishlist: await removeB2BWishlistItem(await customerId(), lineItemId, wishlistId),
+      wishlist: await removeB2BWishlistItem(
+        await customerId(),
+        lineItemId,
+        wishlistId,
+      ),
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist remove failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist remove failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }

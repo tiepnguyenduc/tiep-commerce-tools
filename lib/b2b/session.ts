@@ -18,12 +18,12 @@ function key() {
   const env = getB2BApiEnv();
   const secret =
     process.env.B2B_SESSION_SECRET ||
-    (process.env.NODE_ENV !== "production"
-      ? env.CTP_CLIENT_SECRET
-      : undefined);
+    (process.env.NODE_ENV !== "production" ? env.CTP_CLIENT_SECRET : undefined);
   if (!secret || secret.length < 32)
     throw new Error("Set B2B_SESSION_SECRET to enable business sign-in.");
-  return createHash("sha256").update(`b2b-session:${env.CTP_PROJECT_KEY || ""}:${secret}`).digest();
+  return createHash("sha256")
+    .update(`b2b-session:${env.CTP_PROJECT_KEY || ""}:${secret}`)
+    .digest();
 }
 export function sealSession(session: B2BSession) {
   const iv = randomBytes(12);

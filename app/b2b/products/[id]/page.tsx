@@ -21,7 +21,10 @@ export default async function Page({
     ? await Promise.all([
         readProductReviews(id, {}, "b2b").then(
           (data) => ({ data, error: "" }),
-          (error: unknown) => ({ data: null, error: reviewErrorResponse(error).error }),
+          (error: unknown) => ({
+            data: null,
+            error: reviewErrorResponse(error).error,
+          }),
         ),
         // The snapshot is decoration: a failure here must not cost us the page.
         readProductReviewSummary(id, "b2b").catch(() => null),

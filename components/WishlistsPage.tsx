@@ -5,10 +5,21 @@ import UIInput from "@/components/commercetools-ui/atoms/input";
 import Button from "@/components/commercetools-ui/atoms/button";
 import { useMemo, useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faPen,
+  faPlus,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { WishlistModal } from "@/components/WishlistModal";
-import { createWishlist, deleteWishlist, removeItemFromWishlist, renameWishlist, useWishlists } from "@/lib/wishlist-api";
+import {
+  createWishlist,
+  deleteWishlist,
+  removeItemFromWishlist,
+  renameWishlist,
+  useWishlists,
+} from "@/lib/wishlist-api";
 
 export function WishlistsPage() {
   const { wishlists, isLoading, error } = useWishlists();
@@ -80,12 +91,7 @@ export function WishlistsPage() {
   async function submitRename(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const name = renameName.trim();
-    if (
-      !renameTarget ||
-      !name ||
-      name === renameTarget.name ||
-      savingRename
-    ) {
+    if (!renameTarget || !name || name === renameTarget.name || savingRename) {
       return;
     }
 
@@ -144,7 +150,9 @@ export function WishlistsPage() {
           value={renameName}
         />
         <div className="wishlist-modal-actions">
-          <Button variant="ghost" size="fit"
+          <Button
+            variant="ghost"
+            size="fit"
             className="pill"
             disabled={savingRename}
             onClick={() => setRenameTarget(null)}
@@ -175,7 +183,9 @@ export function WishlistsPage() {
     return (
       <div className="account-stack">
         <div className="wishlist-detail-head">
-          <Button variant="ghost" size="fit"
+          <Button
+            variant="ghost"
+            size="fit"
             className="text-button"
             onClick={() => setSelectedId(null)}
             type="button"
@@ -184,7 +194,9 @@ export function WishlistsPage() {
             All wishlists
           </Button>
           <div className="wishlist-detail-actions">
-            <Button variant="ghost" size="fit"
+            <Button
+              variant="ghost"
+              size="fit"
               className="text-button"
               disabled={savingRename}
               onClick={() => openRename(selected.id, selected.name)}
@@ -194,7 +206,9 @@ export function WishlistsPage() {
               Rename
             </Button>
             {!selected.isDefault && (
-              <Button variant="ghost" size="fit"
+              <Button
+                variant="ghost"
+                size="fit"
                 className="text-button danger"
                 disabled={deletingId !== null}
                 onClick={() => removeWishlist(selected.id, selected.name)}
@@ -210,24 +224,42 @@ export function WishlistsPage() {
           <div>
             <h3>{selected.name}</h3>
             <p className="muted">
-              {selected.lines.length} item{selected.lines.length === 1 ? "" : "s"}
+              {selected.lines.length} item
+              {selected.lines.length === 1 ? "" : "s"}
             </p>
           </div>
-          {selected.isDefault && <span className="wishlist-default-badge">Default</span>}
+          {selected.isDefault && (
+            <span className="wishlist-default-badge">Default</span>
+          )}
         </div>
         {selected.lines.length === 0 ? (
           <div className="wishlist-empty">
             <h3>This wishlist is empty.</h3>
-            <p className="muted">Use the heart on any product to save it here.</p>
+            <p className="muted">
+              Use the heart on any product to save it here.
+            </p>
           </div>
         ) : (
           <div className="wishlist-list">
             {selected.lines.map((line) => (
               <article className="launchpad-ui" key={line.id}>
-                <WishlistItem item={{ lineItemId: line.id, productId: line.productId, name: line.name, count: line.quantity, variant: { sku: line.sku, images: [line.image] } }}
-                  imageSuffix={false} disabled={removingLineId !== null}
+                <WishlistItem
+                  item={{
+                    lineItemId: line.id,
+                    productId: line.productId,
+                    name: line.name,
+                    count: line.quantity,
+                    variant: { sku: line.sku, images: [line.image] },
+                  }}
+                  imageSuffix={false}
+                  disabled={removingLineId !== null}
                   onRemove={() => removeLine(selected.id, line.id)}
-                  details={<p className="storefront-line-details">SKU: {line.sku} · Quantity: {line.quantity}</p>} />
+                  details={
+                    <p className="storefront-line-details">
+                      SKU: {line.sku} · Quantity: {line.quantity}
+                    </p>
+                  }
+                />
               </article>
             ))}
           </div>
@@ -241,7 +273,8 @@ export function WishlistsPage() {
     <div className="account-stack">
       <div className="wishlist-overview-head">
         <p className="muted">
-          Organise saved products into separate lists for projects, rooms, or gifts.
+          Organise saved products into separate lists for projects, rooms, or
+          gifts.
         </p>
         <Button
           variant="primary"
@@ -257,7 +290,9 @@ export function WishlistsPage() {
       <div className="wishlist-card-grid">
         {wishlists.map((wishlist) => (
           <article className="wishlist-card" key={wishlist.id}>
-            <Button variant="ghost" size="fit"
+            <Button
+              variant="ghost"
+              size="fit"
               className="wishlist-card-open"
               onClick={() => setSelectedId(wishlist.id)}
               type="button"
@@ -269,7 +304,8 @@ export function WishlistsPage() {
                 )}
               </span>
               <span className="muted">
-                {wishlist.lines.length} item{wishlist.lines.length === 1 ? "" : "s"}
+                {wishlist.lines.length} item
+                {wishlist.lines.length === 1 ? "" : "s"}
               </span>
               <span className="wishlist-card-images" aria-hidden="true">
                 {wishlist.lines.slice(0, 3).map((line) => (
@@ -279,7 +315,9 @@ export function WishlistsPage() {
               </span>
             </Button>
             <span className="wishlist-card-actions">
-              <Button variant="ghost" size="fit"
+              <Button
+                variant="ghost"
+                size="fit"
                 aria-label={`Rename ${wishlist.name}`}
                 className="wishlist-card-action"
                 disabled={savingRename}
@@ -290,7 +328,9 @@ export function WishlistsPage() {
                 <FontAwesomeIcon aria-hidden="true" icon={faPen} />
               </Button>
               {!wishlist.isDefault && (
-                <Button variant="ghost" size="fit"
+                <Button
+                  variant="ghost"
+                  size="fit"
                   aria-label={`Delete ${wishlist.name}`}
                   className="wishlist-card-action danger"
                   disabled={deletingId !== null}
@@ -328,7 +368,9 @@ export function WishlistsPage() {
               value={newName}
             />
             <div className="wishlist-modal-actions">
-              <Button variant="ghost" size="fit"
+              <Button
+                variant="ghost"
+                size="fit"
                 className="pill"
                 disabled={creating}
                 onClick={() => setShowCreate(false)}

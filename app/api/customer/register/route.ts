@@ -42,7 +42,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ customer: await registerCustomer(parsed.data) });
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Customer registration failed" },
+      {
+        error: e instanceof Error ? e.message : "Customer registration failed",
+      },
       { status: 502 },
     );
   }

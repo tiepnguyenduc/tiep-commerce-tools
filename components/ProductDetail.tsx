@@ -47,13 +47,12 @@ function fallbackVariant(product: Product): ProductVariant {
     price: product.price,
     originalPrice: product.originalPrice,
     attributes: product.specifications ?? [],
-    specifications:
-      product.specifications?.length
-        ? product.specifications
-        : [
-            { name: "category", label: "Category", value: product.category },
-            { name: "color", label: "Color", value: product.color },
-          ],
+    specifications: product.specifications?.length
+      ? product.specifications
+      : [
+          { name: "category", label: "Category", value: product.category },
+          { name: "color", label: "Color", value: product.color },
+        ],
   };
 }
 
@@ -68,7 +67,7 @@ function specificationRows(product: Product, variant: ProductVariant) {
     { name: "variant-key", label: "Variant Key", value: variant.key ?? "" },
     ...(variant.specifications.length
       ? variant.specifications
-      : product.specifications ?? []),
+      : (product.specifications ?? [])),
   ];
   const seen = new Set<string>();
 
@@ -80,7 +79,11 @@ function specificationRows(product: Product, variant: ProductVariant) {
   });
 }
 
-const TABS = { description: "description", specifications: "specifications", reviews: "reviews" } as const;
+const TABS = {
+  description: "description",
+  specifications: "specifications",
+  reviews: "reviews",
+} as const;
 
 type TabId = (typeof TABS)[keyof typeof TABS];
 
@@ -141,7 +144,8 @@ export function ProductDetail({
   ratingSummary?: ProductRatingSummary | null;
 }) {
   const variants = useMemo(
-    () => (product.variants?.length ? product.variants : [fallbackVariant(product)]),
+    () =>
+      product.variants?.length ? product.variants : [fallbackVariant(product)],
     [product],
   );
   const [variantId, setVariantId] = useState(variants[0]?.id ?? 1);
@@ -164,13 +168,19 @@ export function ProductDetail({
     optionGroups
       .map((group) => selectedAttributeValue(selectedVariant, group.name))
       .filter(Boolean)
-      .join(" · ") || (variants.length > 1 ? variantLabel(selectedVariant) : "");
-  const stickyMeta = [variantSummary, selectedVariant.sku ? `SKU ${selectedVariant.sku}` : ""]
+      .join(" · ") ||
+    (variants.length > 1 ? variantLabel(selectedVariant) : "");
+  const stickyMeta = [
+    variantSummary,
+    selectedVariant.sku ? `SKU ${selectedVariant.sku}` : "",
+  ]
     .filter(Boolean)
     .join(" · ");
 
   function selectVariantOption(name: string, value: string) {
-    setVariantId(variantForOption(variants, optionGroups, selectedVariant, name, value).id);
+    setVariantId(
+      variantForOption(variants, optionGroups, selectedVariant, name, value).id,
+    );
   }
 
   function variantCards() {
@@ -184,7 +194,9 @@ export function ProductDetail({
             const selected = variant.id === selectedVariant.id;
             const color = variantColor(variant);
             return (
-              <UIButton variant={selected ? "primary" : "secondary"} size="xs"
+              <UIButton
+                variant={selected ? "primary" : "secondary"}
+                size="xs"
                 aria-pressed={selected}
                 className={`${styles.variantCard} ${selected ? "selected" : ""}`}
                 key={variant.id}
@@ -236,8 +248,17 @@ export function ProductDetail({
       onRevealReviews={() => setActiveTab(TABS.reviews)}
     >
       <main className={`shell detail product-detail ${styles.detail}`}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">All products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
-        <section className="product-gallery" aria-label={`${product.name} gallery`}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <Link href="/">Home</Link>
+          <span>/</span>
+          <Link href="/products">All products</Link>
+          <span>/</span>
+          <span aria-current="page">{product.name}</span>
+        </nav>
+        <section
+          className="product-gallery"
+          aria-label={`${product.name} gallery`}
+        >
           {product.brand ? (
             <Link
               className="product-brand-badge"
@@ -259,15 +280,25 @@ export function ProductDetail({
           <span className="eyebrow">{product.category} collection</span>
           <h1>{product.name}</h1>
           <ProductRatingSnippet className="product-review-snippet" />
-          <p className="product-summary">{product.description.length > 240 ? `${product.description.slice(0, 237).replace(/\s+\S*$/, "")}…` : product.description}</p>
+          <p className="product-summary">
+            {product.description.length > 240
+              ? `${product.description.slice(0, 237).replace(/\s+\S*$/, "")}…`
+              : product.description}
+          </p>
           <div className="product-price-block">
-            <p className={selectedVariant.originalPrice ? "price on-sale" : "price"}>
+            <p
+              className={
+                selectedVariant.originalPrice ? "price on-sale" : "price"
+              }
+            >
               {selectedVariant.originalPrice ? (
                 <span className="price-was">
                   {selectedVariant.originalPrice.formatted}
                 </span>
               ) : null}
-              <span className="price-now">{selectedVariant.price.formatted}</span>
+              <span className="price-now">
+                {selectedVariant.price.formatted}
+              </span>
             </p>
             <span>In stock and ready to ship</span>
           </div>
@@ -281,9 +312,12 @@ export function ProductDetail({
                   <div className="variant-option-list">
                     {group.values.map((value) => {
                       const selected =
-                        selectedAttributeValue(selectedVariant, group.name) === value;
+                        selectedAttributeValue(selectedVariant, group.name) ===
+                        value;
                       return (
-                        <UIButton variant={selected ? "primary" : "secondary"} size="s"
+                        <UIButton
+                          variant={selected ? "primary" : "secondary"}
+                          size="s"
                           aria-pressed={selected}
                           className={`gap-8 ${selected ? "selected" : ""}`}
                           key={value}
@@ -306,14 +340,17 @@ export function ProductDetail({
               ))}
             </div>
           ) : variants.length > 1 ? (
-            <div className="variant-options">
-              {variantCards()}
-            </div>
+            <div className="variant-options">{variantCards()}</div>
           ) : null}
 
           <div className="quantity-control">
             <span>Quantity</span>
-            <QuantitySelector value={quantity} minValue={1} maxValue={99} onChange={setQuantity} />
+            <QuantitySelector
+              value={quantity}
+              minValue={1}
+              maxValue={99}
+              onChange={setQuantity}
+            />
           </div>
 
           <div className="product-actions">
@@ -322,7 +359,10 @@ export function ProductDetail({
               quantity={quantity}
               sku={selectedVariant.sku}
             />
-            <AddToWishlist productId={product.id} variantId={selectedVariant.id} />
+            <AddToWishlist
+              productId={product.id}
+              variantId={selectedVariant.id}
+            />
             <AddToCompare product={productToCompareProduct(product)} />
           </div>
 
@@ -338,7 +378,9 @@ export function ProductDetail({
                 <dd>1-2 business days</dd>
               </div>
             </dl>
-            <p>Available methods and shipping costs are calculated at checkout.</p>
+            <p>
+              Available methods and shipping costs are calculated at checkout.
+            </p>
           </div>
         </section>
 

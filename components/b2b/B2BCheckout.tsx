@@ -4,20 +4,33 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faCircleCheck, faClock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCircleCheck,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 import Image from "@/components/commercetools-ui/atoms/image";
 import { useToast } from "@/components/Toast";
 import type { Cart } from "@/lib/types";
-import type { B2BCheckout as Checkout, B2BOrderAddress, B2BOrderConfirmation as Confirmation } from "@/lib/b2b/order-types";
+import type {
+  B2BCheckout as Checkout,
+  B2BOrderAddress,
+  B2BOrderConfirmation as Confirmation,
+} from "@/lib/b2b/order-types";
 import { useB2B } from "./B2BProvider";
 import { useB2BTranslations } from "./useB2BTranslations";
 import s from "./B2B.module.css";
 import c from "./B2BCheckout.module.css";
 
 async function load<T>(url: string): Promise<T> {
-  const response = await fetch(url, { cache: "no-store", credentials: "same-origin" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error || "Could not load your order.");
+  if (!response.ok)
+    throw new Error(result.error || "Could not load your order.");
   return result;
 }
 
@@ -30,7 +43,9 @@ function addressLines(address: Omit<B2BOrderAddress, "id">) {
     address.company,
     address.name,
     address.street,
-    [address.postalCode, address.city, address.region].filter(Boolean).join(" "),
+    [address.postalCode, address.city, address.region]
+      .filter(Boolean)
+      .join(" "),
     address.country,
   ].filter(Boolean);
 }
@@ -45,7 +60,8 @@ function OrderLines({ cart }: { cart: Cart }) {
           <div>
             <strong>{line.name}</strong>
             <span>
-              {t("SKU")} {line.sku} · {line.quantity} × {line.unitPrice.formatted}
+              {t("SKU")} {line.sku} · {line.quantity} ×{" "}
+              {line.unitPrice.formatted}
             </span>
           </div>
           <b>{line.total.formatted}</b>
@@ -106,13 +122,19 @@ export function B2BCheckout() {
   const refresh = useCallback(async () => {
     setLoadError("");
     try {
-      const { checkout: next } = await load<{ checkout: Checkout }>("/api/b2b/checkout");
+      const { checkout: next } = await load<{ checkout: Checkout }>(
+        "/api/b2b/checkout",
+      );
       setCheckout(next);
       setAddressId((current) =>
-        next.addresses.some((address) => address.id === current) ? current : next.defaultAddressId,
+        next.addresses.some((address) => address.id === current)
+          ? current
+          : next.defaultAddressId,
       );
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : "Could not load your order.");
+      setLoadError(
+        e instanceof Error ? e.message : "Could not load your order.",
+      );
     }
   }, []);
 
@@ -130,15 +152,25 @@ export function B2BCheckout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ purchaseOrderNumber, addressId, cartVersion: checkout.cart.version }),
+        body: JSON.stringify({
+          purchaseOrderNumber,
+          addressId,
+          cartVersion: checkout.cart.version,
+        }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || t("The order could not be placed."));
-      showToast(t("Order {number} placed.", { number: result.order.orderNumber }), "success");
+      if (!response.ok)
+        throw new Error(result.error || t("The order could not be placed."));
+      showToast(
+        t("Order {number} placed.", { number: result.order.orderNumber }),
+        "success",
+      );
       void reload(); // The ordered bag is closed; refresh the header bag count.
       router.push(orderHref(result.order));
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("The order could not be placed."));
+      setError(
+        e instanceof Error ? e.message : t("The order could not be placed."),
+      );
       setPlacing(false);
       void refresh(); // A failed attempt may still have changed the bag version.
     }
@@ -161,10 +193,15 @@ export function B2BCheckout() {
             {t("Checkout")}
             <span>.</span>
           </h1>
-          <p>{t("Choose the delivery address, add your purchase order number and place the order.")}</p>
+          <p>
+            {t(
+              "Choose the delivery address, add your purchase order number and place the order.",
+            )}
+          </p>
         </div>
         <Link className={s.textLink} href="/b2b/cart">
-          <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" /> {t("Back to bag")}
+          <FontAwesomeIcon icon={faArrowLeft} aria-hidden="true" />{" "}
+          {t("Back to bag")}
         </Link>
       </header>
 
@@ -172,7 +209,11 @@ export function B2BCheckout() {
         <section className={s.bagEmpty}>
           <h2>{t("We couldn’t load your order.")}</h2>
           <p role="alert">{loadError}</p>
-          <button type="button" className={s.button} onClick={() => void refresh()}>
+          <button
+            type="button"
+            className={s.button}
+            onClick={() => void refresh()}
+          >
             {t("Try again")}
           </button>
         </section>
@@ -189,14 +230,21 @@ export function B2BCheckout() {
           </Link>
         </section>
       ) : (
-        <form className={s.bagLayout} onSubmit={(event) => void placeOrder(event)}>
+        <form
+          className={s.bagLayout}
+          onSubmit={(event) => void placeOrder(event)}
+        >
           <div className={c.steps}>
             <fieldset className={c.step}>
               <legend>{t("1. Delivery address")}</legend>
               {checkout.addresses.length ? (
                 <div className={c.addresses}>
                   {checkout.addresses.map((address) => (
-                    <label key={address.id} className={c.address} data-selected={address.id === addressId}>
+                    <label
+                      key={address.id}
+                      className={c.address}
+                      data-selected={address.id === addressId}
+                    >
                       <input
                         type="radio"
                         name="addressId"
@@ -229,14 +277,18 @@ export function B2BCheckout() {
                 <input
                   name="purchaseOrderNumber"
                   value={purchaseOrderNumber}
-                  onChange={(event) => setPurchaseOrderNumber(event.target.value)}
+                  onChange={(event) =>
+                    setPurchaseOrderNumber(event.target.value)
+                  }
                   maxLength={50}
                   required
                   autoComplete="off"
                   placeholder="PO-2026-001"
                 />
               </label>
-              <p className={c.hint}>{t("Your finance team uses this number to match the invoice.")}</p>
+              <p className={c.hint}>
+                {t("Your finance team uses this number to match the invoice.")}
+              </p>
             </fieldset>
 
             <fieldset className={c.step}>
@@ -245,7 +297,10 @@ export function B2BCheckout() {
             </fieldset>
           </div>
 
-          <aside className={s.bagSummary} aria-labelledby="checkout-summary-title">
+          <aside
+            className={s.bagSummary}
+            aria-labelledby="checkout-summary-title"
+          >
             <span className={s.eyebrow}>{t("THE PURCHASE AT A GLANCE")}</span>
             <h2 id="checkout-summary-title">{t("Order summary")}</h2>
             <div className={s.bagContext}>
@@ -254,7 +309,9 @@ export function B2BCheckout() {
             </div>
             <Totals cart={cart} />
             <p className={s.bagTaxNote}>
-              {t("Orders above your company’s approval limits wait for an approver before they are processed.")}
+              {t(
+                "Orders above your company’s approval limits wait for an approver before they are processed.",
+              )}
             </p>
             {error && (
               <p className={c.error} role="alert">
@@ -283,8 +340,14 @@ export function B2BOrderConfirmationView({ order }: { order: Confirmation }) {
   const created = new Date(order.createdAt);
   return (
     <>
-      <section className={c.status} data-state={pending ? "pending" : rejected ? "rejected" : "placed"}>
-        <FontAwesomeIcon icon={pending ? faClock : faCircleCheck} aria-hidden="true" />
+      <section
+        className={c.status}
+        data-state={pending ? "pending" : rejected ? "rejected" : "placed"}
+      >
+        <FontAwesomeIcon
+          icon={pending ? faClock : faCircleCheck}
+          aria-hidden="true"
+        />
         <div>
           <h2>
             {pending
@@ -295,10 +358,16 @@ export function B2BOrderConfirmationView({ order }: { order: Confirmation }) {
           </h2>
           <p>
             {pending
-              ? t("It matches an approval rule of your company. It will be processed once the approvers sign off.")
+              ? t(
+                  "It matches an approval rule of your company. It will be processed once the approvers sign off.",
+                )
               : rejected
-                ? t("An approver rejected this order. Check the approval details for the reason.")
-                : t("We have received your order and will start processing it.")}
+                ? t(
+                    "An approver rejected this order. Check the approval details for the reason.",
+                  )
+                : t(
+                    "We have received your order and will start processing it.",
+                  )}
           </p>
           {order.approval && (
             <Link
@@ -327,7 +396,10 @@ export function B2BOrderConfirmationView({ order }: { order: Confirmation }) {
               <dd>
                 {Number.isNaN(created.getTime())
                   ? "—"
-                  : new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(created)}
+                  : new Intl.DateTimeFormat(locale, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    }).format(created)}
               </dd>
             </div>
             <div>
@@ -359,7 +431,10 @@ export function B2BOrderConfirmationView({ order }: { order: Confirmation }) {
         <aside className={s.bagSummary} aria-labelledby="order-summary-title">
           <span className={s.eyebrow}>{t("ORDER TOTAL")}</span>
           <h2 id="order-summary-title">{t("Order summary")}</h2>
-          <Totals cart={order.order} shipping={order.shippingPrice?.formatted} />
+          <Totals
+            cart={order.order}
+            shipping={order.shippingPrice?.formatted}
+          />
           <Link className={s.bagCheckoutBtn} href="/b2b/products">
             <span>{t("Continue shopping")}</span>
             <FontAwesomeIcon icon={faArrowRight} aria-hidden="true" />
@@ -370,7 +445,13 @@ export function B2BOrderConfirmationView({ order }: { order: Confirmation }) {
   );
 }
 
-export function B2BOrderConfirmation({ id, businessUnitKey = "" }: { id: string; businessUnitKey?: string }) {
+export function B2BOrderConfirmation({
+  id,
+  businessUnitKey = "",
+}: {
+  id: string;
+  businessUnitKey?: string;
+}) {
   const { t } = useB2BTranslations();
   const [order, setOrder] = useState<Confirmation | null>(null);
   const [error, setError] = useState("");
@@ -381,7 +462,13 @@ export function B2BOrderConfirmation({ id, businessUnitKey = "" }: { id: string;
       `/api/b2b/orders/${encodeURIComponent(id)}?businessUnitKey=${encodeURIComponent(businessUnitKey)}`,
     )
       .then((result) => active && setOrder(result.order))
-      .catch((e) => active && setError(e instanceof Error ? e.message : "Could not load your order."));
+      .catch(
+        (e) =>
+          active &&
+          setError(
+            e instanceof Error ? e.message : "Could not load your order.",
+          ),
+      );
     return () => {
       active = false;
     };

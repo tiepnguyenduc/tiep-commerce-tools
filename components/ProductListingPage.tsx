@@ -11,7 +11,13 @@ import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import { ProductCard } from "@/components/ProductCard";
 import { listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faChevronRight, faMagnifyingGlass, faSliders, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faChevronRight,
+  faMagnifyingGlass,
+  faSliders,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 export type ProductSearchParams = {
   q?: string;
@@ -206,9 +212,7 @@ export async function ProductListingPage({
           href: removeParamsHref(basePath, currentParams, ["sale"]),
         }
       : null,
-  ].filter((filter): filter is ActiveFilter =>
-    Boolean(filter),
-  );
+  ].filter((filter): filter is ActiveFilter => Boolean(filter));
   const isSearch = variant === "search";
   const title = isSearch
     ? p.q
@@ -232,7 +236,12 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Sort by</span>
-          <CTSelect className="field" id={`${location}-sort`} name="sort" defaultValue={p.sort ?? ""}>
+          <CTSelect
+            className="field"
+            id={`${location}-sort`}
+            name="sort"
+            defaultValue={p.sort ?? ""}
+          >
             <option value="">Newest</option>
             <option value="price-asc">Price: Low to high</option>
             <option value="price-desc">Price: High to low</option>
@@ -280,7 +289,12 @@ export async function ProductListingPage({
 
         <label className="filter-group">
           <span className="filter-label">Color</span>
-          <CTSelect className="field" id={`${location}-color`} name="color" defaultValue={p.color ?? ""}>
+          <CTSelect
+            className="field"
+            id={`${location}-color`}
+            name="color"
+            defaultValue={p.color ?? ""}
+          >
             <option value="">All colors</option>
             {result.facets.colors.map((x) => (
               <option key={x}>{x}</option>
@@ -310,7 +324,11 @@ export async function ProductListingPage({
           </p>
         </div>
 
-        <form action={basePath} className={`catalog-search-hero ${styles.searchForm}`} method="get">
+        <form
+          action={basePath}
+          className={`catalog-search-hero ${styles.searchForm}`}
+          method="get"
+        >
           <label className="sr-only" htmlFor={`${variant}-search-input`}>
             Search products
           </label>
@@ -332,7 +350,12 @@ export async function ProductListingPage({
           <input type="hidden" name="categoryId" value={p.categoryId ?? ""} />
           <input type="hidden" name="color" value={p.color ?? ""} />
           {saleOnly ? <input type="hidden" name="sale" value="true" /> : null}
-          <UIButton variant="primary" className={styles.searchButton} size="s" type="submit">
+          <UIButton
+            variant="primary"
+            className={styles.searchButton}
+            size="s"
+            type="submit"
+          >
             <span>Search</span>
             <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
           </UIButton>
@@ -341,22 +364,22 @@ export async function ProductListingPage({
         <div className="search-quick-row" aria-label="Popular searches">
           <span>Popular:</span>
           {popularSearches.map((term) => (
-            <Link
-              href={`${basePath}?q=${encodeURIComponent(term)}`}
-              key={term}
-            >
+            <Link href={`${basePath}?q=${encodeURIComponent(term)}`} key={term}>
               {term}
             </Link>
           ))}
         </div>
       </header>
 
-      <section className="results-meta-panel" aria-label="Search result summary">
+      <section
+        className="results-meta-panel"
+        aria-label="Search result summary"
+      >
         <div>
           <strong>{result.total} products</strong>
           <span>
-            Showing {resultStart}-{resultEnd} · Page {result.pagination.page}{" "}
-            of {result.pagination.totalPages}
+            Showing {resultStart}-{resultEnd} · Page {result.pagination.page} of{" "}
+            {result.pagination.totalPages}
           </span>
         </div>
         <div className="active-filter-list" aria-label="Active filters">

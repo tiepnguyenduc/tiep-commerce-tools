@@ -3,7 +3,15 @@
 import CTSelect from "@/components/commercetools-ui/atoms/dropdown/default-dropdown";
 import UIInput from "@/components/commercetools-ui/atoms/input";
 import { useEffect, useId, useRef, useState } from "react";
-import { findAddressLocationByPostalCode, getLinkedAddressOptions, hasPostalCodePrefix, isKnownPostalCode, syncPostalCode, syncLinkedAddressField, type LinkedAddressField } from "@/lib/address-directory";
+import {
+  findAddressLocationByPostalCode,
+  getLinkedAddressOptions,
+  hasPostalCodePrefix,
+  isKnownPostalCode,
+  syncPostalCode,
+  syncLinkedAddressField,
+  type LinkedAddressField,
+} from "@/lib/address-directory";
 import type { CustomerAddress } from "@/lib/types";
 
 const fields: readonly {
@@ -12,7 +20,11 @@ const fields: readonly {
   placeholder: string;
 }[] = [
   { field: "country", placeholder: "Country", autoComplete: "country" },
-  { field: "region", placeholder: "State / Region", autoComplete: "address-level1" },
+  {
+    field: "region",
+    placeholder: "State / Region",
+    autoComplete: "address-level1",
+  },
   { field: "city", placeholder: "City", autoComplete: "address-level2" },
 ];
 
@@ -34,9 +46,9 @@ export function LinkedAddressFields({
   const matchedLocation = findAddressLocationByPostalCode(postalCode);
   const postalCodeIsValid = Boolean(matchedLocation);
   const showPostalCodeError = Boolean(
-    postalCode
-      && !postalCodeIsValid
-      && (postalCodeTouched || !hasPostalCodePrefix(postalCode)),
+    postalCode &&
+    !postalCodeIsValid &&
+    (postalCodeTouched || !hasPostalCodePrefix(postalCode)),
   );
 
   useEffect(() => {
@@ -59,7 +71,9 @@ export function LinkedAddressFields({
             required
             value={address[field] ?? ""}
             onChange={(event) =>
-              onChange(syncLinkedAddressField(address, field, event.target.value))
+              onChange(
+                syncLinkedAddressField(address, field, event.target.value),
+              )
             }
           >
             <option value="">Select {placeholder.toLowerCase()}</option>
@@ -96,7 +110,9 @@ export function LinkedAddressFields({
           onInvalid={() => setPostalCodeTouched(true)}
         />
         <small
-          className={showPostalCodeError ? "field-message error" : "field-message"}
+          className={
+            showPostalCodeError ? "field-message error" : "field-message"
+          }
           id={postalMessageId}
           role={showPostalCodeError ? "alert" : undefined}
         >

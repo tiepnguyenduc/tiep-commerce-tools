@@ -28,7 +28,9 @@ function localized(
   locale: string,
   fallback = "",
 ) {
-  return value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback;
+  return (
+    value?.[locale] || value?.en || Object.values(value ?? {})[0] || fallback
+  );
 }
 
 export function attributeLabel(name: string) {
@@ -180,7 +182,9 @@ function brandFromSpecifications(specifications: ProductSpecification[]) {
 
 function productData(resource: CtProduct) {
   const { current, staged } = resource.masterData;
-  return staged && variantCount(staged) > variantCount(current) ? staged : current;
+  return staged && variantCount(staged) > variantCount(current)
+    ? staged
+    : current;
 }
 
 export function mapCategoryResourcesToHeaderCategories(
@@ -193,13 +197,18 @@ export function mapCategoryResourcesToHeaderCategories(
   return resources
     .filter(
       (category) =>
-        !category.parent && (!category.ancestors || category.ancestors.length === 0),
+        !category.parent &&
+        (!category.ancestors || category.ancestors.length === 0),
     )
     .sort((a, b) => {
       const orderA = Number.parseFloat(a.orderHint);
       const orderB = Number.parseFloat(b.orderHint);
 
-      if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) {
+      if (
+        Number.isFinite(orderA) &&
+        Number.isFinite(orderB) &&
+        orderA !== orderB
+      ) {
         return orderA - orderB;
       }
 
@@ -239,7 +248,9 @@ export function mapProductResourceToStorefrontProduct(
   );
   const selectedVariant = variants[0];
   const brand =
-    brandFromSpecifications(variants.flatMap((variant) => variant.attributes)) ||
+    brandFromSpecifications(
+      variants.flatMap((variant) => variant.attributes),
+    ) ||
     sampleProducts[index % sampleProducts.length].brand ||
     "WORK/SHOP";
   const color =

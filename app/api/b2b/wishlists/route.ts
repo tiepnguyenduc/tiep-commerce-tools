@@ -26,7 +26,9 @@ export async function GET() {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlists read failed" },
+      {
+        error: error instanceof Error ? error.message : "Wishlists read failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }
@@ -42,12 +44,17 @@ export async function POST(request: Request) {
   }
   try {
     return NextResponse.json(
-      { wishlist: await createB2BWishlist(await customerId(), parsed.data.name) },
+      {
+        wishlist: await createB2BWishlist(await customerId(), parsed.data.name),
+      },
       { status: 201 },
     );
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist create failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist create failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }

@@ -39,13 +39,21 @@ type WishlistContext = {
   create: (name: string) => Promise<Wishlist>;
   rename: (id: string, name: string) => Promise<Wishlist>;
   removeList: (id: string) => Promise<void>;
-  toggle: (wishlistId: string, productId: string, variantId?: number) => Promise<void>;
+  toggle: (
+    wishlistId: string,
+    productId: string,
+    variantId?: number,
+  ) => Promise<void>;
   removeLine: (wishlistId: string, lineItemId: string) => Promise<void>;
 };
 
 const Context = createContext<WishlistContext | null>(null);
 
-function matchingLine(wishlist: Wishlist, productId: string, variantId?: number) {
+function matchingLine(
+  wishlist: Wishlist,
+  productId: string,
+  variantId?: number,
+) {
   return wishlist.lines.find(
     (line) =>
       line.productId === productId &&
@@ -72,7 +80,9 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
   customerIdRef.current = customerId;
   const [ownerId, setOwnerId] = useState("");
   const [wishlists, setWishlists] = useState<Wishlist[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const [error, setError] = useState("");
   const [pending, setPending] = useState<string | null>(null);
 
@@ -110,7 +120,11 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
       if (customerIdRef.current === owner) {
         setWishlists([]);
         setStatus("error");
-        setError(requestError instanceof Error ? requestError.message : "Wishlist request failed.");
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Wishlist request failed.",
+        );
       }
       throw requestError;
     }
@@ -147,9 +161,13 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
 
   async function removeList(id: string) {
     const data = await readJson<{ deletedId: string }>(
-      await fetch(`/api/b2b/wishlists/${encodeURIComponent(id)}`, { method: "DELETE" }),
+      await fetch(`/api/b2b/wishlists/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }),
     );
-    setWishlists((current) => current.filter((entry) => entry.id !== data.deletedId));
+    setWishlists((current) =>
+      current.filter((entry) => entry.id !== data.deletedId),
+    );
   }
 
   async function removeLine(wishlistId: string, lineItemId: string) {
@@ -168,7 +186,11 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function toggle(wishlistId: string, productId: string, variantId?: number) {
+  async function toggle(
+    wishlistId: string,
+    productId: string,
+    variantId?: number,
+  ) {
     const wishlist = wishlists.find((entry) => entry.id === wishlistId);
     if (pending) return;
     const line = wishlist
@@ -182,11 +204,14 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
     setPending(operationKey);
     try {
       const data = await readJson<{ wishlist: Wishlist }>(
-        await fetch(`/api/b2b/wishlists/${encodeURIComponent(wishlistId)}/items`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId, variantId }),
-        }),
+        await fetch(
+          `/api/b2b/wishlists/${encodeURIComponent(wishlistId)}/items`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, variantId }),
+          },
+        ),
       );
       upsert(data.wishlist);
     } finally {
@@ -195,18 +220,20 @@ export function B2BWishlistProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Context.Provider value={{
-      wishlists,
-      ready,
-      pending,
-      error,
-      reload: () => load(customerId),
-      create,
-      rename,
-      removeList,
-      toggle,
-      removeLine,
-    }}>
+    <Context.Provider
+      value={{
+        wishlists,
+        ready,
+        pending,
+        error,
+        reload: () => load(customerId),
+        create,
+        rename,
+        removeList,
+        toggle,
+        removeLine,
+      }}
+    >
       {children}
     </Context.Provider>
   );
@@ -229,13 +256,16 @@ export function B2BSaveButton({
 }) {
   const { t } = useB2BTranslations();
   const { state } = useB2B();
-  const { wishlists, ready, pending, reload, create, toggle } = useB2BWishlist();
+  const { wishlists, ready, pending, reload, create, toggle } =
+    useB2BWishlist();
   const [open, setOpen] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const showToast = useToast();
-  const saved = wishlists.some((wishlist) => Boolean(matchingLine(wishlist, productId, variantId)));
+  const saved = wishlists.some((wishlist) =>
+    Boolean(matchingLine(wishlist, productId, variantId)),
+  );
 
   async function openPicker() {
     if (!state?.customer) {
@@ -246,7 +276,12 @@ export function B2BSaveButton({
       if (!ready) await reload();
       setOpen(true);
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not load wishlists.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not load wishlists.",
+        "error",
+      );
     }
   }
 
@@ -254,10 +289,20 @@ export function B2BSaveButton({
     try {
       const wasSaved = Boolean(matchingLine(wishlist, productId, variantId));
       await toggle(wishlist.id, productId, variantId);
-      showToast(wasSaved ? `Removed from ${wishlist.name}.` : `Saved to ${wishlist.name}.`, "success");
+      showToast(
+        wasSaved
+          ? `Removed from ${wishlist.name}.`
+          : `Saved to ${wishlist.name}.`,
+        "success",
+      );
       setOpen(false);
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not update the wishlist.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not update the wishlist.",
+        "error",
+      );
     }
   }
 
@@ -274,7 +319,12 @@ export function B2BSaveButton({
       setShowCreate(false);
       setOpen(false);
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not create the wishlist.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not create the wishlist.",
+        "error",
+      );
     } finally {
       setBusy(false);
     }
@@ -298,39 +348,105 @@ export function B2BSaveButton({
         onClick={() => void openPicker()}
       >
         <HeartIcon aria-hidden="true" />
-        {!compact && (pending ? t("Updating wishlist…") : saved ? t("In My Wishlist") : t("Add to My Wishlist"))}
+        {!compact &&
+          (pending
+            ? t("Updating wishlist…")
+            : saved
+              ? t("In My Wishlist")
+              : t("Add to My Wishlist"))}
       </button>
       {open && (
-        <WishlistModal onClose={() => setOpen(false)} title={showCreate ? "Create new wishlist" : "Add to wishlist"}>
+        <WishlistModal
+          onClose={() => setOpen(false)}
+          title={showCreate ? "Create new wishlist" : "Add to wishlist"}
+        >
           {showCreate ? (
             <form className="wishlist-create-form" onSubmit={createAndSave}>
-              <Button variant="ghost" size="fit" type="button" onClick={() => setShowCreate(false)}>
-                <ArrowLeftIcon aria-hidden="true" width={16} /> Back to wishlists
+              <Button
+                variant="ghost"
+                size="fit"
+                type="button"
+                onClick={() => setShowCreate(false)}
+              >
+                <ArrowLeftIcon aria-hidden="true" width={16} /> Back to
+                wishlists
               </Button>
               <label htmlFor={`b2b-wishlist-${productId}`}>Wishlist name</label>
-              <Input id={`b2b-wishlist-${productId}`} value={name} maxLength={100} required autoFocus onChange={(event) => setName(event.target.value)} />
+              <Input
+                id={`b2b-wishlist-${productId}`}
+                value={name}
+                maxLength={100}
+                required
+                autoFocus
+                onChange={(event) => setName(event.target.value)}
+              />
               <div className="wishlist-modal-actions">
-                <Button variant="secondary" type="button" onClick={() => setShowCreate(false)}>Cancel</Button>
-                <Button variant="primary" type="submit" disabled={!name.trim() || busy}>{busy ? "Creating…" : "Create and save"}</Button>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setShowCreate(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!name.trim() || busy}
+                >
+                  {busy ? "Creating…" : "Create and save"}
+                </Button>
               </div>
             </form>
           ) : (
             <>
-              <p className="wishlist-picker-intro">Choose a list to save this product. Select a saved list to remove it.</p>
+              <p className="wishlist-picker-intro">
+                Choose a list to save this product. Select a saved list to
+                remove it.
+              </p>
               <div className="wishlist-picker-list">
                 {wishlists.map((wishlist) => {
-                  const inList = Boolean(matchingLine(wishlist, productId, variantId));
+                  const inList = Boolean(
+                    matchingLine(wishlist, productId, variantId),
+                  );
                   return (
-                    <Button variant={inList ? "primary" : "secondary"} size="s" className={`wishlist-picker-option${inList ? " saved" : ""}`} aria-pressed={inList} disabled={pending !== null} key={wishlist.id} onClick={() => void toggleList(wishlist)} type="button">
-                      <span><strong>{wishlist.name}</strong>{wishlist.isDefault && <small>Default</small>}</span>
-                      <span className="wishlist-picker-count">{wishlist.lines.length} item{wishlist.lines.length === 1 ? "" : "s"}{inList && <CheckIcon aria-hidden="true" width={16} />}</span>
+                    <Button
+                      variant={inList ? "primary" : "secondary"}
+                      size="s"
+                      className={`wishlist-picker-option${inList ? " saved" : ""}`}
+                      aria-pressed={inList}
+                      disabled={pending !== null}
+                      key={wishlist.id}
+                      onClick={() => void toggleList(wishlist)}
+                      type="button"
+                    >
+                      <span>
+                        <strong>{wishlist.name}</strong>
+                        {wishlist.isDefault && <small>Default</small>}
+                      </span>
+                      <span className="wishlist-picker-count">
+                        {wishlist.lines.length} item
+                        {wishlist.lines.length === 1 ? "" : "s"}
+                        {inList && <CheckIcon aria-hidden="true" width={16} />}
+                      </span>
                     </Button>
                   );
                 })}
               </div>
               <div className="wishlist-picker-footer">
-                <Button variant="secondary" type="button" onClick={() => setShowCreate(true)}><PlusIcon aria-hidden="true" width={16} /> Create new wishlist</Button>
-                <Link className="wishlist-manage-link" href="/b2b/wishlist" onClick={() => setOpen(false)}>Manage wishlists</Link>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setShowCreate(true)}
+                >
+                  <PlusIcon aria-hidden="true" width={16} /> Create new wishlist
+                </Button>
+                <Link
+                  className="wishlist-manage-link"
+                  href="/b2b/wishlist"
+                  onClick={() => setOpen(false)}
+                >
+                  Manage wishlists
+                </Link>
               </div>
             </>
           )}
@@ -343,11 +459,20 @@ export function B2BSaveButton({
 export function B2BHeaderWishlistLink() {
   const { t } = useB2BTranslations();
   const { wishlists } = useB2BWishlist();
-  const count = wishlists.reduce((total, wishlist) => total + wishlist.lines.length, 0);
+  const count = wishlists.reduce(
+    (total, wishlist) => total + wishlist.lines.length,
+    0,
+  );
   return (
-    <Link href="/b2b/wishlist" aria-label={`${t("My Wishlist")}, ${count} items`}>
+    <Link
+      href="/b2b/wishlist"
+      aria-label={`${t("My Wishlist")}, ${count} items`}
+    >
       <HeartIcon aria-hidden="true" />
-      <span>{t("My Wishlist")}{count ? ` (${count})` : ""}</span>
+      <span>
+        {t("My Wishlist")}
+        {count ? ` (${count})` : ""}
+      </span>
     </Link>
   );
 }
@@ -355,7 +480,17 @@ export function B2BHeaderWishlistLink() {
 export function B2BWishlistPage() {
   const { state, busy, act } = useB2B();
   const { openCart } = useB2BMiniCart();
-  const { wishlists, ready, error, reload, pending, create, rename, removeList, removeLine } = useB2BWishlist();
+  const {
+    wishlists,
+    ready,
+    error,
+    reload,
+    pending,
+    create,
+    rename,
+    removeList,
+    removeLine,
+  } = useB2BWishlist();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
@@ -363,7 +498,10 @@ export function B2BWishlistPage() {
   const [renameName, setRenameName] = useState("");
   const [saving, setSaving] = useState(false);
   const showToast = useToast();
-  const selected = useMemo(() => wishlists.find((entry) => entry.id === selectedId) ?? null, [selectedId, wishlists]);
+  const selected = useMemo(
+    () => wishlists.find((entry) => entry.id === selectedId) ?? null,
+    [selectedId, wishlists],
+  );
 
   useEffect(() => {
     setSelectedId(null);
@@ -380,7 +518,12 @@ export function B2BWishlistPage() {
       setShowCreate(false);
       showToast(`${wishlist.name} was created.`, "success");
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not create the wishlist.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not create the wishlist.",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -395,7 +538,12 @@ export function B2BWishlistPage() {
       setRenameTarget(null);
       showToast(`Wishlist renamed to ${updated.name}.`, "success");
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not rename the wishlist.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not rename the wishlist.",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -409,60 +557,187 @@ export function B2BWishlistPage() {
       if (selectedId === wishlist.id) setSelectedId(null);
       showToast(`${wishlist.name} was deleted.`, "success");
     } catch (requestError) {
-      showToast(requestError instanceof Error ? requestError.message : "Could not delete the wishlist.", "error");
+      showToast(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not delete the wishlist.",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
   }
 
   const modal = renameTarget ? (
-    <WishlistModal title="Rename wishlist" onClose={() => !saving && setRenameTarget(null)}>
+    <WishlistModal
+      title="Rename wishlist"
+      onClose={() => !saving && setRenameTarget(null)}
+    >
       <form className="wishlist-create-form" onSubmit={submitRename}>
         <label htmlFor="b2b-wishlist-rename">Wishlist name</label>
-        <Input id="b2b-wishlist-rename" value={renameName} maxLength={100} required autoFocus onChange={(event) => setRenameName(event.target.value)} />
+        <Input
+          id="b2b-wishlist-rename"
+          value={renameName}
+          maxLength={100}
+          required
+          autoFocus
+          onChange={(event) => setRenameName(event.target.value)}
+        />
         <div className="wishlist-modal-actions">
-          <Button variant="secondary" type="button" disabled={saving} onClick={() => setRenameTarget(null)}>Cancel</Button>
-          <Button variant="primary" type="submit" disabled={saving || !renameName.trim()}>{saving ? "Saving…" : "Save name"}</Button>
+          <Button
+            variant="secondary"
+            type="button"
+            disabled={saving}
+            onClick={() => setRenameTarget(null)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={saving || !renameName.trim()}
+          >
+            {saving ? "Saving…" : "Save name"}
+          </Button>
         </div>
       </form>
     </WishlistModal>
   ) : null;
 
   return (
-    <B2BAccountWorkspace title="My Wishlist" description="Organise products into personal lists and return to them from either storefront.">
+    <B2BAccountWorkspace
+      title="My Wishlist"
+      description="Organise products into personal lists and return to them from either storefront."
+    >
       {!state?.customer || !ready ? (
         <div className={s.empty} role="status">
-          {error ? <><p>My Wishlist is temporarily unavailable.</p><button className={s.button} type="button" onClick={() => void reload()}>Try again</button></> : "Loading My Wishlist…"}
+          {error ? (
+            <>
+              <p>My Wishlist is temporarily unavailable.</p>
+              <button
+                className={s.button}
+                type="button"
+                onClick={() => void reload()}
+              >
+                Try again
+              </button>
+            </>
+          ) : (
+            "Loading My Wishlist…"
+          )}
         </div>
       ) : selected ? (
         <div className={s.wishlistStack}>
           <div className={s.wishlistToolbar}>
-            <button type="button" onClick={() => setSelectedId(null)}><ArrowLeftIcon aria-hidden="true" /> All wishlists</button>
+            <button type="button" onClick={() => setSelectedId(null)}>
+              <ArrowLeftIcon aria-hidden="true" /> All wishlists
+            </button>
             <div>
-              <button type="button" onClick={() => { setRenameTarget(selected); setRenameName(selected.name); }}><PencilIcon aria-hidden="true" /> Rename</button>
-              {!selected.isDefault && <button type="button" className={s.danger} onClick={() => void deleteList(selected)}><TrashIcon aria-hidden="true" /> Delete</button>}
+              <button
+                type="button"
+                onClick={() => {
+                  setRenameTarget(selected);
+                  setRenameName(selected.name);
+                }}
+              >
+                <PencilIcon aria-hidden="true" /> Rename
+              </button>
+              {!selected.isDefault && (
+                <button
+                  type="button"
+                  className={s.danger}
+                  onClick={() => void deleteList(selected)}
+                >
+                  <TrashIcon aria-hidden="true" /> Delete
+                </button>
+              )}
             </div>
           </div>
           <div className={s.wishlistTitle}>
-            <div><h2>{selected.name}</h2><p>{selected.lines.length} item{selected.lines.length === 1 ? "" : "s"}</p></div>
+            <div>
+              <h2>{selected.name}</h2>
+              <p>
+                {selected.lines.length} item
+                {selected.lines.length === 1 ? "" : "s"}
+              </p>
+            </div>
             {selected.isDefault && <span>Default</span>}
           </div>
           {!selected.lines.length ? (
-            <div className={s.empty}><h2>This wishlist is empty.</h2><p>Use “Add to My Wishlist” while browsing to save products here.</p><Link href="/b2b/products">Explore equipment →</Link></div>
+            <div className={s.empty}>
+              <h2>This wishlist is empty.</h2>
+              <p>
+                Use “Add to My Wishlist” while browsing to save products here.
+              </p>
+              <Link href="/b2b/products">Explore equipment →</Link>
+            </div>
           ) : (
             <div className={s.grid}>
               {selected.lines.map((line) => {
-                const product = state.products.find((entry) => entry.id === line.productId);
-                const variant = product?.variants.find((entry) => entry.id === line.variantId) ?? product?.variants[0];
+                const product = state.products.find(
+                  (entry) => entry.id === line.productId,
+                );
+                const variant =
+                  product?.variants.find(
+                    (entry) => entry.id === line.variantId,
+                  ) ?? product?.variants[0];
                 return (
                   <article className={s.product} key={line.id}>
                     {line.image && <img src={line.image} alt="" />}
                     <h2>{line.name}</h2>
                     <p>SKU: {line.sku}</p>
-                    <p>{state.context ? variant?.price?.formatted || "Price unavailable" : "Select a store for pricing"}</p>
+                    <p>
+                      {state.context
+                        ? variant?.price?.formatted || "Price unavailable"
+                        : "Select a store for pricing"}
+                    </p>
                     <div className={s.actions}>
-                      <button type="button" disabled={pending !== null} onClick={async () => { try { await removeLine(selected.id, line.id); showToast("Item removed from the wishlist.", "success"); } catch (requestError) { showToast(requestError instanceof Error ? requestError.message : "Could not remove the item.", "error"); } }}>Remove</button>
-                      {product && variant && <button className={s.primary} type="button" disabled={busy || !state.context || !variant.price} onClick={async () => { const success = await act({ action: "add-to-cart", productId: product.id, variantId: variant.id, quantity: 1 }); showToast(success ? `${product.name} added to your bag.` : "The result could not be confirmed. Check your bag before trying again.", success ? "success" : "error"); if (success) openCart(); }}>Add 1 to bag</button>}
+                      <button
+                        type="button"
+                        disabled={pending !== null}
+                        onClick={async () => {
+                          try {
+                            await removeLine(selected.id, line.id);
+                            showToast(
+                              "Item removed from the wishlist.",
+                              "success",
+                            );
+                          } catch (requestError) {
+                            showToast(
+                              requestError instanceof Error
+                                ? requestError.message
+                                : "Could not remove the item.",
+                              "error",
+                            );
+                          }
+                        }}
+                      >
+                        Remove
+                      </button>
+                      {product && variant && (
+                        <button
+                          className={s.primary}
+                          type="button"
+                          disabled={busy || !state.context || !variant.price}
+                          onClick={async () => {
+                            const success = await act({
+                              action: "add-to-cart",
+                              productId: product.id,
+                              variantId: variant.id,
+                              quantity: 1,
+                            });
+                            showToast(
+                              success
+                                ? `${product.name} added to your bag.`
+                                : "The result could not be confirmed. Check your bag before trying again.",
+                              success ? "success" : "error",
+                            );
+                            if (success) openCart();
+                          }}
+                        >
+                          Add 1 to bag
+                        </button>
+                      )}
                     </div>
                   </article>
                 );
@@ -474,34 +749,101 @@ export function B2BWishlistPage() {
       ) : (
         <div className={s.wishlistStack}>
           <div className={s.wishlistOverview}>
-            <p>Create separate lists for projects, teams, or future purchases.</p>
-            <button className={s.primaryAction} type="button" onClick={() => setShowCreate(true)}><PlusIcon aria-hidden="true" /> Create new wishlist</button>
+            <p>
+              Create separate lists for projects, teams, or future purchases.
+            </p>
+            <button
+              className={s.primaryAction}
+              type="button"
+              onClick={() => setShowCreate(true)}
+            >
+              <PlusIcon aria-hidden="true" /> Create new wishlist
+            </button>
           </div>
           <div className={s.wishlistCards}>
             {wishlists.map((wishlist) => (
               <article className={s.wishlistCard} key={wishlist.id}>
-                <button className={s.wishlistOpen} type="button" onClick={() => setSelectedId(wishlist.id)}>
-                  <span className={s.wishlistCardTitle}><strong>{wishlist.name}</strong>{wishlist.isDefault && <small>Default</small>}</span>
-                  <span>{wishlist.lines.length} item{wishlist.lines.length === 1 ? "" : "s"}</span>
-                  <span className={s.wishlistImages}>{wishlist.lines.slice(0, 3).map((line) => <img src={line.image} alt="" key={line.id} />)}{!wishlist.lines.length && <i>No saved items yet</i>}</span>
+                <button
+                  className={s.wishlistOpen}
+                  type="button"
+                  onClick={() => setSelectedId(wishlist.id)}
+                >
+                  <span className={s.wishlistCardTitle}>
+                    <strong>{wishlist.name}</strong>
+                    {wishlist.isDefault && <small>Default</small>}
+                  </span>
+                  <span>
+                    {wishlist.lines.length} item
+                    {wishlist.lines.length === 1 ? "" : "s"}
+                  </span>
+                  <span className={s.wishlistImages}>
+                    {wishlist.lines.slice(0, 3).map((line) => (
+                      <img src={line.image} alt="" key={line.id} />
+                    ))}
+                    {!wishlist.lines.length && <i>No saved items yet</i>}
+                  </span>
                 </button>
                 <div className={s.wishlistCardActions}>
-                  <button type="button" aria-label={`Rename ${wishlist.name}`} onClick={() => { setRenameTarget(wishlist); setRenameName(wishlist.name); }}><PencilIcon aria-hidden="true" /></button>
-                  {!wishlist.isDefault && <button type="button" className={s.danger} aria-label={`Delete ${wishlist.name}`} onClick={() => void deleteList(wishlist)}><TrashIcon aria-hidden="true" /></button>}
+                  <button
+                    type="button"
+                    aria-label={`Rename ${wishlist.name}`}
+                    onClick={() => {
+                      setRenameTarget(wishlist);
+                      setRenameName(wishlist.name);
+                    }}
+                  >
+                    <PencilIcon aria-hidden="true" />
+                  </button>
+                  {!wishlist.isDefault && (
+                    <button
+                      type="button"
+                      className={s.danger}
+                      aria-label={`Delete ${wishlist.name}`}
+                      onClick={() => void deleteList(wishlist)}
+                    >
+                      <TrashIcon aria-hidden="true" />
+                    </button>
+                  )}
                 </div>
               </article>
             ))}
           </div>
-          {showCreate && <WishlistModal title="Create new wishlist" onClose={() => !saving && setShowCreate(false)}>
-            <form className="wishlist-create-form" onSubmit={submitCreate}>
-              <label htmlFor="b2b-wishlist-name">Wishlist name</label>
-              <Input id="b2b-wishlist-name" value={newName} maxLength={100} required autoFocus placeholder="e.g. Site equipment" onChange={(event) => setNewName(event.target.value)} />
-              <div className="wishlist-modal-actions">
-                <Button variant="secondary" type="button" disabled={saving} onClick={() => setShowCreate(false)}>Cancel</Button>
-                <Button variant="primary" type="submit" disabled={saving || !newName.trim()}>{saving ? "Creating…" : "Create wishlist"}</Button>
-              </div>
-            </form>
-          </WishlistModal>}
+          {showCreate && (
+            <WishlistModal
+              title="Create new wishlist"
+              onClose={() => !saving && setShowCreate(false)}
+            >
+              <form className="wishlist-create-form" onSubmit={submitCreate}>
+                <label htmlFor="b2b-wishlist-name">Wishlist name</label>
+                <Input
+                  id="b2b-wishlist-name"
+                  value={newName}
+                  maxLength={100}
+                  required
+                  autoFocus
+                  placeholder="e.g. Site equipment"
+                  onChange={(event) => setNewName(event.target.value)}
+                />
+                <div className="wishlist-modal-actions">
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    disabled={saving}
+                    onClick={() => setShowCreate(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={saving || !newName.trim()}
+                  >
+                    {saving ? "Creating…" : "Create wishlist"}
+                  </Button>
+                </div>
+              </form>
+            </WishlistModal>
+          )}
           {modal}
         </div>
       )}

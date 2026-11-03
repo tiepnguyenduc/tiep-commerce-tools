@@ -10,7 +10,10 @@ const input = z.object({
 export async function PATCH(request: Request) {
   const parsed = input.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid password input" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid password input" },
+      { status: 400 },
+    );
   }
 
   try {

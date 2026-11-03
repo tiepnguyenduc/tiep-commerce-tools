@@ -6,10 +6,21 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faCheck, faHeart, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faCheck,
+  faHeart,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/Toast";
 import { WishlistModal } from "@/components/WishlistModal";
-import { addItemToWishlist, createWishlist, loadWishlists, removeItemFromWishlist, useWishlists } from "@/lib/wishlist-api";
+import {
+  addItemToWishlist,
+  createWishlist,
+  loadWishlists,
+  removeItemFromWishlist,
+  useWishlists,
+} from "@/lib/wishlist-api";
 import type { Wishlist } from "@/lib/types";
 
 function matchingLine(
@@ -36,7 +47,9 @@ export function AddToWishlist({
   const { wishlists, status } = useWishlists();
   const [isOpen, setIsOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [pendingWishlistId, setPendingWishlistId] = useState<string | null>(null);
+  const [pendingWishlistId, setPendingWishlistId] = useState<string | null>(
+    null,
+  );
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newWishlistName, setNewWishlistName] = useState("");
   const [creatingWishlist, setCreatingWishlist] = useState(false);
@@ -91,7 +104,9 @@ export function AddToWishlist({
       router.refresh();
     } catch (error) {
       showToast(
-        error instanceof Error ? error.message : "Could not update the wishlist.",
+        error instanceof Error
+          ? error.message
+          : "Could not update the wishlist.",
         "error",
       );
     } finally {
@@ -135,7 +150,9 @@ export function AddToWishlist({
 
   return (
     <>
-      <UIButton variant="secondary" size="icon"
+      <UIButton
+        variant="secondary"
+        size="icon"
         aria-label={
           isSaved
             ? "Manage product wishlists"
@@ -162,7 +179,9 @@ export function AddToWishlist({
         >
           {showCreateForm ? (
             <>
-              <UIButton variant="ghost" size="fit"
+              <UIButton
+                variant="ghost"
+                size="fit"
                 className="text-button wishlist-picker-back"
                 disabled={creatingWishlist}
                 onClick={() => setShowCreateForm(false)}
@@ -172,7 +191,9 @@ export function AddToWishlist({
                 Back to wishlists
               </UIButton>
               <form className="wishlist-create-form" onSubmit={createAndSave}>
-                <label htmlFor={`new-wishlist-${productId}`}>Wishlist name</label>
+                <label htmlFor={`new-wishlist-${productId}`}>
+                  Wishlist name
+                </label>
                 <UIInput
                   autoFocus
 
@@ -187,14 +208,17 @@ export function AddToWishlist({
                   The current product will be saved to the new wishlist.
                 </p>
                 <div className="wishlist-modal-actions">
-                  <UIButton variant="secondary" size="s"
+                  <UIButton
+                    variant="secondary"
+                    size="s"
                     disabled={creatingWishlist}
                     onClick={() => setShowCreateForm(false)}
                     type="button"
                   >
                     Cancel
                   </UIButton>
-                  <UIButton variant="primary"
+                  <UIButton
+                    variant="primary"
 
                     disabled={creatingWishlist || !newWishlistName.trim()}
                     type="submit"
@@ -206,14 +230,19 @@ export function AddToWishlist({
             </>
           ) : (
             <>
-              <p className="wishlist-picker-intro">Choose a list to save this product. Select a saved list to remove it.</p>
+              <p className="wishlist-picker-intro">
+                Choose a list to save this product. Select a saved list to
+                remove it.
+              </p>
               <div className="wishlist-picker-list">
                 {wishlists.map((wishlist) => {
                   const saved = Boolean(
                     matchingLine(wishlist, productId, variantId),
                   );
                   return (
-                    <UIButton variant={saved ? "primary" : "secondary"} size="s"
+                    <UIButton
+                      variant={saved ? "primary" : "secondary"}
+                      size="s"
                       aria-pressed={saved}
                       className={`wishlist-picker-option${saved ? " saved" : ""}`}
                       disabled={pendingWishlistId !== null}
@@ -240,7 +269,9 @@ export function AddToWishlist({
                 })}
               </div>
               <div className="wishlist-picker-footer">
-                <UIButton variant="secondary" size="s"
+                <UIButton
+                  variant="secondary"
+                  size="s"
                   className="wishlist-create-trigger"
                   onClick={() => setShowCreateForm(true)}
                   type="button"

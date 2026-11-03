@@ -30,11 +30,18 @@ export async function PUT(request: Request, { params }: Context) {
   try {
     const { wishlistId } = await params;
     return NextResponse.json({
-      wishlist: await renameB2BWishlist(await customerId(), wishlistId, parsed.data.name),
+      wishlist: await renameB2BWishlist(
+        await customerId(),
+        wishlistId,
+        parsed.data.name,
+      ),
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist rename failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist rename failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }
@@ -47,7 +54,10 @@ export async function DELETE(_request: Request, { params }: Context) {
     return NextResponse.json({ deletedId: wishlistId });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist delete failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist delete failed",
+      },
       { status: b2bWishlistErrorStatus(error) },
     );
   }

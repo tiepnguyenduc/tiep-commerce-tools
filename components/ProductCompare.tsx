@@ -5,12 +5,20 @@ import UIButton from "@/components/commercetools-ui/atoms/button";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCodeCompare, faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCodeCompare,
+  faTrashCan,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { AddToCart } from "@/components/AddToCart";
 import { useToast } from "@/components/Toast";
 import { type CompareProductData } from "@/components/ProductCompareData";
 
-import { compareChangeEvent as storageKey, readCompareProducts, writeCompareProducts } from "@/lib/compare-storage";
+import {
+  compareChangeEvent as storageKey,
+  readCompareProducts,
+  writeCompareProducts,
+} from "@/lib/compare-storage";
 
 export function useCompareProducts() {
   const [products, setProducts] = useState<CompareProductData[]>([]);
@@ -79,7 +87,9 @@ export function AddToCompare({
   }
 
   return (
-    <UIButton variant="secondary" size="icon"
+    <UIButton
+      variant="secondary"
+      size="icon"
       aria-label={
         selected ? "Remove product from compare" : "Add product to compare"
       }
@@ -100,7 +110,11 @@ export function HeaderCompareLink() {
   const { products } = useCompareProducts();
 
   return (
-    <Link className="header-compare-link" href="/compare" aria-label={`Compare products${products.length ? ` (${products.length})` : ""}`}>
+    <Link
+      className="header-compare-link"
+      href="/compare"
+      aria-label={`Compare products${products.length ? ` (${products.length})` : ""}`}
+    >
       <FontAwesomeIcon aria-hidden="true" icon={faCodeCompare} />
       <span>Compare</span>
       {products.length ? <strong>{products.length}</strong> : null}
@@ -145,7 +159,8 @@ function compareRows(products: CompareProductData[]) {
       label,
       values: products.map(
         (product) =>
-          product.specifications?.find((spec) => spec.name === name)?.value ?? "",
+          product.specifications?.find((spec) => spec.name === name)?.value ??
+          "",
       ),
     });
   }
@@ -169,7 +184,13 @@ export function ComparePage() {
           </p>
         </div>
         {products.length ? (
-          <UIButton variant="ghost" size="fit" className="text-button" onClick={clear} type="button">
+          <UIButton
+            variant="ghost"
+            size="fit"
+            className="text-button"
+            onClick={clear}
+            type="button"
+          >
             <FontAwesomeIcon aria-hidden="true" icon={faTrashCan} />
             <span>Clear all</span>
           </UIButton>
@@ -188,10 +209,7 @@ export function ComparePage() {
           </ButtonLink>
         </section>
       ) : (
-        <section
-          aria-label="Compared products"
-          className="compare-table-wrap"
-        >
+        <section aria-label="Compared products" className="compare-table-wrap">
           <table className="compare-table">
             <thead>
               <tr>
@@ -199,7 +217,9 @@ export function ComparePage() {
                 {products.map((product) => (
                   <th key={product.id} scope="col">
                     <div className="compare-product-head">
-                      <UIButton variant="ghost" size="fit"
+                      <UIButton
+                        variant="ghost"
+                        size="fit"
                         aria-label={`Remove ${product.name} from compare`}
                         onClick={() => remove(product.id)}
                         type="button"
@@ -228,7 +248,11 @@ export function ComparePage() {
                 <th scope="row">Actions</th>
                 {products.map((product) => (
                   <td key={product.id}>
-                    <AddToCart compact productId={product.id} sku={product.sku} />
+                    <AddToCart
+                      compact
+                      productId={product.id}
+                      sku={product.sku}
+                    />
                   </td>
                 ))}
               </tr>

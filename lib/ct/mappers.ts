@@ -38,7 +38,10 @@ function localizedName(line: Pick<LineItem, "name">, locale: string) {
   return line.name[locale] || line.name.en || Object.values(line.name)[0] || "";
 }
 
-function localizedSlug(line: Pick<LineItem, "productId" | "productSlug">, locale: string) {
+function localizedSlug(
+  line: Pick<LineItem, "productId" | "productSlug">,
+  locale: string,
+) {
   return (
     line.productSlug?.[locale] ||
     line.productSlug?.en ||
@@ -68,7 +71,8 @@ export function mapCommercetoolsCart(
       slug: localizedSlug(line, locale),
       variantId: line.variant.id,
       variantKey: line.variant.key,
-      variantLabel: line.variant.key || line.variant.sku || `Variant ${line.variant.id}`,
+      variantLabel:
+        line.variant.key || line.variant.sku || `Variant ${line.variant.id}`,
       variantAttributes: variantAttributes(line.variant, locale),
       sku: line.variant.sku || line.id,
       name: localizedName(line, locale),

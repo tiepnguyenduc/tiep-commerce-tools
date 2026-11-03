@@ -146,7 +146,9 @@
   color: var(--ink);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 :global(#launchpad-storefront) .variantCard:hover {
   border-color: #9a9c90;
@@ -213,7 +215,9 @@
   color: var(--ink);
   font-size: 13px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 :global(#launchpad-storefront) .option:hover {
   border-color: #9a9c90;
@@ -302,7 +306,10 @@
   outline: 2px solid #9a712e;
   outline-offset: -2px;
 }
-:global(#launchpad-storefront) .buyBox .purchase .stepper[class*="cursor-not-allowed"] {
+:global(#launchpad-storefront)
+  .buyBox
+  .purchase
+  .stepper[class*="cursor-not-allowed"] {
   background: #f1efe8;
 }
 :global(#launchpad-storefront) .purchase .addButton {
@@ -319,7 +326,9 @@
   color: #fff;
   font-size: 14px;
   font-weight: 650;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
 }
 :global(#launchpad-storefront) .purchase .addButton:hover:not(:disabled) {
   background: #1f291e;
@@ -372,7 +381,9 @@
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 :global(#launchpad-storefront) .secondaryActions > button:hover:not(:disabled) {
   border-color: var(--ink);
@@ -383,11 +394,17 @@
   background: #f1efe8;
   color: var(--ink);
 }
-:global(#launchpad-storefront) .secondaryActions > button[aria-pressed="true"] svg {
+:global(#launchpad-storefront)
+  .secondaryActions
+  > button[aria-pressed="true"]
+  svg {
   color: #a2442a;
   fill: currentColor;
 }
-:global(#launchpad-storefront) .secondaryActions > button:first-child[aria-pressed="true"] svg {
+:global(#launchpad-storefront)
+  .secondaryActions
+  > button:first-child[aria-pressed="true"]
+  svg {
   color: var(--ink);
   fill: none;
 }

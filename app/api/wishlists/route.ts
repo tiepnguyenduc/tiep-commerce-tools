@@ -15,7 +15,9 @@ export async function GET() {
     return NextResponse.json({ wishlists: await readWishlists() });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlists read failed" },
+      {
+        error: error instanceof Error ? error.message : "Wishlists read failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }
@@ -37,7 +39,10 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist create failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist create failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }

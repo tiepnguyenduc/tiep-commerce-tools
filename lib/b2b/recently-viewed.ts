@@ -11,7 +11,16 @@ export function parseRecentlyViewed(value: string | null): string[] {
   try {
     const parsed: unknown = JSON.parse(value || "[]");
     return Array.isArray(parsed)
-      ? [...new Set(parsed.filter((id): id is string => typeof id === "string" && id.trim().length > 0 && id.length <= 256))].slice(0, B2B_RECENTLY_VIEWED_LIMIT)
+      ? [
+          ...new Set(
+            parsed.filter(
+              (id): id is string =>
+                typeof id === "string" &&
+                id.trim().length > 0 &&
+                id.length <= 256,
+            ),
+          ),
+        ].slice(0, B2B_RECENTLY_VIEWED_LIMIT)
       : [];
   } catch {
     return [];
@@ -19,17 +28,28 @@ export function parseRecentlyViewed(value: string | null): string[] {
 }
 
 export function pushRecentlyViewed(ids: string[], id: string): string[] {
-  return [id, ...ids.filter((value) => value !== id)].slice(0, B2B_RECENTLY_VIEWED_LIMIT);
+  return [id, ...ids.filter((value) => value !== id)].slice(
+    0,
+    B2B_RECENTLY_VIEWED_LIMIT,
+  );
 }
 
 /** Recently viewed products still in the assortment, most recent first, minus `exclude`. */
-export function resolveRecentlyViewed(ids: string[], products: B2BProduct[], exclude?: string) {
+export function resolveRecentlyViewed(
+  ids: string[],
+  products: B2BProduct[],
+  exclude?: string,
+) {
   const byId = new Map(products.map((product) => [product.id, product]));
   return ids.filter((id) => id !== exclude).flatMap((id) => byId.get(id) ?? []);
 }
 
 /** Products sharing a category with `product`, closest category first. */
-export function relatedBusinessProducts(product: B2BProduct, products: B2BProduct[], limit = 4) {
+export function relatedBusinessProducts(
+  product: B2BProduct,
+  products: B2BProduct[],
+  limit = 4,
+) {
   const categoryIds = new Set(product.categoryIds ?? []);
   const score = (candidate: B2BProduct) =>
     (candidate.category === product.category ? 2 : 0) +

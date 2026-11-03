@@ -6,7 +6,10 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import type { Swiper as SwiperClass } from "swiper";
 import { A11y, Keyboard } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -68,7 +71,9 @@ export function ProductItemSlider({
         </div>
         {products.length > 1 ? (
           <div className="recent-slider-actions">
-            <UIButton variant="secondary" size="icon"
+            <UIButton
+              variant="secondary"
+              size="icon"
               aria-label={`Show previous ${title.toLowerCase()}`}
               disabled={edges.isBeginning}
               onClick={() => swiper?.slidePrev()}
@@ -76,7 +81,9 @@ export function ProductItemSlider({
             >
               <FontAwesomeIcon aria-hidden="true" icon={faChevronLeft} />
             </UIButton>
-            <UIButton variant="secondary" size="icon"
+            <UIButton
+              variant="secondary"
+              size="icon"
               aria-label={`Show next ${title.toLowerCase()}`}
               disabled={edges.isEnd}
               onClick={() => swiper?.slideNext()}
@@ -117,7 +124,10 @@ export function ProductItemSlider({
                 </Link>
                 <div className="product-image-actions">
                   <AddToWishlist compact productId={product.id} />
-                  <AddToCompare compact product={itemToCompareProduct(product)} />
+                  <AddToCompare
+                    compact
+                    product={itemToCompareProduct(product)}
+                  />
                 </div>
               </div>
               <div className="recent-product-body">

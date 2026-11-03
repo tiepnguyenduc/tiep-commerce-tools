@@ -14,7 +14,9 @@ export function BrandFilterList({
   selectedBrands?: string[];
 }) {
   const selectedBrandSet = new Set(selectedBrands);
-  const selectedIndex = brands.findIndex((brand) => selectedBrandSet.has(brand));
+  const selectedIndex = brands.findIndex((brand) =>
+    selectedBrandSet.has(brand),
+  );
   const [expanded, setExpanded] = useState(selectedIndex >= visibleBrandCount);
   const visibleBrands = expanded ? brands : brands.slice(0, visibleBrandCount);
   const canToggle = brands.length > visibleBrandCount;
@@ -36,12 +38,16 @@ export function BrandFilterList({
         ))}
       </div>
       {canToggle ? (
-        <UIButton variant="secondary" size="s"
+        <UIButton
+          variant="secondary"
+          size="s"
           className="filter-toggle-button"
           onClick={() => setExpanded((value) => !value)}
           type="button"
         >
-          {expanded ? "Show less" : `Show more (${brands.length - visibleBrandCount})`}
+          {expanded
+            ? "Show less"
+            : `Show more (${brands.length - visibleBrandCount})`}
         </UIButton>
       ) : null}
     </fieldset>

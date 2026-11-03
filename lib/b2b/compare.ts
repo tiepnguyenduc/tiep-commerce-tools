@@ -6,13 +6,29 @@ export function businessCompareKey(state: B2BState) {
 export function parseBusinessCompare(value: string | null): string[] {
   try {
     const parsed: unknown = JSON.parse(value || "[]");
-    return Array.isArray(parsed) ? [...new Set(parsed.filter((id): id is string => typeof id === "string" && id.trim().length > 0 && id.length <= 256))].slice(0, B2B_COMPARE_LIMIT) : [];
-  } catch { return []; }
+    return Array.isArray(parsed)
+      ? [
+          ...new Set(
+            parsed.filter(
+              (id): id is string =>
+                typeof id === "string" &&
+                id.trim().length > 0 &&
+                id.length <= 256,
+            ),
+          ),
+        ].slice(0, B2B_COMPARE_LIMIT)
+      : [];
+  } catch {
+    return [];
+  }
 }
 export function toggleBusinessCompare(ids: string[], id: string): string[] {
   if (ids.includes(id)) return ids.filter((value) => value !== id);
   return ids.length < B2B_COMPARE_LIMIT ? [...ids, id] : ids;
 }
 export function resolveBusinessCompare(ids: string[], products: B2BProduct[]) {
-  return ids.map((id) => ({ id, product: products.find((product) => product.id === id) }));
+  return ids.map((id) => ({
+    id,
+    product: products.find((product) => product.id === id),
+  }));
 }

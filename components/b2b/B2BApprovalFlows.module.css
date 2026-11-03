@@ -191,7 +191,10 @@
   color: var(--af-ink);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 :global(#launchpad-storefront) .approvals .tabApproved {
   --tone: var(--af-approved);
@@ -207,7 +210,9 @@
 }
 :global(#launchpad-storefront) .approvals .tab[aria-selected="true"] {
   border-color: var(--tone);
-  box-shadow: 0 0 0 1px var(--tone), 0 8px 22px rgb(47 56 41 / 0.08);
+  box-shadow:
+    0 0 0 1px var(--tone),
+    0 8px 22px rgb(47 56 41 / 0.08);
 }
 :global(#launchpad-storefront) .approvals .tabIcon {
   display: grid;
@@ -285,7 +290,9 @@
 }
 :global(#launchpad-storefront) .approvals .row {
   display: grid;
-  grid-template-columns: 128px minmax(220px, 1.6fr) minmax(110px, 0.8fr) 70px minmax(110px, 0.8fr) 110px;
+  grid-template-columns:
+    128px minmax(220px, 1.6fr) minmax(110px, 0.8fr)
+    70px minmax(110px, 0.8fr) 110px;
   align-items: center;
   border-top: 1px solid #ecebe4;
   font-size: 13px;
@@ -581,7 +588,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 :global(#launchpad-storefront) .approvals .approveButton svg,
 :global(#launchpad-storefront) .approvals .rejectButton svg {
@@ -843,7 +852,10 @@
 :global(#launchpad-storefront) .approvals .timeline li:last-child {
   padding-bottom: 0;
 }
-:global(#launchpad-storefront) .approvals .timeline li:not(:last-child)::before {
+:global(#launchpad-storefront)
+  .approvals
+  .timeline
+  li:not(:last-child)::before {
   content: "";
   position: absolute;
   left: 14px;
@@ -998,7 +1010,10 @@
     grid-column: 1 / -1;
     order: -1;
   }
-  :global(#launchpad-storefront) .approvals .row > span[data-label]:not(.flowCell)::before {
+  :global(#launchpad-storefront)
+    .approvals
+    .row
+    > span[data-label]:not(.flowCell)::before {
     content: attr(data-label);
     display: block;
     margin-bottom: 2px;

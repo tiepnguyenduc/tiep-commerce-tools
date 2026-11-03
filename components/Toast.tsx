@@ -1,6 +1,13 @@
 "use client";
 import UIButton from "@/components/commercetools-ui/atoms/button";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -54,7 +61,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <output className={`toast ${toast.tone}`} key={toast.id}>
             <span>{toast.message}</span>
-            <UIButton variant="ghost" size="fit"
+            <UIButton
+              variant="ghost"
+              size="fit"
               aria-label="Dismiss notification"
               onClick={() => dismiss(toast.id)}
               type="button"

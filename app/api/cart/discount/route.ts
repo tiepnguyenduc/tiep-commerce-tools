@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import {
-  discountApplyInput,
-  discountRemoveInput,
-} from "@/lib/cart-discount";
+import { discountApplyInput, discountRemoveInput } from "@/lib/cart-discount";
 import { getB2BReadiness, getEnvReadiness } from "@/lib/env";
-import {
-  applyLiveDiscountCode,
-  removeLiveDiscountCode,
-} from "@/lib/ct/cart";
+import { applyLiveDiscountCode, removeLiveDiscountCode } from "@/lib/ct/cart";
 import { getCartId } from "@/lib/ct/session";
 import type { StoreMode } from "@/lib/types";
 
@@ -38,7 +32,8 @@ function errorResponse(error: unknown) {
     typeof error === "object" && error !== null && "statusCode" in error
       ? (error as { statusCode?: number }).statusCode
       : undefined;
-  const status = statusCode && statusCode >= 400 && statusCode < 500 ? 400 : 502;
+  const status =
+    statusCode && statusCode >= 400 && statusCode < 500 ? 400 : 502;
   return NextResponse.json({ error: message }, { status });
 }
 

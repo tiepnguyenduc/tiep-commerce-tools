@@ -6,6 +6,9 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ businessUnitKey?: string }>;
 }) {
-  const [{ id }, { businessUnitKey }] = await Promise.all([params, searchParams]);
+  const [{ id }, { businessUnitKey }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   return <B2BOrderConfirmation id={id} businessUnitKey={businessUnitKey} />;
 }

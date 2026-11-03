@@ -43,7 +43,9 @@ export function optionGroupsFor(variants: OptionVariant[]): OptionGroup[] {
 }
 
 export function selectedAttributeValue(variant: OptionVariant, name: string) {
-  return variant.attributes.find((attribute) => attribute.name === name)?.value ?? "";
+  return (
+    variant.attributes.find((attribute) => attribute.name === name)?.value ?? ""
+  );
 }
 
 /**
@@ -68,18 +70,22 @@ export function variantForOption<V extends OptionVariant>(
     variants.find((variant) =>
       Array.from(nextSelections).every(
         ([attributeName, selectedValue]) =>
-          !selectedValue || selectedAttributeValue(variant, attributeName) === selectedValue,
+          !selectedValue ||
+          selectedAttributeValue(variant, attributeName) === selectedValue,
       ),
     ) ??
-    variants.find((variant) => selectedAttributeValue(variant, name) === value) ??
+    variants.find(
+      (variant) => selectedAttributeValue(variant, name) === value,
+    ) ??
     current
   );
 }
 
 export function variantColor(variant: OptionVariant) {
   return (
-    variant.attributes.find((attribute) => /color label|search color/i.test(attribute.label ?? ""))
-      ?.value ?? ""
+    variant.attributes.find((attribute) =>
+      /color label|search color/i.test(attribute.label ?? ""),
+    )?.value ?? ""
   );
 }
 

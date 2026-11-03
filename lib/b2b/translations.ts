@@ -1122,15 +1122,8 @@ const messages: Record<
     "Métodos e custos de envio são calculados no checkout.",
     "Verzendmethoden en -kosten worden bij het afrekenen berekend.",
   ],
-  "Brand": [
-    "Marke",
-    "Marca",
-    "Marque",
-    "Marca",
-    "Marca",
-    "Merk",
-  ],
-  "Breadcrumb": [
+  Brand: ["Marke", "Marca", "Marque", "Marca", "Marca", "Merk"],
+  Breadcrumb: [
     "Brotkrümelnavigation",
     "Ruta de navegación",
     "Fil d’Ariane",
@@ -1138,7 +1131,7 @@ const messages: Record<
     "Navegação estrutural",
     "Kruimelpad",
   ],
-  "Business": [
+  Business: [
     "Geschäftskunden",
     "Empresas",
     "Professionnels",
@@ -1154,7 +1147,7 @@ const messages: Record<
     "Comprar {name}",
     "{name} kopen",
   ],
-  "Category": [
+  Category: [
     "Kategorie",
     "Categoría",
     "Catégorie",
@@ -1178,7 +1171,7 @@ const messages: Record<
     "Entrega para sua empresa",
     "Levering voor uw bedrijf",
   ],
-  "Description": [
+  Description: [
     "Beschreibung",
     "Descripción",
     "Description",
@@ -1290,15 +1283,8 @@ const messages: Record<
     "Produto indisponível",
     "Product niet beschikbaar",
   ],
-  "Qty": [
-    "Menge",
-    "Cant.",
-    "Qté",
-    "Qtà",
-    "Qtd.",
-    "Aantal",
-  ],
-  "Quantity": [
+  Qty: ["Menge", "Cant.", "Qté", "Qtà", "Qtd.", "Aantal"],
+  Quantity: [
     "Menge",
     "Cantidad",
     "Quantité",
@@ -1322,7 +1308,7 @@ const messages: Record<
     "Produtos relacionados",
     "Gerelateerde producten",
   ],
-  "Reviews": [
+  Reviews: [
     "Bewertungen",
     "Reseñas",
     "Avis",
@@ -1338,15 +1324,8 @@ const messages: Record<
     "SELECIONADO PARA SUA EMPRESA",
     "GESELECTEERD VOOR UW BEDRIJF",
   ],
-  "SKU": [
-    "SKU",
-    "SKU",
-    "SKU",
-    "SKU",
-    "SKU",
-    "SKU",
-  ],
-  "Select": [
+  SKU: ["SKU", "SKU", "SKU", "SKU", "SKU", "SKU"],
+  Select: [
     "Auswählen",
     "Seleccionar",
     "Choisir",
@@ -1362,7 +1341,7 @@ const messages: Record<
     "Selecione uma loja para adicionar este produto",
     "Kies een winkel om dit product toe te voegen",
   ],
-  "Selected": [
+  Selected: [
     "Ausgewählt",
     "Seleccionado",
     "Sélectionné",
@@ -1378,7 +1357,7 @@ const messages: Record<
     "Entre e selecione uma loja empresarial →",
     "Log in en kies een zakelijke winkel →",
   ],
-  "Specifications": [
+  Specifications: [
     "Spezifikationen",
     "Especificaciones",
     "Caractéristiques",
@@ -1506,14 +1485,15 @@ const messages: Record<
     "Detalhes do fluxo de aprovação",
     "Details goedkeuringsstroom",
   ],
-  "Orders that need sign-off from your company before they are released for fulfilment.": [
-    "Bestellungen, die vor der Ausführung von Ihrem Unternehmen freigegeben werden müssen.",
-    "Pedidos que tu empresa debe aprobar antes de su preparación.",
-    "Commandes que votre entreprise doit approuver avant leur traitement.",
-    "Ordini che la tua azienda deve approvare prima dell’evasione.",
-    "Pedidos que sua empresa precisa aprovar antes do processamento.",
-    "Bestellingen die uw bedrijf moet goedkeuren voordat ze worden verwerkt.",
-  ],
+  "Orders that need sign-off from your company before they are released for fulfilment.":
+    [
+      "Bestellungen, die vor der Ausführung von Ihrem Unternehmen freigegeben werden müssen.",
+      "Pedidos que tu empresa debe aprobar antes de su preparación.",
+      "Commandes que votre entreprise doit approuver avant leur traitement.",
+      "Ordini che la tua azienda deve approvare prima dell’evasione.",
+      "Pedidos que sua empresa precisa aprovar antes do processamento.",
+      "Bestellingen die uw bedrijf moet goedkeuren voordat ze worden verwerkt.",
+    ],
   "Review, approve or reject orders that need company sign-off.": [
     "Bestellungen prüfen, freigeben oder ablehnen.",
     "Revisa, aprueba o rechaza pedidos que requieren aprobación.",
@@ -1530,7 +1510,7 @@ const messages: Record<
     "Aguardando aprovação",
     "Wacht op goedkeuring",
   ],
-  "Pending": [
+  Pending: [
     "Ausstehend",
     "Pendiente",
     "En attente",
@@ -1538,7 +1518,7 @@ const messages: Record<
     "Pendente",
     "In behandeling",
   ],
-  "Approved": [
+  Approved: [
     "Freigegeben",
     "Aprobado",
     "Approuvé",
@@ -1546,7 +1526,7 @@ const messages: Record<
     "Aprovado",
     "Goedgekeurd",
   ],
-  "Rejected": [
+  Rejected: [
     "Abgelehnt",
     "Rechazado",
     "Refusé",
@@ -1626,14 +1606,7 @@ const messages: Record<
     "Menor total",
     "Laagste totaal",
   ],
-  "Status": [
-    "Status",
-    "Estado",
-    "Statut",
-    "Stato",
-    "Status",
-    "Status",
-  ],
+  Status: ["Status", "Estado", "Statut", "Stato", "Status", "Status"],
   "Approval flow": [
     "Freigabeprozess",
     "Flujo de aprobación",
@@ -1642,54 +1615,12 @@ const messages: Record<
     "Fluxo de aprovação",
     "Goedkeuringsstroom",
   ],
-  "Date": [
-    "Datum",
-    "Fecha",
-    "Date",
-    "Data",
-    "Data",
-    "Datum",
-  ],
-  "Items": [
-    "Artikel",
-    "Artículos",
-    "Articles",
-    "Articoli",
-    "Itens",
-    "Artikelen",
-  ],
-  "Total": [
-    "Gesamt",
-    "Total",
-    "Total",
-    "Totale",
-    "Total",
-    "Totaal",
-  ],
-  "Order": [
-    "Bestellung",
-    "Pedido",
-    "Commande",
-    "Ordine",
-    "Pedido",
-    "Bestelling",
-  ],
-  "Review": [
-    "Prüfen",
-    "Revisar",
-    "Examiner",
-    "Esamina",
-    "Revisar",
-    "Beoordelen",
-  ],
-  "View": [
-    "Ansehen",
-    "Ver",
-    "Voir",
-    "Vedi",
-    "Ver",
-    "Bekijken",
-  ],
+  Date: ["Datum", "Fecha", "Date", "Data", "Data", "Datum"],
+  Items: ["Artikel", "Artículos", "Articles", "Articoli", "Itens", "Artikelen"],
+  Total: ["Gesamt", "Total", "Total", "Totale", "Total", "Totaal"],
+  Order: ["Bestellung", "Pedido", "Commande", "Ordine", "Pedido", "Bestelling"],
+  Review: ["Prüfen", "Revisar", "Examiner", "Esamina", "Revisar", "Beoordelen"],
+  View: ["Ansehen", "Ver", "Voir", "Vedi", "Ver", "Bekijken"],
   "Nothing is waiting for approval": [
     "Nichts wartet auf Freigabe",
     "No hay nada pendiente de aprobación",
@@ -1714,14 +1645,15 @@ const messages: Record<
     "Nenhum fluxo rejeitado",
     "Geen afgewezen stromen",
   ],
-  "Orders that match an approval rule for this business unit will appear here.": [
-    "Bestellungen, die einer Freigaberegel dieser Geschäftseinheit entsprechen, erscheinen hier.",
-    "Aquí aparecerán los pedidos que cumplan una regla de aprobación de esta unidad.",
-    "Les commandes soumises à une règle d’approbation de cette unité apparaîtront ici.",
-    "Qui compariranno gli ordini soggetti a una regola di approvazione di questa unità.",
-    "Pedidos que correspondem a uma regra de aprovação desta unidade aparecerão aqui.",
-    "Bestellingen die onder een goedkeuringsregel van deze eenheid vallen, verschijnen hier.",
-  ],
+  "Orders that match an approval rule for this business unit will appear here.":
+    [
+      "Bestellungen, die einer Freigaberegel dieser Geschäftseinheit entsprechen, erscheinen hier.",
+      "Aquí aparecerán los pedidos que cumplan una regla de aprobación de esta unidad.",
+      "Les commandes soumises à une règle d’approbation de cette unité apparaîtront ici.",
+      "Qui compariranno gli ordini soggetti a una regola di approvazione di questa unità.",
+      "Pedidos que correspondem a uma regra de aprovação desta unidade aparecerão aqui.",
+      "Bestellingen die onder een goedkeuringsregel van deze eenheid vallen, verschijnen hier.",
+    ],
   "Back to approval flows": [
     "Zurück zu den Freigabeprozessen",
     "Volver a los flujos de aprobación",
@@ -1738,7 +1670,7 @@ const messages: Record<
     "Total do pedido",
     "Totaal bestelling",
   ],
-  "Reject": [
+  Reject: [
     "Ablehnen",
     "Rechazar",
     "Refuser",
@@ -1826,7 +1758,7 @@ const messages: Record<
     "Itens do pedido",
     "Bestelde artikelen",
   ],
-  "Subtotal": [
+  Subtotal: [
     "Zwischensumme",
     "Subtotal",
     "Sous-total",
@@ -1834,7 +1766,7 @@ const messages: Record<
     "Subtotal",
     "Subtotaal",
   ],
-  "Shipping": [
+  Shipping: [
     "Versand",
     "Envío",
     "Livraison",
@@ -1842,14 +1774,7 @@ const messages: Record<
     "Frete",
     "Verzending",
   ],
-  "Tax": [
-    "Steuer",
-    "Impuestos",
-    "Taxes",
-    "Imposte",
-    "Impostos",
-    "Btw",
-  ],
+  Tax: ["Steuer", "Impuestos", "Taxes", "Imposte", "Impostos", "Btw"],
   "Approval progress": [
     "Freigabeverlauf",
     "Progreso de aprobación",
@@ -1906,14 +1831,15 @@ const messages: Record<
     "Regras de aprovação",
     "Goedkeuringsregels",
   ],
-  "Decide which orders need sign-off, who places them and who approves them, tier by tier.": [
-    "Legen Sie fest, welche Bestellungen freigegeben werden müssen und wer sie Stufe für Stufe freigibt.",
-    "Decide qué pedidos requieren aprobación y quién los aprueba, nivel por nivel.",
-    "Définissez les commandes à approuver et qui les approuve, niveau par niveau.",
-    "Decidi quali ordini richiedono approvazione e chi li approva, livello per livello.",
-    "Defina quais pedidos exigem aprovação e quem os aprova, nível a nível.",
-    "Bepaal welke bestellingen goedkeuring nodig hebben en wie ze per niveau goedkeurt.",
-  ],
+  "Decide which orders need sign-off, who places them and who approves them, tier by tier.":
+    [
+      "Legen Sie fest, welche Bestellungen freigegeben werden müssen und wer sie Stufe für Stufe freigibt.",
+      "Decide qué pedidos requieren aprobación y quién los aprueba, nivel por nivel.",
+      "Définissez les commandes à approuver et qui les approuve, niveau par niveau.",
+      "Decidi quali ordini richiedono approvazione e chi li approva, livello per livello.",
+      "Defina quais pedidos exigem aprovação e quem os aprova, nível a nível.",
+      "Bepaal welke bestellingen goedkeuring nodig hebben en wie ze per niveau goedkeurt.",
+    ],
   "Set which orders need sign-off and who approves them.": [
     "Festlegen, welche Bestellungen freigegeben werden müssen.",
     "Define qué pedidos requieren aprobación.",
@@ -1954,15 +1880,8 @@ const messages: Record<
     "Todas as regras",
     "Alle regels",
   ],
-  "Active": [
-    "Aktiv",
-    "Activa",
-    "Active",
-    "Attiva",
-    "Ativa",
-    "Actief",
-  ],
-  "Inactive": [
+  Active: ["Aktiv", "Activa", "Active", "Attiva", "Ativa", "Actief"],
+  Inactive: [
     "Inaktiv",
     "Inactiva",
     "Inactive",
@@ -1994,7 +1913,7 @@ const messages: Record<
     "Aplica-se quando",
     "Geldt wanneer",
   ],
-  "Approvers": [
+  Approvers: [
     "Freigebende",
     "Aprobadores",
     "Approbateurs",
@@ -2002,14 +1921,7 @@ const messages: Record<
     "Aprovadores",
     "Goedkeurders",
   ],
-  "Edit": [
-    "Bearbeiten",
-    "Editar",
-    "Modifier",
-    "Modifica",
-    "Editar",
-    "Bewerken",
-  ],
+  Edit: ["Bearbeiten", "Editar", "Modifier", "Modifica", "Editar", "Bewerken"],
   "Tier {count}": [
     "Stufe {count}",
     "Nivel {count}",
@@ -2042,7 +1954,7 @@ const messages: Record<
     "Funções solicitantes",
     "Rollen aanvragers",
   ],
-  "Conditions": [
+  Conditions: [
     "Bedingungen",
     "Condiciones",
     "Conditions",
@@ -2106,7 +2018,14 @@ const messages: Record<
     "Regra atualizada.",
     "Regel bijgewerkt.",
   ],
-  Checkout: ["Kasse", "Pago", "Paiement", "Checkout", "Finalizar compra", "Afrekenen"],
+  Checkout: [
+    "Kasse",
+    "Pago",
+    "Paiement",
+    "Checkout",
+    "Finalizar compra",
+    "Afrekenen",
+  ],
   "Back to bag": [
     "Zurück zur Tasche",
     "Volver a la bolsa",

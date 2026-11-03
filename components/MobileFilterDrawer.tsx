@@ -13,7 +13,9 @@ export function MobileFilterDrawer({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <UIButton variant="secondary" size="s"
+      <UIButton
+        variant="secondary"
+        size="s"
         className={`mobile-filter-trigger ${styles.mobileFilter}`}
         onClick={() => setOpen(true)}
         type="button"
@@ -22,22 +24,29 @@ export function MobileFilterDrawer({ children }: { children: ReactNode }) {
         <span>Filter</span>
       </UIButton>
 
-      <Drawer isOpen={open} onClose={() => setOpen(false)} aria-label="Product filters" className={`storefront-filter-drawer ${styles.filterDrawer}`}>
-            <div className="mobile-filter-head">
-              <div>
-                <p className="eyebrow">Filters</p>
-                <h2>Refine results</h2>
-              </div>
-              <UIButton variant="secondary" size="icon"
-                aria-label="Close filters"
-                onClick={() => setOpen(false)}
-                ref={closeRef}
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
-              </UIButton>
-            </div>
-            {children}
+      <Drawer
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        aria-label="Product filters"
+        className={`storefront-filter-drawer ${styles.filterDrawer}`}
+      >
+        <div className="mobile-filter-head">
+          <div>
+            <p className="eyebrow">Filters</p>
+            <h2>Refine results</h2>
+          </div>
+          <UIButton
+            variant="secondary"
+            size="icon"
+            aria-label="Close filters"
+            onClick={() => setOpen(false)}
+            ref={closeRef}
+            type="button"
+          >
+            <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
+          </UIButton>
+        </div>
+        {children}
       </Drawer>
     </>
   );

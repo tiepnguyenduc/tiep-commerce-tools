@@ -46,7 +46,11 @@ export function useB2BMiniCart() {
   return useContext(B2BMiniCartContext);
 }
 
-export function B2BMiniCartProvider({ children }: { children: React.ReactNode }) {
+export function B2BMiniCartProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { state, busy, error, reload, act } = useB2B();
   const [isOpen, setIsOpen] = useState(false);
   const [pendingLineId, setPendingLineId] = useState<string | null>(null);
@@ -58,7 +62,8 @@ export function B2BMiniCartProvider({ children }: { children: React.ReactNode })
 
   const setLineQuantity = useCallback(
     async (line: CartLine, quantity: number) => {
-      if (!cart || pendingLineId || quantity < 0 || quantity > 10000) return false;
+      if (!cart || pendingLineId || quantity < 0 || quantity > 10000)
+        return false;
       setPendingLineId(line.id);
       try {
         const success = await act({
@@ -133,9 +138,7 @@ export function B2BHeaderCartButton() {
       <ShoppingBagIcon aria-hidden="true" />
       <span>
         <small>{t("Purchasing bag")}</small>
-        <strong>
-          {t("{count} items", { count: itemCount })}
-        </strong>
+        <strong>{t("{count} items", { count: itemCount })}</strong>
       </span>
       <b className={s.mobileBagCount}>{itemCount}</b>
     </button>
@@ -153,7 +156,9 @@ function B2BMiniCartLineItem({
   onQuantityChange: (quantity: number) => Promise<boolean>;
   onNavigate: () => void;
 }) {
-  const href = line.productId ? `/b2b/products/${encodeURIComponent(line.productId)}` : null;
+  const href = line.productId
+    ? `/b2b/products/${encodeURIComponent(line.productId)}`
+    : null;
 
   return (
     <article className="mini-cart-line">
@@ -186,10 +191,18 @@ function B2BMiniCartLineItem({
             line.name
           )}
         </h3>
-        {line.sku && <p className="muted" style={{ fontSize: "11px" }}>SKU: {line.sku}</p>}
+        {line.sku && (
+          <p className="muted" style={{ fontSize: "11px" }}>
+            SKU: {line.sku}
+          </p>
+        )}
         <CartLineVariant line={line} />
-        <p className="muted" style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>
-          {line.unitPrice.formatted} <span style={{ fontWeight: 400, fontSize: "11px" }}>/ unit</span>
+        <p
+          className="muted"
+          style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}
+        >
+          {line.unitPrice.formatted}{" "}
+          <span style={{ fontWeight: 400, fontSize: "11px" }}>/ unit</span>
         </p>
 
         <div className="mini-cart-line-actions">
@@ -219,7 +232,13 @@ function B2BMiniCartLineItem({
             disabled={disabled}
             onClick={() => void onQuantityChange(0)}
             aria-label={`Remove ${line.name} from bag`}
-            style={{ color: "#8a4b38", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "4px" }}
+            style={{
+              color: "#8a4b38",
+              fontSize: "12px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
           >
             <FontAwesomeIcon icon={faTrashCan} aria-hidden="true" />
             <span>Remove</span>
@@ -228,7 +247,9 @@ function B2BMiniCartLineItem({
       </div>
 
       <div style={{ textAlign: "right" }}>
-        <strong style={{ fontSize: "14px", fontWeight: 700 }}>{line.total.formatted}</strong>
+        <strong style={{ fontSize: "14px", fontWeight: 700 }}>
+          {line.total.formatted}
+        </strong>
       </div>
     </article>
   );
@@ -273,15 +294,27 @@ function B2BMiniCartDrawer({
     >
       <header className="mini-cart-head">
         <div>
-          <span className="eyebrow" style={{ textTransform: "uppercase", fontSize: "10px", letterSpacing: "1.5px", color: "#6a6d62" }}>
+          <span
+            className="eyebrow"
+            style={{
+              textTransform: "uppercase",
+              fontSize: "10px",
+              letterSpacing: "1.5px",
+              color: "#6a6d62",
+            }}
+          >
             {t("Purchasing bag")}
           </span>
           <h2 style={{ fontSize: "22px", margin: "4px 0 0" }}>
-            {cart?.itemCount ?? 0} {cart?.itemCount === 1 ? t("item") : t("items")}
+            {cart?.itemCount ?? 0}{" "}
+            {cart?.itemCount === 1 ? t("item") : t("items")}
           </h2>
           {state?.context && (
-            <p style={{ margin: "2px 0 0", fontSize: "11px", color: "#676a5f" }}>
-              {activeUnit?.name || state.context.businessUnitKey} · {activeStore?.name || state.context.storeKey}
+            <p
+              style={{ margin: "2px 0 0", fontSize: "11px", color: "#676a5f" }}
+            >
+              {activeUnit?.name || state.context.businessUnitKey} ·{" "}
+              {activeStore?.name || state.context.storeKey}
             </p>
           )}
         </div>
@@ -309,7 +342,9 @@ function B2BMiniCartDrawer({
         </p>
       ) : lines.length === 0 ? (
         <div className="mini-cart-empty">
-          <h3 style={{ fontSize: "18px", margin: "0 0 6px" }}>{t("Your cart is empty.")}</h3>
+          <h3 style={{ fontSize: "18px", margin: "0 0 6px" }}>
+            {t("Your cart is empty.")}
+          </h3>
           <p className="muted" style={{ fontSize: "13px", margin: "0 0 16px" }}>
             {t("Browse the catalog and add products here.")}
           </p>
@@ -332,29 +367,76 @@ function B2BMiniCartDrawer({
           </div>
 
           <footer className="mini-cart-summary">
-            <div className="row" style={{ display: "flex", justifyContent: "space-between", margin: "4px 0", fontSize: "13px" }}>
+            <div
+              className="row"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                margin: "4px 0",
+                fontSize: "13px",
+              }}
+            >
               <span>{t("Subtotal")}</span>
               <strong>{cart?.subtotal.formatted}</strong>
             </div>
             {cart && cart.discountTotal.centAmount > 0 && (
-              <div className="row" style={{ display: "flex", justifyContent: "space-between", margin: "4px 0", fontSize: "13px", color: "#2d613b" }}>
+              <div
+                className="row"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  margin: "4px 0",
+                  fontSize: "13px",
+                  color: "#2d613b",
+                }}
+              >
                 <span>{t("Discount")}</span>
                 <strong>−{cart.discountTotal.formatted}</strong>
               </div>
             )}
             {cart && cart.taxTotal.centAmount > 0 && (
-              <div className="row" style={{ display: "flex", justifyContent: "space-between", margin: "4px 0", fontSize: "13px" }}>
+              <div
+                className="row"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  margin: "4px 0",
+                  fontSize: "13px",
+                }}
+              >
                 <span>{t("Tax")}</span>
                 <strong>{cart.taxTotal.formatted}</strong>
               </div>
             )}
-            <div className="row mini-cart-total" style={{ display: "flex", justifyContent: "space-between", margin: "8px 0 16px", paddingTop: "8px", borderTop: "1px solid var(--line)", fontSize: "16px" }}>
+            <div
+              className="row mini-cart-total"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                margin: "8px 0 16px",
+                paddingTop: "8px",
+                borderTop: "1px solid var(--line)",
+                fontSize: "16px",
+              }}
+            >
               <span>{t("Total")}</span>
               <strong>{cart?.total.formatted}</strong>
             </div>
 
-            <div className="mini-cart-cta" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-              <ButtonLink variant="secondary" href="/b2b/cart" onClick={onClose} style={{ textAlign: "center", justifyContent: "center" }}>
+            <div
+              className="mini-cart-cta"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "10px",
+              }}
+            >
+              <ButtonLink
+                variant="secondary"
+                href="/b2b/cart"
+                onClick={onClose}
+                style={{ textAlign: "center", justifyContent: "center" }}
+              >
                 {t("View bag")}
               </ButtonLink>
               <ButtonLink

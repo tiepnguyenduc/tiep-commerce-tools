@@ -7,11 +7,26 @@ export const REVIEW_MEDIA_LIMITS = {
   maxBytes: 100 * 1024 * 1024,
 };
 
-export const REVIEW_MEDIA_MAX_MB = Math.round(REVIEW_MEDIA_LIMITS.maxBytes / (1024 * 1024));
+export const REVIEW_MEDIA_MAX_MB = Math.round(
+  REVIEW_MEDIA_LIMITS.maxBytes / (1024 * 1024),
+);
 
-export const REVIEW_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
-export const REVIEW_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
-export const REVIEW_MEDIA_ACCEPT = [...REVIEW_IMAGE_TYPES, ...REVIEW_VIDEO_TYPES].join(",");
+export const REVIEW_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+];
+export const REVIEW_VIDEO_TYPES = [
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+];
+export const REVIEW_MEDIA_ACCEPT = [
+  ...REVIEW_IMAGE_TYPES,
+  ...REVIEW_VIDEO_TYPES,
+].join(",");
 
 /** Copy shown under the upload field, kept in one place so both sides agree. */
 export const REVIEW_MEDIA_HINT =

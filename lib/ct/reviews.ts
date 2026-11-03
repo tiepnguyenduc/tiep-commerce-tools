@@ -39,7 +39,10 @@ declare global {
 }
 
 export class ProductReviewError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
     super(message);
   }
 }
@@ -87,19 +90,25 @@ function trainingReviews(productId: string) {
 }
 
 /** Every review of a product, newest first, capped at {@link SCAN_LIMIT}. */
-async function scanProductReviews(productId: string, catalog: ReviewCatalog): Promise<ProductReview[]> {
+async function scanProductReviews(
+  productId: string,
+  catalog: ReviewCatalog,
+): Promise<ProductReview[]> {
   const apiRoot = apiRootFor(catalog);
   if (!apiRoot) return trainingReviews(productId).reviews;
 
-  const { body } = await apiRoot.reviews().get({
-    queryArgs: {
-      where: `target(typeId="product" and id=${JSON.stringify(productId)}) and includedInStatistics=true`,
-      sort: ["createdAt desc", "id desc"],
-      limit: SCAN_LIMIT,
-      withTotal: false,
-      expand: ["custom.type"],
-    },
-  }).execute();
+  const { body } = await apiRoot
+    .reviews()
+    .get({
+      queryArgs: {
+        where: `target(typeId="product" and id=${JSON.stringify(productId)}) and includedInStatistics=true`,
+        sort: ["createdAt desc", "id desc"],
+        limit: SCAN_LIMIT,
+        withTotal: false,
+        expand: ["custom.type"],
+      },
+    })
+    .execute();
 
   return body.results.map(mapReview);
 }
@@ -116,20 +125,33 @@ function wholeStars(review: ProductReview) {
   return value >= 1 && value <= 5 ? value : null;
 }
 
-function matchesQuery(review: ProductReview, { search, ratings, withMedia }: ProductReviewQuery) {
+function matchesQuery(
+  review: ProductReview,
+  { search, ratings, withMedia }: ProductReviewQuery,
+) {
   if (withMedia && !review.media.length) return false;
   if (ratings?.length) {
     const stars = wholeStars(review);
     if (stars === null || !ratings.includes(stars)) return false;
   }
   if (search) {
-    const haystack = `${review.title} ${review.text} ${review.authorName}`.toLowerCase();
-    if (!search.toLowerCase().split(/\s+/).filter(Boolean).every((term) => haystack.includes(term))) return false;
+    const haystack =
+      `${review.title} ${review.text} ${review.authorName}`.toLowerCase();
+    if (
+      !search
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+        .every((term) => haystack.includes(term))
+    )
+      return false;
   }
   return true;
 }
 
-const BY_RATING: Partial<Record<ReviewSortOrder, (a: ProductReview, b: ProductReview) => number>> = {
+const BY_RATING: Partial<
+  Record<ReviewSortOrder, (a: ProductReview, b: ProductReview) => number>
+> = {
   highest: (a, b) => (b.rating ?? 0) - (a.rating ?? 0),
   lowest: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
 };
@@ -184,7 +206,10 @@ export async function readProductReviews(
 ): Promise<ProductReviewPage> {
   const all = await scanProductReviews(productId, catalog);
   const offset = Math.max(0, query.offset ?? 0);
-  const matching = sortReviews(all.filter((review) => matchesQuery(review, query)), query.sort ?? "newest");
+  const matching = sortReviews(
+    all.filter((review) => matchesQuery(review, query)),
+    query.sort ?? "newest",
+  );
 
   return {
     reviews: matching.slice(offset, offset + PAGE_SIZE),
@@ -216,29 +241,46 @@ async function ensureReviewMediaType(apiRoot: ApiRoot, catalog: ReviewCatalog) {
   if (mediaTypeReady.has(catalog)) return;
 
   try {
-    await apiRoot.types().withKey({ key: REVIEW_MEDIA_TYPE_KEY }).get().execute();
+    await apiRoot
+      .types()
+      .withKey({ key: REVIEW_MEDIA_TYPE_KEY })
+      .get()
+      .execute();
   } catch (error) {
     if ((error as { statusCode?: number })?.statusCode !== 404) {
-      throw new ProductReviewError("Could not attach your photos or video. Please try again.", 503);
+      throw new ProductReviewError(
+        "Could not attach your photos or video. Please try again.",
+        503,
+      );
     }
     try {
-      await apiRoot.types().post({
-        body: {
-          key: REVIEW_MEDIA_TYPE_KEY,
-          name: { en: "Storefront review media" },
-          description: { en: "Photos and videos shoppers attach to product reviews." },
-          resourceTypeIds: ["review"],
-          fieldDefinitions: [{
-            name: MEDIA_FIELD,
-            label: { en: "Media" },
-            type: { name: "String" },
-            required: false,
-            inputHint: "MultiLine",
-          }],
-        },
-      }).execute();
+      await apiRoot
+        .types()
+        .post({
+          body: {
+            key: REVIEW_MEDIA_TYPE_KEY,
+            name: { en: "Storefront review media" },
+            description: {
+              en: "Photos and videos shoppers attach to product reviews.",
+            },
+            resourceTypeIds: ["review"],
+            fieldDefinitions: [
+              {
+                name: MEDIA_FIELD,
+                label: { en: "Media" },
+                type: { name: "String" },
+                required: false,
+                inputHint: "MultiLine",
+              },
+            ],
+          },
+        })
+        .execute();
     } catch {
-      throw new ProductReviewError("Could not attach your photos or video. Please try again.", 503);
+      throw new ProductReviewError(
+        "Could not attach your photos or video. Please try again.",
+        503,
+      );
     }
   }
 
@@ -267,27 +309,37 @@ export async function createProductReview(
   }
 
   // Only published products can receive reviews through the storefront.
-  await apiRoot.productProjections().withId({ ID: productId }).get({
-    queryArgs: { staged: false },
-  }).execute();
+  await apiRoot
+    .productProjections()
+    .withId({ ID: productId })
+    .get({
+      queryArgs: { staged: false },
+    })
+    .execute();
   if (media.length) await ensureReviewMediaType(apiRoot, catalog);
 
-  const { body } = await apiRoot.reviews().post({
-    body: {
-      ...fields,
-      locale: process.env.CTP_LOCALE || "en-US",
-      target: { typeId: "product", id: productId },
-      ...(media.length
-        ? {
-            custom: {
-              type: { typeId: "type" as const, key: REVIEW_MEDIA_TYPE_KEY },
-              fields: { [MEDIA_FIELD]: JSON.stringify(media) },
-            },
-          }
-        : {}),
-    },
-  }).execute();
+  const { body } = await apiRoot
+    .reviews()
+    .post({
+      body: {
+        ...fields,
+        locale: process.env.CTP_LOCALE || "en-US",
+        target: { typeId: "product", id: productId },
+        ...(media.length
+          ? {
+              custom: {
+                type: { typeId: "type" as const, key: REVIEW_MEDIA_TYPE_KEY },
+                fields: { [MEDIA_FIELD]: JSON.stringify(media) },
+              },
+            }
+          : {}),
+      },
+    })
+    .execute();
 
   // The freshly created review echoes back its custom fields unexpanded.
-  return { ...mapReview(body), media: media.length ? media : mapReview(body).media };
+  return {
+    ...mapReview(body),
+    media: media.length ? media : mapReview(body).media,
+  };
 }

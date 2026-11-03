@@ -4,7 +4,16 @@ import Button from "@/components/commercetools-ui/atoms/button";
 import Link from "@/components/commercetools-ui/atoms/link";
 import { ArrowRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import useOnClickOutside from "@/lib/launchpad/helpers/hooks/useOnClickOutside/index";
 import type { Category } from "@/lib/launchpad/types/entity/category";
 import styles from "./HeaderCategoryNavigation.module.css";
@@ -27,8 +36,14 @@ type NavigationMenu = {
 };
 
 /** Top level categories beyond the inline budget move into a single "More" flyout. */
-function toNavigationMenus(categories: Category[], maxInlineItems: number): NavigationMenu[] {
-  const inline = categories.length > maxInlineItems ? categories.slice(0, maxInlineItems) : categories;
+function toNavigationMenus(
+  categories: Category[],
+  maxInlineItems: number,
+): NavigationMenu[] {
+  const inline =
+    categories.length > maxInlineItems
+      ? categories.slice(0, maxInlineItems)
+      : categories;
   const overflow = categories.slice(inline.length);
   const menus = inline.map((category) => ({
     id: category.categoryId as string,
@@ -38,18 +53,27 @@ function toNavigationMenus(categories: Category[], maxInlineItems: number): Navi
     intro: category,
   }));
 
-  return overflow.length ? [...menus, { id: "more-categories", name: "More", groups: overflow }] : menus;
+  return overflow.length
+    ? [...menus, { id: "more-categories", name: "More", groups: overflow }]
+    : menus;
 }
 
 /** Ids of the category currently listed plus its ancestors, so the whole path can be marked. */
-function activeCategoryTrail(categories: Category[], activeCategoryId: string | null) {
+function activeCategoryTrail(
+  categories: Category[],
+  activeCategoryId: string | null,
+) {
   const trail = new Set<string>();
   if (!activeCategoryId) return trail;
 
   const walk = (branch: Category[], ancestors: string[]): boolean =>
     branch.some((category) => {
       const path = [...ancestors, category.categoryId as string];
-      if (category.categoryId !== activeCategoryId && !walk(category.descendants ?? [], path)) return false;
+      if (
+        category.categoryId !== activeCategoryId &&
+        !walk(category.descendants ?? [], path)
+      )
+        return false;
       for (const categoryId of path) trail.add(categoryId);
       return true;
     });
@@ -68,7 +92,10 @@ export function HeaderCategoryNavigation({
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [hoverMenu, setHoverMenu] = useState<string | null>(null);
   const [heights, setHeights] = useState<Record<string, number>>({});
-  const [underline, setUnderline] = useState<{ left: number; width: number } | null>(null);
+  const [underline, setUnderline] = useState<{
+    left: number;
+    width: number;
+  } | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const contentRefs = useRef(new Map<string, HTMLDivElement>());
@@ -77,10 +104,19 @@ export function HeaderCategoryNavigation({
   const searchParams = useSearchParams();
   const activeCategoryId = searchParams?.get("categoryId") ?? null;
 
-  const menus = useMemo(() => toNavigationMenus(categories, maxInlineItems), [categories, maxInlineItems]);
-  const trail = useMemo(() => activeCategoryTrail(categories, activeCategoryId), [categories, activeCategoryId]);
+  const menus = useMemo(
+    () => toNavigationMenus(categories, maxInlineItems),
+    [categories, maxInlineItems],
+  );
+  const trail = useMemo(
+    () => activeCategoryTrail(categories, activeCategoryId),
+    [categories, activeCategoryId],
+  );
 
-  const panelId = useCallback((menuId: string) => `${instanceId}-${menuId}`, [instanceId]);
+  const panelId = useCallback(
+    (menuId: string) => `${instanceId}-${menuId}`,
+    [instanceId],
+  );
 
   const clearTimer = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
@@ -106,7 +142,8 @@ export function HeaderCategoryNavigation({
     (menuId: string) => {
       clearTimer();
       if (openMenu) setOpenMenu(menuId);
-      else timer.current = setTimeout(() => setOpenMenu(menuId), HOVER_INTENT_MS);
+      else
+        timer.current = setTimeout(() => setOpenMenu(menuId), HOVER_INTENT_MS);
     },
     [clearTimer, openMenu],
   );
@@ -117,7 +154,10 @@ export function HeaderCategoryNavigation({
   }, [clearTimer]);
 
   const focusTrigger = useCallback(
-    (menuId: string) => navRef.current?.querySelector<HTMLElement>(`[data-menu="${menuId}"] [data-nav-focus]`)?.focus(),
+    (menuId: string) =>
+      navRef.current
+        ?.querySelector<HTMLElement>(`[data-menu="${menuId}"] [data-nav-focus]`)
+        ?.focus(),
     [],
   );
 
@@ -125,7 +165,10 @@ export function HeaderCategoryNavigation({
     (menuId: string) => {
       open(menuId);
       requestAnimationFrame(() => {
-        document.getElementById(panelId(menuId))?.querySelector<HTMLAnchorElement>("a")?.focus();
+        document
+          .getElementById(panelId(menuId))
+          ?.querySelector<HTMLAnchorElement>("a")
+          ?.focus();
       });
     },
     [open, panelId],
@@ -162,15 +205,24 @@ export function HeaderCategoryNavigation({
   }, [menus]);
 
   // One underline slides between items instead of every item fading its own in.
-  const underlinedMenu = openMenu ?? hoverMenu ?? menus.find((menu) => trail.has(menu.id))?.id ?? null;
+  const underlinedMenu =
+    openMenu ??
+    hoverMenu ??
+    menus.find((menu) => trail.has(menu.id))?.id ??
+    null;
   useEffect(() => {
     const list = listRef.current;
-    const item = underlinedMenu ? list?.querySelector<HTMLElement>(`[data-menu="${underlinedMenu}"]`) : null;
+    const item = underlinedMenu
+      ? list?.querySelector<HTMLElement>(`[data-menu="${underlinedMenu}"]`)
+      : null;
     if (!list || !item) return;
 
     const place = () => {
       const bounds = item.getBoundingClientRect();
-      setUnderline({ left: bounds.left - list.getBoundingClientRect().left, width: bounds.width });
+      setUnderline({
+        left: bounds.left - list.getBoundingClientRect().left,
+        width: bounds.width,
+      });
     };
 
     place();
@@ -179,8 +231,14 @@ export function HeaderCategoryNavigation({
   }, [underlinedMenu]);
 
   function moveTrigger(current: HTMLElement, step: 1 | -1) {
-    const triggers = [...(navRef.current?.querySelectorAll<HTMLElement>("[data-nav-focus]") ?? [])];
-    const next = triggers[(triggers.indexOf(current) + step + triggers.length) % triggers.length];
+    const triggers = [
+      ...(navRef.current?.querySelectorAll<HTMLElement>("[data-nav-focus]") ??
+        []),
+    ];
+    const next =
+      triggers[
+        (triggers.indexOf(current) + step + triggers.length) % triggers.length
+      ];
     next?.focus();
   }
 
@@ -200,13 +258,20 @@ export function HeaderCategoryNavigation({
 
     if (!menuId) return;
 
-    if (event.key === "ArrowDown" && isTrigger && menus.some((menu) => menu.id === menuId && menu.groups.length)) {
+    if (
+      event.key === "ArrowDown" &&
+      isTrigger &&
+      menus.some((menu) => menu.id === menuId && menu.groups.length)
+    ) {
       event.preventDefault();
       openAndFocusPanel(menuId);
       return;
     }
 
-    if ((event.key === "ArrowRight" || event.key === "ArrowLeft") && target.matches("[data-nav-focus]")) {
+    if (
+      (event.key === "ArrowRight" || event.key === "ArrowLeft") &&
+      target.matches("[data-nav-focus]")
+    ) {
       event.preventDefault();
       moveTrigger(target, event.key === "ArrowRight" ? 1 : -1);
     }
@@ -222,8 +287,14 @@ export function HeaderCategoryNavigation({
           <li key={child.categoryId}>
             <Link
               link={child._url}
-              className={trail.has(child.categoryId as string) ? styles.current : undefined}
-              aria-current={child.categoryId === activeCategoryId ? "page" : undefined}
+              className={
+                trail.has(child.categoryId as string)
+                  ? styles.current
+                  : undefined
+              }
+              aria-current={
+                child.categoryId === activeCategoryId ? "page" : undefined
+              }
             >
               {child.name}
             </Link>
@@ -278,7 +349,9 @@ export function HeaderCategoryNavigation({
                     className={styles.label}
                     data-nav-trigger
                     data-nav-focus
-                    aria-current={menu.id === activeCategoryId ? "page" : undefined}
+                    aria-current={
+                      menu.id === activeCategoryId ? "page" : undefined
+                    }
                     onFocus={() => setHoverMenu(menu.id)}
                   >
                     <span className={styles.labelText}>{menu.name}</span>
@@ -322,7 +395,14 @@ export function HeaderCategoryNavigation({
           className={styles.underline}
           aria-hidden="true"
           data-visible={underline && underlinedMenu ? true : undefined}
-          style={underline ? { transform: `translateX(${underline.left}px)`, width: underline.width } : undefined}
+          style={
+            underline
+              ? {
+                  transform: `translateX(${underline.left}px)`,
+                  width: underline.width,
+                }
+              : undefined
+          }
         />
       </ul>
 
@@ -371,7 +451,11 @@ export function HeaderCategoryNavigation({
                       <Link
                         link={group._url}
                         className={styles.groupTitle}
-                        aria-current={group.categoryId === activeCategoryId ? "page" : undefined}
+                        aria-current={
+                          group.categoryId === activeCategoryId
+                            ? "page"
+                            : undefined
+                        }
                       >
                         {group.name}
                         <ArrowRightIcon aria-hidden="true" />

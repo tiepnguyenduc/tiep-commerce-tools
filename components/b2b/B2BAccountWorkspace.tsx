@@ -155,7 +155,8 @@ export function B2BAccountDashboard() {
     {
       href: "/b2b/account/approval-flows",
       title: "Approval flows",
-      description: "Review, approve or reject orders that need company sign-off.",
+      description:
+        "Review, approve or reject orders that need company sign-off.",
       icon: ClipboardDocumentCheckIcon,
     },
     {
@@ -246,9 +247,7 @@ function AccountLoad({
       )}
     </div>
   ) : (
-    <>
-      {children}
-    </>
+    <>{children}</>
   );
 }
 export function B2BProfilePage() {

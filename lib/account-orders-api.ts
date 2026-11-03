@@ -1,7 +1,4 @@
-import type {
-  CustomerOrderDetail,
-  CustomerOrderSummary,
-} from "./types";
+import type { CustomerOrderDetail, CustomerOrderSummary } from "./types";
 
 async function readJson<T>(response: Response): Promise<T> {
   const data = await response.json();

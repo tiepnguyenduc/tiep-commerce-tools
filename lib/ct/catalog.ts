@@ -61,7 +61,10 @@ export async function listCatalogCategories(): Promise<HeaderCategory[]> {
     const seenNames = new Set<string>();
 
     return body.results
-      .map((category) => ({ ...mapCategoryResourceToHeaderCategory(category), parentId: category.parent?.id }))
+      .map((category) => ({
+        ...mapCategoryResourceToHeaderCategory(category),
+        parentId: category.parent?.id,
+      }))
       .filter((category) => {
         if (!category.name || seenNames.has(category.name)) return false;
         seenNames.add(category.name);
@@ -274,7 +277,9 @@ function summarizeBrands(items: Product[]): ProductBrandSummary[] {
     });
   }
 
-  return Array.from(byBrand.values()).sort((a, b) => a.name.localeCompare(b.name));
+  return Array.from(byBrand.values()).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 }
 
 export async function listCatalogBrands(): Promise<ProductBrandSummary[]> {
@@ -299,7 +304,9 @@ export async function getRelatedProducts(product: Product, limit = 8) {
   const sameCategory = candidates.filter(
     (item) => item.category === product.category,
   );
-  const fallback = candidates.filter((item) => item.category !== product.category);
+  const fallback = candidates.filter(
+    (item) => item.category !== product.category,
+  );
 
   return [...sameCategory, ...fallback].slice(0, limit);
 }

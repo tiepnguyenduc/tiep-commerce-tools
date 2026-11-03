@@ -9,11 +9,15 @@ export function toLaunchpadTileProduct(product: Product): LaunchpadProduct {
     description: product.description,
     slug: product.slug,
     _url: `/products/${product.slug}`,
-    variants: [{
-      sku: product.sku,
-      images: [product.image],
-      price: product.originalPrice ?? product.price,
-      discountedPrice: product.originalPrice ? { value: product.price } : undefined,
-    }],
+    variants: [
+      {
+        sku: product.sku,
+        images: [product.image],
+        price: product.originalPrice ?? product.price,
+        discountedPrice: product.originalPrice
+          ? { value: product.price }
+          : undefined,
+      },
+    ],
   };
 }

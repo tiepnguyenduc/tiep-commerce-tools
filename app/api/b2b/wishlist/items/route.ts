@@ -54,10 +54,7 @@ export async function DELETE(request: Request) {
     const session = await readB2BSession();
     if (!session.customer) throw new Error("B2B login required.");
     return NextResponse.json({
-      wishlist: await removeB2BWishlistItem(
-        session.customer.id,
-        lineItemId,
-      ),
+      wishlist: await removeB2BWishlistItem(session.customer.id, lineItemId),
     });
   } catch (error) {
     return NextResponse.json(

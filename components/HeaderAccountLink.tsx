@@ -85,19 +85,27 @@ export function HeaderAccountLink({
 
   return (
     <HeaderDataMenu>
-      <summary aria-label={customer ? `Account for ${label}` : label} className="header-account-link" title={label}>
+      <summary
+        aria-label={customer ? `Account for ${label}` : label}
+        className="header-account-link"
+        title={label}
+      >
         <FontAwesomeIcon aria-hidden="true" icon={faUser} />
         <span>{label}</span>
       </summary>
       <div className="header-data-panel">
         <strong>{customer ? `Hello, ${label}` : "Welcome to WORK/SHOP"}</strong>
         {customer && <p className="muted">{customer.email}</p>}
-        <Link href="/account">{customer ? "My account" : "Login / Register"}</Link>
-        {customer && <>
-          <Link href="/account/orders">My orders</Link>
-          <Link href="/account/addresses">My addresses</Link>
-          <Link href="/account/wishlists">My wishlists</Link>
-        </>}
+        <Link href="/account">
+          {customer ? "My account" : "Login / Register"}
+        </Link>
+        {customer && (
+          <>
+            <Link href="/account/orders">My orders</Link>
+            <Link href="/account/addresses">My addresses</Link>
+            <Link href="/account/wishlists">My wishlists</Link>
+          </>
+        )}
       </div>
     </HeaderDataMenu>
   );

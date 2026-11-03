@@ -1,76 +1,478 @@
-.page { max-width: 1240px; margin: auto; padding: 50px 28px 70px; }
-.eyebrow { color: #7b704f; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; margin: 0 0 14px; }
-.heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 34px; }
-.heading h1 { margin: 0 0 14px; font-size: clamp(34px, 5vw, 58px); line-height: 1.08; letter-spacing: -1.8px; font-weight: 500; }
-.heading p:not(.eyebrow) { color: #68705f; font-size: 14px; line-height: 1.7; max-width: 630px; margin: 0; }
-.heading > a { white-space: nowrap; color: #766039; font-size: 12px; padding-bottom: 5px; }
-.empty { padding: 45px 28px; background: #ebe8df; text-align: center; color: #5d6556; line-height: 1.7; font-size: 14px; }
-.empty h2 { font-size: 25px; font-weight: 500; color: #30382d; }
-.empty a { display: inline-block; padding: 12px; color: #7c602c; }
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
-.category { padding: 25px; border: 1px solid #dcd9cd; background: #fff; }
-.category h2 { font-size: 22px; font-weight: 500; margin: 0 0 12px; }
-.category a { display: block; padding: 10px 0; font-size: 13px; line-height: 1.5; color: #48543e; }
-.category h2 a { font-size: inherit; color: #2f372a; }
-.category ul { list-style: none; padding: 0; margin: 0; }
-.category ul ul { padding-left: 16px; border-left: 1px solid #e7e4da; }
-.product { background: #fff; border: 1px solid #dedbcf; padding: 20px; }
-.product img { width: 100%; height: 180px; object-fit: contain; background: #f4f2ec; }
-.product h2 { font-size: 17px; font-weight: 500; line-height: 1.45; margin: 16px 0 8px; }
-.product p { font-size: 12px; color: #707664; line-height: 1.6; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 18px; }
-.actions button, .actions a, .button { min-height: 42px; border: 1px solid #b6b8a9; background: transparent; padding: 10px 14px; color: #394430; font-size: 12px; cursor: pointer; }
-.actions button:disabled, .button:disabled { opacity: .5; cursor: not-allowed; }
-.toggle { display: inline-flex; align-items: center; gap: 7px; background: transparent; border: 0; padding: 10px 0; font-size: 12px; color: #616b54; cursor: pointer; }
-.toggle svg { width: 16px; height: 16px; }
-.toggle[aria-pressed='true'] { color: #906d31; }
-.toggle:disabled { opacity: .5; }
-.iconToggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: 1px solid #d2cec1; border-radius: 50%; background: rgba(255,255,255,.96); color: #30382d; box-shadow: 0 3px 12px rgba(35,42,31,.12); cursor: pointer; transition: color .16s, background .16s, border-color .16s, transform .16s, box-shadow .16s; }
-.iconToggle svg { width: 19px; height: 19px; }
-.iconToggle:hover { border-color: #8e866f; background: #f8f5ed; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(35,42,31,.17); }
-.iconToggle:active { transform: translateY(0) scale(.96); }
-.iconToggle:focus-visible { outline: 2px solid #9a712e; outline-offset: 3px; }
-.iconToggle[aria-pressed='true'] { border-color: #8a682d; background: #30382d; color: #fff; }
-.iconToggle[aria-pressed='true'] svg { fill: currentColor; }
-.iconToggle:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-.primary { background: #303b2b !important; border-color: #303b2b !important; color: #fff !important; }
-.note { margin: 20px 0; color: #646e59; font-size: 12px; line-height: 1.7; }
-.order { background: #fff; border: 1px solid #dedbcf; padding: 26px; }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) 110px auto; gap: 14px; align-items: start; padding: 18px 0; border-bottom: 1px solid #e6e3d8; }
-.row label { display: grid; gap: 8px; color: #5d6852; font-size: 11px; }
-.row input { min-width: 0; width: 100%; padding: 12px; border: 1px solid #d4d5c8; background: #fafaf6; color: #303b29; font-size: 13px; }
-.row > button { margin-top: 23px; }
-.preview { grid-column: 1/-1; font-size: 12px; line-height: 1.7; color: #606c52; }
-.preview a { font-weight: 600; }
-.error { color: #9d422d; }
-.toolLinks { display: flex; flex-wrap: wrap; gap: 6px 22px; padding: 18px 0; border-top: 1px solid #dedbcf; border-bottom: 1px solid #dedbcf; margin-bottom: 30px; }
-.toolLinks a { font-size: 12px; padding: 8px 0; color: #556047; }
-.feedback { font-size: 12px; color: #586746; line-height: 1.6; }
-.wishlistStack { display: grid; gap: 24px; }
-.wishlistOverview { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.wishlistOverview > p { margin: 0; color: #68705f; font-size: 13px; line-height: 1.7; }
-.primaryAction { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; border: 1px solid #65774d; background: #65774d; color: #fff; padding: 10px 16px; cursor: pointer; }
-.primaryAction svg { width: 18px; height: 18px; }
-.wishlistCards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.wishlistCard { position: relative; border: 1px solid #deded3; background: #fff; min-width: 0; }
-.wishlistOpen { display: grid; gap: 12px; width: 100%; min-height: 190px; border: 0; background: transparent; padding: 22px 58px 22px 22px; color: #30382d; text-align: left; cursor: pointer; }
-.wishlistOpen:hover { background: #fafaf6; }
-.wishlistCardTitle { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
-.wishlistCardTitle strong { font-size: 18px; font-weight: 500; }
-.wishlistCardTitle small, .wishlistTitle > span { background: #e7eadd; color: #536040; padding: 4px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
-.wishlistOpen > span:nth-child(2) { color: #737965; font-size: 12px; }
-.wishlistImages { display: flex; gap: 8px; min-width: 0; overflow: hidden; }
-.wishlistImages img { width: 64px; height: 64px; flex: 0 0 64px; object-fit: contain; background: #f4f2ec; }
-.wishlistImages i { color: #858a79; font-size: 12px; font-style: normal; }
-.wishlistCardActions { position: absolute; top: 14px; right: 14px; display: flex; gap: 4px; }
-.wishlistCardActions button, .wishlistToolbar button { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: #59634d; padding: 8px; cursor: pointer; }
-.wishlistCardActions svg, .wishlistToolbar svg { width: 17px; height: 17px; }
-.danger { color: #953e31 !important; }
-.wishlistToolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid #deded3; padding-bottom: 16px; }
-.wishlistToolbar > div { display: flex; gap: 5px; }
-.wishlistTitle { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.wishlistTitle h2 { margin: 0 0 6px; font-size: 26px; font-weight: 500; }
-.wishlistTitle p { margin: 0; color: #737965; font-size: 12px; }
-@media(max-width:850px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media(max-width:700px) { .wishlistCards { grid-template-columns: 1fr; } }
-@media(max-width:540px) { .page { padding: 32px 20px 50px; } .heading { display: block; } .heading > a { display: inline-block; margin-top: 18px; } .grid { grid-template-columns: 1fr; } .row { grid-template-columns: minmax(0,1fr) 80px; } .row > button { margin: 0; grid-column: 1/-1; justify-self: start; } .order { padding: 16px; } .wishlistOverview, .wishlistToolbar, .wishlistTitle { align-items: flex-start; flex-direction: column; } .wishlistToolbar > div { flex-wrap: wrap; } }
+.page {
+  max-width: 1240px;
+  margin: auto;
+  padding: 50px 28px 70px;
+}
+.eyebrow {
+  color: #7b704f;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 34px;
+}
+.heading h1 {
+  margin: 0 0 14px;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.08;
+  letter-spacing: -1.8px;
+  font-weight: 500;
+}
+.heading p:not(.eyebrow) {
+  color: #68705f;
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 630px;
+  margin: 0;
+}
+.heading > a {
+  white-space: nowrap;
+  color: #766039;
+  font-size: 12px;
+  padding-bottom: 5px;
+}
+.empty {
+  padding: 45px 28px;
+  background: #ebe8df;
+  text-align: center;
+  color: #5d6556;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.empty h2 {
+  font-size: 25px;
+  font-weight: 500;
+  color: #30382d;
+}
+.empty a {
+  display: inline-block;
+  padding: 12px;
+  color: #7c602c;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.category {
+  padding: 25px;
+  border: 1px solid #dcd9cd;
+  background: #fff;
+}
+.category h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.category a {
+  display: block;
+  padding: 10px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #48543e;
+}
+.category h2 a {
+  font-size: inherit;
+  color: #2f372a;
+}
+.category ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.category ul ul {
+  padding-left: 16px;
+  border-left: 1px solid #e7e4da;
+}
+.product {
+  background: #fff;
+  border: 1px solid #dedbcf;
+  padding: 20px;
+}
+.product img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #f4f2ec;
+}
+.product h2 {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.45;
+  margin: 16px 0 8px;
+}
+.product p {
+  font-size: 12px;
+  color: #707664;
+  line-height: 1.6;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 18px;
+}
+.actions button,
+.actions a,
+.button {
+  min-height: 42px;
+  border: 1px solid #b6b8a9;
+  background: transparent;
+  padding: 10px 14px;
+  color: #394430;
+  font-size: 12px;
+  cursor: pointer;
+}
+.actions button:disabled,
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 0;
+  padding: 10px 0;
+  font-size: 12px;
+  color: #616b54;
+  cursor: pointer;
+}
+.toggle svg {
+  width: 16px;
+  height: 16px;
+}
+.toggle[aria-pressed="true"] {
+  color: #906d31;
+}
+.toggle:disabled {
+  opacity: 0.5;
+}
+.iconToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #d2cec1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  color: #30382d;
+  box-shadow: 0 3px 12px rgba(35, 42, 31, 0.12);
+  cursor: pointer;
+  transition:
+    color 0.16s,
+    background 0.16s,
+    border-color 0.16s,
+    transform 0.16s,
+    box-shadow 0.16s;
+}
+.iconToggle svg {
+  width: 19px;
+  height: 19px;
+}
+.iconToggle:hover {
+  border-color: #8e866f;
+  background: #f8f5ed;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(35, 42, 31, 0.17);
+}
+.iconToggle:active {
+  transform: translateY(0) scale(0.96);
+}
+.iconToggle:focus-visible {
+  outline: 2px solid #9a712e;
+  outline-offset: 3px;
+}
+.iconToggle[aria-pressed="true"] {
+  border-color: #8a682d;
+  background: #30382d;
+  color: #fff;
+}
+.iconToggle[aria-pressed="true"] svg {
+  fill: currentColor;
+}
+.iconToggle:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+.primary {
+  background: #303b2b !important;
+  border-color: #303b2b !important;
+  color: #fff !important;
+}
+.note {
+  margin: 20px 0;
+  color: #646e59;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.order {
+  background: #fff;
+  border: 1px solid #dedbcf;
+  padding: 26px;
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px auto;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 0;
+  border-bottom: 1px solid #e6e3d8;
+}
+.row label {
+  display: grid;
+  gap: 8px;
+  color: #5d6852;
+  font-size: 11px;
+}
+.row input {
+  min-width: 0;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d4d5c8;
+  background: #fafaf6;
+  color: #303b29;
+  font-size: 13px;
+}
+.row > button {
+  margin-top: 23px;
+}
+.preview {
+  grid-column: 1/-1;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #606c52;
+}
+.preview a {
+  font-weight: 600;
+}
+.error {
+  color: #9d422d;
+}
+.toolLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  padding: 18px 0;
+  border-top: 1px solid #dedbcf;
+  border-bottom: 1px solid #dedbcf;
+  margin-bottom: 30px;
+}
+.toolLinks a {
+  font-size: 12px;
+  padding: 8px 0;
+  color: #556047;
+}
+.feedback {
+  font-size: 12px;
+  color: #586746;
+  line-height: 1.6;
+}
+.wishlistStack {
+  display: grid;
+  gap: 24px;
+}
+.wishlistOverview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.wishlistOverview > p {
+  margin: 0;
+  color: #68705f;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.primaryAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid #65774d;
+  background: #65774d;
+  color: #fff;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+.primaryAction svg {
+  width: 18px;
+  height: 18px;
+}
+.wishlistCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.wishlistCard {
+  position: relative;
+  border: 1px solid #deded3;
+  background: #fff;
+  min-width: 0;
+}
+.wishlistOpen {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-height: 190px;
+  border: 0;
+  background: transparent;
+  padding: 22px 58px 22px 22px;
+  color: #30382d;
+  text-align: left;
+  cursor: pointer;
+}
+.wishlistOpen:hover {
+  background: #fafaf6;
+}
+.wishlistCardTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.wishlistCardTitle strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+.wishlistCardTitle small,
+.wishlistTitle > span {
+  background: #e7eadd;
+  color: #536040;
+  padding: 4px 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.wishlistOpen > span:nth-child(2) {
+  color: #737965;
+  font-size: 12px;
+}
+.wishlistImages {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+.wishlistImages img {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  object-fit: contain;
+  background: #f4f2ec;
+}
+.wishlistImages i {
+  color: #858a79;
+  font-size: 12px;
+  font-style: normal;
+}
+.wishlistCardActions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+}
+.wishlistCardActions button,
+.wishlistToolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: #59634d;
+  padding: 8px;
+  cursor: pointer;
+}
+.wishlistCardActions svg,
+.wishlistToolbar svg {
+  width: 17px;
+  height: 17px;
+}
+.danger {
+  color: #953e31 !important;
+}
+.wishlistToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #deded3;
+  padding-bottom: 16px;
+}
+.wishlistToolbar > div {
+  display: flex;
+  gap: 5px;
+}
+.wishlistTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.wishlistTitle h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 500;
+}
+.wishlistTitle p {
+  margin: 0;
+  color: #737965;
+  font-size: 12px;
+}
+@media (max-width: 850px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .wishlistCards {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 540px) {
+  .page {
+    padding: 32px 20px 50px;
+  }
+  .heading {
+    display: block;
+  }
+  .heading > a {
+    display: inline-block;
+    margin-top: 18px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    grid-template-columns: minmax(0, 1fr) 80px;
+  }
+  .row > button {
+    margin: 0;
+    grid-column: 1/-1;
+    justify-self: start;
+  }
+  .order {
+    padding: 16px;
+  }
+  .wishlistOverview,
+  .wishlistToolbar,
+  .wishlistTitle {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .wishlistToolbar > div {
+    flex-wrap: wrap;
+  }
+}

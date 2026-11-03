@@ -6,7 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import { useMiniCart } from "@/components/MiniCart";
 import { useToast } from "@/components/Toast";
-import type { Cart, CustomerAddress, CustomerOrderDetail, StoreMode } from "@/lib/types";
+import type {
+  Cart,
+  CustomerAddress,
+  CustomerOrderDetail,
+  StoreMode,
+} from "@/lib/types";
 
 const REORDER_MODE: StoreMode = "b2c";
 
@@ -26,7 +31,9 @@ function addressLines(address: CustomerAddress) {
   return [
     [address.firstName, address.lastName].filter(Boolean).join(" "),
     [address.streetNumber, address.streetName].filter(Boolean).join(" "),
-    [address.city, address.region, address.postalCode].filter(Boolean).join(", "),
+    [address.city, address.region, address.postalCode]
+      .filter(Boolean)
+      .join(", "),
     address.country,
     address.phone,
   ].filter(Boolean);
@@ -123,14 +130,16 @@ export function OrderDetails({
           <span className="eyebrow">Order details</span>
           <h3 id={`order-detail-${order.id}`}>Order #{order.orderNumber}</h3>
           <p className="muted">
-            Placed {new Date(order.createdAt).toLocaleString("en-US", {
+            Placed{" "}
+            {new Date(order.createdAt).toLocaleString("en-US", {
               dateStyle: "medium",
               timeStyle: "short",
             })}
           </p>
         </div>
         <div className="order-detail-actions">
-          <UIButton variant="primary"
+          <UIButton
+            variant="primary"
 
             disabled={reordering || order.lines.length === 0}
             onClick={reorder}
@@ -139,7 +148,13 @@ export function OrderDetails({
             <FontAwesomeIcon aria-hidden="true" icon={faRotateRight} />
             <span>{reordering ? "Reordering…" : "Reorder"}</span>
           </UIButton>
-          <UIButton variant="ghost" size="fit" className="text-button" onClick={onClose} type="button">
+          <UIButton
+            variant="ghost"
+            size="fit"
+            className="text-button"
+            onClick={onClose}
+            type="button"
+          >
             Close
           </UIButton>
         </div>
@@ -185,8 +200,14 @@ export function OrderDetails({
 
       <div className="order-detail-bottom">
         <div className="order-address-grid">
-          <OrderAddress address={order.shippingAddress} title="Shipping address" />
-          <OrderAddress address={order.billingAddress} title="Billing address" />
+          <OrderAddress
+            address={order.shippingAddress}
+            title="Shipping address"
+          />
+          <OrderAddress
+            address={order.billingAddress}
+            title="Billing address"
+          />
         </div>
         <dl className="order-total-list">
           <div>

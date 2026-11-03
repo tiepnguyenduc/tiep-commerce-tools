@@ -17,7 +17,10 @@ export function useReservedSpace(barRef: RefObject<HTMLDivElement | null>) {
     if (!bar) return;
 
     const publish = () =>
-      document.documentElement.style.setProperty("--product-sticky-bar", `${Math.round(bar.offsetHeight)}px`);
+      document.documentElement.style.setProperty(
+        "--product-sticky-bar",
+        `${Math.round(bar.offsetHeight)}px`,
+      );
 
     publish();
     const observer = new ResizeObserver(publish);
@@ -63,7 +66,13 @@ export function ProductStickyBar({
     >
       <div className={`shell ${styles.inner}`}>
         <div className={styles.identity}>
-          <img className={styles.thumb} src={variant.image || product.image} alt="" width={56} height={56} />
+          <img
+            className={styles.thumb}
+            src={variant.image || product.image}
+            alt=""
+            width={56}
+            height={56}
+          />
           <span className={styles.copy}>
             <strong>{product.name}</strong>
             {meta ? <small>{meta}</small> : null}
@@ -71,15 +80,28 @@ export function ProductStickyBar({
         </div>
 
         <div className={styles.purchase}>
-          <p className={wasPrice ? `${styles.price} ${styles.onSale}` : styles.price}>
+          <p
+            className={
+              wasPrice ? `${styles.price} ${styles.onSale}` : styles.price
+            }
+          >
             {wasPrice ? <s>{wasPrice.formatted}</s> : null}
             <span>{price.formatted}</span>
           </p>
           <div className={styles.quantity}>
             <span className={styles.quantityLabel}>Qty</span>
-            <QuantitySelector value={quantity} minValue={1} maxValue={99} onChange={onQuantityChange} />
+            <QuantitySelector
+              value={quantity}
+              minValue={1}
+              maxValue={99}
+              onChange={onQuantityChange}
+            />
           </div>
-          <AddToCart productId={product.id} quantity={quantity} sku={variant.sku} />
+          <AddToCart
+            productId={product.id}
+            quantity={quantity}
+            sku={variant.sku}
+          />
           <AddToWishlist productId={product.id} variantId={variant.id} />
         </div>
       </div>

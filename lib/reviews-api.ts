@@ -1,20 +1,35 @@
 "use client";
 
-import type { ProductReview, ProductReviewInput, ProductReviewPage, ProductReviewQuery } from "./types";
+import type {
+  ProductReview,
+  ProductReviewInput,
+  ProductReviewPage,
+  ProductReviewQuery,
+} from "./types";
 
 async function readJson<T>(response: Response): Promise<T> {
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "Reviews are temporarily unavailable. Please try again.");
+  if (!response.ok)
+    throw new Error(
+      data.error || "Reviews are temporarily unavailable. Please try again.",
+    );
   return data as T;
 }
 
 /** Only the parts of the query that differ from the defaults reach the URL. */
-export function reviewQueryString({ offset = 0, search = "", ratings = [], withMedia, sort }: ProductReviewQuery) {
+export function reviewQueryString({
+  offset = 0,
+  search = "",
+  ratings = [],
+  withMedia,
+  sort,
+}: ProductReviewQuery) {
   const params = new URLSearchParams();
 
   if (offset) params.set("offset", String(offset));
   if (search.trim()) params.set("q", search.trim());
-  if (ratings.length) params.set("rating", [...ratings].sort((a, b) => b - a).join(","));
+  if (ratings.length)
+    params.set("rating", [...ratings].sort((a, b) => b - a).join(","));
   if (withMedia) params.set("media", "with");
   if (sort && sort !== "newest") params.set("sort", sort);
 
@@ -31,13 +46,17 @@ export async function loadProductReviews(
 ) {
   const search = reviewQueryString(query);
 
-  return readJson<ProductReviewPage>(await fetch(
-    `${basePath}/${encodeURIComponent(productId)}/reviews${search ? `?${search}` : ""}`,
-    { cache: "no-store" },
-  ));
+  return readJson<ProductReviewPage>(
+    await fetch(
+      `${basePath}/${encodeURIComponent(productId)}/reviews${search ? `?${search}` : ""}`,
+      { cache: "no-store" },
+    ),
+  );
 }
 
-export type ReviewSubmission = Omit<ProductReviewInput, "media"> & { files?: File[] };
+export type ReviewSubmission = Omit<ProductReviewInput, "media"> & {
+  files?: File[];
+};
 
 export async function submitProductReview(
   productId: string,
@@ -48,16 +67,21 @@ export async function submitProductReview(
 
   // Media has to travel as multipart; a plain draft stays JSON.
   if (!files.length) {
-    return readJson<{ review: ProductReview }>(await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-    }));
+    return readJson<{ review: ProductReview }>(
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      }),
+    );
   }
 
   const form = new FormData();
-  for (const [name, value] of Object.entries(input)) form.set(name, String(value));
+  for (const [name, value] of Object.entries(input))
+    form.set(name, String(value));
   for (const file of files) form.append("media", file);
 
-  return readJson<{ review: ProductReview }>(await fetch(url, { method: "POST", body: form }));
+  return readJson<{ review: ProductReview }>(
+    await fetch(url, { method: "POST", body: form }),
+  );
 }

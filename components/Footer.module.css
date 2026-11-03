@@ -27,11 +27,13 @@
   line-height: 1;
 }
 
-.wordmark span { color: #d9f25f; }
+.wordmark span {
+  color: #d9f25f;
+}
 
 .identity p {
   margin: 19px 0 0;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 23px;
   line-height: 1.35;
   color: #d6dfd5;
@@ -59,7 +61,9 @@
   gap: 8px;
 }
 
-.footer .emailField { min-width: 0; }
+.footer .emailField {
+  min-width: 0;
+}
 
 .footer .emailField input {
   height: 48px !important;
@@ -71,8 +75,13 @@
   font-size: 14px;
 }
 
-.footer .emailField input::placeholder { color: #b9c8bd !important; }
-.footer .emailField input:focus-visible { outline: 2px solid #d9f25f !important; outline-offset: 3px; }
+.footer .emailField input::placeholder {
+  color: #b9c8bd !important;
+}
+.footer .emailField input:focus-visible {
+  outline: 2px solid #d9f25f !important;
+  outline-offset: 3px;
+}
 
 .footer .signupButton {
   display: inline-flex !important;
@@ -88,8 +97,14 @@
   font-weight: 700 !important;
 }
 
-.footer .signupButton:hover { background: #e7fa9b !important; }
-.footer a:focus-visible, .footer button:focus-visible { outline: 2px solid #d9f25f; outline-offset: 4px; }
+.footer .signupButton:hover {
+  background: #e7fa9b !important;
+}
+.footer a:focus-visible,
+.footer button:focus-visible {
+  outline: 2px solid #d9f25f;
+  outline-offset: 4px;
+}
 
 .services {
   display: grid;
@@ -100,15 +115,43 @@
   border-bottom: 1px solid #3b5145;
 }
 
-.services > div { display: flex; align-items: center; gap: 15px; }
-.services svg { flex: 0 0 22px; width: 22px; height: 22px; color: #d9f25f; }
-.services strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.4; }
-.services span { display: block; margin-top: 4px; font-size: 12px; line-height: 1.5; color: #b9c8bd; }
+.services > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.services svg {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  color: #d9f25f;
+}
+.services strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.services span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b9c8bd;
+}
 
-.footer .navigation nav { background: transparent !important; }
-.footer .navigation [data-footer-desktop] { padding: 32px 0 !important; }
-.footer .navigation [data-footer-desktop] > div { gap: 24px; }
-.footer .navigation [data-footer-desktop] > div > div > div { align-items: flex-start !important; }
+.footer .navigation nav {
+  background: transparent !important;
+}
+.footer .navigation [data-footer-desktop] {
+  padding: 32px 0 !important;
+}
+.footer .navigation [data-footer-desktop] > div {
+  gap: 24px;
+}
+.footer .navigation [data-footer-desktop] > div > div > div {
+  align-items: flex-start !important;
+}
 .footer .navigation [data-footer-desktop] p {
   margin: 0 !important;
   padding-bottom: 16px !important;
@@ -119,13 +162,35 @@
   letter-spacing: 1.6px;
   text-transform: uppercase;
 }
-.footer .navigation ul { margin: 0; padding: 0; }
-.footer .navigation ul[role='list'] { gap: 11px !important; }
-.footer .navigation a { color: #b9c8bd !important; font-size: 13px; line-height: 1.6; text-decoration: none; }
-.footer .navigation a:hover { color: #d9f25f !important; text-decoration: underline; text-underline-offset: 4px; }
-.footer .navigation [data-footer-mobile] > li { border-color: #3b5145 !important; }
-.footer .navigation [data-footer-mobile] button { padding: 0 !important; height: 54px !important; color: #f4f0e7 !important; }
-.footer .navigation [data-footer-mobile] svg { color: #d9f25f !important; }
+.footer .navigation ul {
+  margin: 0;
+  padding: 0;
+}
+.footer .navigation ul[role="list"] {
+  gap: 11px !important;
+}
+.footer .navigation a {
+  color: #b9c8bd !important;
+  font-size: 13px;
+  line-height: 1.6;
+  text-decoration: none;
+}
+.footer .navigation a:hover {
+  color: #d9f25f !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.footer .navigation [data-footer-mobile] > li {
+  border-color: #3b5145 !important;
+}
+.footer .navigation [data-footer-mobile] button {
+  padding: 0 !important;
+  height: 54px !important;
+  color: #f4f0e7 !important;
+}
+.footer .navigation [data-footer-mobile] svg {
+  color: #d9f25f !important;
+}
 
 .bottom {
   display: flex;
@@ -138,18 +203,50 @@
   font-size: 11px;
   line-height: 1.6;
 }
-.bottom strong { color: #f4f0e7; font-weight: 600; }
+.bottom strong {
+  color: #f4f0e7;
+  font-weight: 600;
+}
 
 @media (max-width: 767px) {
-  .footer { margin-top: 48px; }
-  .inner { padding: 36px 22px 24px; }
-  .newsletter { grid-template-columns: 1fr; gap: 30px; padding-bottom: 28px; }
-  .wordmark { font-size: 36px; }
-  .identity p { font-size: 21px; margin-top: 14px; }
-  .signup label { font-size: 19px; }
-  .signup p { margin-bottom: 16px; }
-  .services { grid-template-columns: 1fr; gap: 21px; padding: 25px 0; }
-  .services span { font-size: 12px; }
-  .footer .signupButton { padding: 0 16px !important; gap: 10px !important; }
-  .bottom { border-top: 0; padding-top: 23px; }
+  .footer {
+    margin-top: 48px;
+  }
+  .inner {
+    padding: 36px 22px 24px;
+  }
+  .newsletter {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding-bottom: 28px;
+  }
+  .wordmark {
+    font-size: 36px;
+  }
+  .identity p {
+    font-size: 21px;
+    margin-top: 14px;
+  }
+  .signup label {
+    font-size: 19px;
+  }
+  .signup p {
+    margin-bottom: 16px;
+  }
+  .services {
+    grid-template-columns: 1fr;
+    gap: 21px;
+    padding: 25px 0;
+  }
+  .services span {
+    font-size: 12px;
+  }
+  .footer .signupButton {
+    padding: 0 16px !important;
+    gap: 10px !important;
+  }
+  .bottom {
+    border-top: 0;
+    padding-top: 23px;
+  }
 }

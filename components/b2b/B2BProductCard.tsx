@@ -60,7 +60,9 @@ function CatalogCartButton({
         showToast(
           success
             ? `${productName} ${t("added to your bag.")}`
-            : t("The result could not be confirmed. Check your bag before trying again."),
+            : t(
+                "The result could not be confirmed. Check your bag before trying again.",
+              ),
           success ? "success" : "error",
         );
         if (success) openCart();
@@ -117,9 +119,7 @@ export function B2BProductCard({ product: p }: { product: B2BProduct }) {
       </div>
       <p className={s.productCategory}>{p.category}</p>
       <h3>
-        <Link href={`/b2b/products/${encodeURIComponent(p.id)}`}>
-          {p.name}
-        </Link>
+        <Link href={`/b2b/products/${encodeURIComponent(p.id)}`}>{p.name}</Link>
       </h3>
       <div className={s.price}>
         {p.price?.formatted ??

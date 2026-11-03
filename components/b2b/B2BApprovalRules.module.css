@@ -88,7 +88,11 @@
   color: var(--af-ink);
   font-weight: 600;
 }
-:global(#launchpad-storefront) .rules .segmented button[aria-selected="true"] span {
+:global(#launchpad-storefront)
+  .rules
+  .segmented
+  button[aria-selected="true"]
+  span {
   background: var(--af-olive);
   color: #fff;
 }
@@ -420,7 +424,10 @@
   color: #fff;
   font-weight: 600;
 }
-:global(#launchpad-storefront) .rules .rolePicker button[aria-pressed="true"]::before {
+:global(#launchpad-storefront)
+  .rules
+  .rolePicker
+  button[aria-pressed="true"]::before {
   content: "✓";
   font-size: 11px;
 }
@@ -468,7 +475,9 @@
 }
 :global(#launchpad-storefront) .rules .conditionRow {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.9fr) minmax(130px, 1fr) 40px;
+  grid-template-columns:
+    minmax(150px, 1fr) minmax(130px, 0.9fr) minmax(130px, 1fr)
+    40px;
   gap: 8px;
   align-items: center;
   padding: 10px;

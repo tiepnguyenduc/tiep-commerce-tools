@@ -13,7 +13,11 @@ import styles from "./HeaderMobileCategoryMenu.module.css";
  * Drill-down category navigation for the drawer: one level at a time keeps deep
  * catalogues thumb-friendly instead of stacking every subcategory in one scroll.
  */
-export function HeaderMobileCategoryMenu({ categories }: { categories: Category[] }) {
+export function HeaderMobileCategoryMenu({
+  categories,
+}: {
+  categories: Category[];
+}) {
   const [path, setPath] = useState<Category[]>([]);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
   const { isOpen, setDepth } = useHeaderMobileMenu();
@@ -56,9 +60,19 @@ export function HeaderMobileCategoryMenu({ categories }: { categories: Category[
   return (
     <nav className={styles.menu} aria-label="Product categories">
       {/* Keyed so every level change replays the transition. */}
-      <div className={styles.levelHeader} key={`head-${current?.categoryId ?? "root"}`} data-direction={direction}>
+      <div
+        className={styles.levelHeader}
+        key={`head-${current?.categoryId ?? "root"}`}
+        data-direction={direction}
+      >
         {current && (
-          <Button variant="ghost" size="fit" type="button" className={styles.back} onClick={back}>
+          <Button
+            variant="ghost"
+            size="fit"
+            type="button"
+            className={styles.back}
+            onClick={back}
+          >
             <span className={styles.row}>
               <ChevronLeftIcon aria-hidden="true" />
               {parent ? parent.name : "All categories"}
@@ -77,10 +91,17 @@ export function HeaderMobileCategoryMenu({ categories }: { categories: Category[
         )}
       </div>
 
-      <ul className={styles.list} key={current?.categoryId ?? "root"} data-direction={direction}>
+      <ul
+        className={styles.list}
+        key={current?.categoryId ?? "root"}
+        data-direction={direction}
+      >
         {level.map((category, index) => (
           // The stagger stops building up after a few rows so long levels still feel instant.
-          <li key={category.categoryId} style={{ "--row": Math.min(index, 6) } as CSSProperties}>
+          <li
+            key={category.categoryId}
+            style={{ "--row": Math.min(index, 6) } as CSSProperties}
+          >
             {category.descendants?.length ? (
               <Button
                 variant="ghost"
@@ -99,8 +120,12 @@ export function HeaderMobileCategoryMenu({ categories }: { categories: Category[
               <Link
                 link={category._url}
                 className={styles.item}
-                data-active={category.categoryId === activeCategoryId || undefined}
-                aria-current={category.categoryId === activeCategoryId ? "page" : undefined}
+                data-active={
+                  category.categoryId === activeCategoryId || undefined
+                }
+                aria-current={
+                  category.categoryId === activeCategoryId ? "page" : undefined
+                }
               >
                 <span className={styles.row}>
                   <span>{category.name}</span>

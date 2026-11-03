@@ -75,18 +75,27 @@ async function createCart(mode: StoreMode) {
     return response.body;
   }
 
-  const response = await requireApiRoot().carts().post({ body: draft(mode) }).execute();
+  const response = await requireApiRoot()
+    .carts()
+    .post({ body: draft(mode) })
+    .execute();
   return response.body;
 }
 
-async function targetForCart(mode: StoreMode, cartId: string): Promise<CartUpdateTarget> {
+async function targetForCart(
+  mode: StoreMode,
+  cartId: string,
+): Promise<CartUpdateTarget> {
   if (mode === "b2b") {
     const context = requireB2BContext();
     const builder = b2bChain(context).carts().withId({ ID: cartId });
     return {
       get: async () =>
-        (await builder.get({ queryArgs: { expand: discountCodeExpand } }).execute())
-          .body,
+        (
+          await builder
+            .get({ queryArgs: { expand: discountCodeExpand } })
+            .execute()
+        ).body,
       update: async (version, actions) =>
         (
           await builder
@@ -102,8 +111,11 @@ async function targetForCart(mode: StoreMode, cartId: string): Promise<CartUpdat
   const builder = requireApiRoot().carts().withId({ ID: cartId });
   return {
     get: async () =>
-      (await builder.get({ queryArgs: { expand: discountCodeExpand } }).execute())
-        .body,
+      (
+        await builder
+          .get({ queryArgs: { expand: discountCodeExpand } })
+          .execute()
+      ).body,
     update: async (version, actions) =>
       (
         await builder
@@ -125,7 +137,10 @@ function isConcurrentModification(error: unknown) {
   );
 }
 
-async function withRetry(target: CartUpdateTarget, actionsFor: (cart: CtCart) => CartUpdateAction[]) {
+async function withRetry(
+  target: CartUpdateTarget,
+  actionsFor: (cart: CtCart) => CartUpdateAction[],
+) {
   let cart = await target.get();
   try {
     return await target.update(cart.version, actionsFor(cart));
@@ -136,7 +151,10 @@ async function withRetry(target: CartUpdateTarget, actionsFor: (cart: CtCart) =>
   }
 }
 
-function lineMatches(line: CtCart["lineItems"][number], input: Pick<CartUpdateInput, "productId" | "sku">) {
+function lineMatches(
+  line: CtCart["lineItems"][number],
+  input: Pick<CartUpdateInput, "productId" | "sku">,
+) {
   return input.sku
     ? line.variant.sku === input.sku
     : line.productId === input.productId;
@@ -209,7 +227,11 @@ export async function updateLiveCart(input: CartUpdateInput): Promise<Cart> {
 
   const target = await targetForCart(input.mode, cartId);
   const updated = await withRetry(target, updateActions(input));
-  return mapCommercetoolsCart(updated, input.mode, requireCommerceConfig().locale);
+  return mapCommercetoolsCart(
+    updated,
+    input.mode,
+    requireCommerceConfig().locale,
+  );
 }
 
 export async function clearLiveCart(mode: StoreMode): Promise<Cart> {
@@ -253,7 +275,9 @@ async function updateLiveCartWithActions(
 ): Promise<Cart> {
   const cartId = getCartId(mode);
   if (!cartId) {
-    throw new Error("No active cart. Add an item before applying a discount code.");
+    throw new Error(
+      "No active cart. Add an item before applying a discount code.",
+    );
   }
 
   const target = await targetForCart(mode, cartId);
@@ -282,7 +306,8 @@ export async function createLiveOrder(
   purchaseOrderNumber?: string,
 ): Promise<Order> {
   const cartId = getCartId(mode);
-  if (!cartId) throw new Error("No active cart. Add an item before placing an order.");
+  if (!cartId)
+    throw new Error("No active cart. Add an item before placing an order.");
 
   const target = await targetForCart(mode, cartId);
   const cart = await target.get();

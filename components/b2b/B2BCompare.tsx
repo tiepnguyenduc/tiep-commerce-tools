@@ -64,9 +64,12 @@ export function B2BCompareProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     if (!ids.includes(id) && ids.length >= B2B_COMPARE_LIMIT) {
       showToast(
-        t("Compare up to {count} products. Remove a product before adding another.", {
-          count: B2B_COMPARE_LIMIT,
-        }),
+        t(
+          "Compare up to {count} products. Remove a product before adding another.",
+          {
+            count: B2B_COMPARE_LIMIT,
+          },
+        ),
         "error",
       );
       return;
@@ -111,7 +114,11 @@ export function B2BCompareButton({
       className={compact ? s.iconToggle : s.toggle}
       type="button"
       aria-pressed={selected}
-      aria-label={selected ? t("Remove product from compare") : t("Add product to compare")}
+      aria-label={
+        selected
+          ? t("Remove product from compare")
+          : t("Add product to compare")
+      }
       title={selected ? t("Remove from compare") : t("Add to compare")}
       disabled={!ready}
       onClick={() => toggle(productId)}

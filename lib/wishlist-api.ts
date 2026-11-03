@@ -4,11 +4,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Wishlist } from "./types";
 
 type WishlistStatus =
-  | "idle"
-  | "loading"
-  | "ready"
-  | "unauthenticated"
-  | "error";
+  "idle" | "loading" | "ready" | "unauthenticated" | "error";
 
 type WishlistState = {
   wishlists: Wishlist[];
@@ -78,7 +74,8 @@ export function loadWishlists(force = false): Promise<Wishlist[]> {
   pendingLoad = fetch("/api/wishlists", { cache: "no-store" })
     .then((response) => readJson<{ wishlists: Wishlist[] }>(response))
     .then(({ wishlists }) => {
-      if (currentGeneration === generation) emit({ wishlists, status: "ready", error: "" });
+      if (currentGeneration === generation)
+        emit({ wishlists, status: "ready", error: "" });
       return wishlists;
     })
     .catch((error) => {
@@ -144,14 +141,11 @@ export async function addItemToWishlist(
   input: { productId: string; variantId?: number },
 ) {
   const data = await readJson<{ wishlist: Wishlist }>(
-    await fetch(
-      `/api/wishlists/${encodeURIComponent(wishlistId)}/items`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      },
-    ),
+    await fetch(`/api/wishlists/${encodeURIComponent(wishlistId)}/items`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    }),
   );
   return upsertWishlist(data.wishlist);
 }

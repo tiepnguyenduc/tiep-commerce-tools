@@ -5,10 +5,10 @@
   bottom: 0;
   /* Under the sticky header (z-index 40), above the page. */
   z-index: 38;
-  background: rgba(255, 255, 255, .96);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
-  box-shadow: 0 -16px 30px -26px rgba(21, 37, 29, .55);
+  box-shadow: 0 -16px 30px -26px rgba(21, 37, 29, 0.55);
   color: var(--ink);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -161,4 +161,3 @@
     display: none;
   }
 }
-

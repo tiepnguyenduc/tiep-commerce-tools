@@ -22,9 +22,18 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="card-meta-row">
         <span className="tag">{product.category}</span>
-        {product.brand && <Link className="tag brand-tag" href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}>{product.brand}</Link>}
+        {product.brand && (
+          <Link
+            className="tag brand-tag"
+            href={`/shop-by-brand?brand=${encodeURIComponent(product.brand)}`}
+          >
+            {product.brand}
+          </Link>
+        )}
       </div>
-      <p className="muted launchpad-product-description">{product.description}</p>
+      <p className="muted launchpad-product-description">
+        {product.description}
+      </p>
       <ProductCartStatus productId={product.id} />
       <div className="product-image-actions">
         <AddToWishlist compact productId={product.id} />

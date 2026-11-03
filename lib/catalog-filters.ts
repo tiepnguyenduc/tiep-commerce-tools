@@ -70,7 +70,10 @@ function sortProducts(items: Product[], sort = "") {
   return selected;
 }
 
-function normalizePositiveInteger(value: string | number | undefined, fallback: number) {
+function normalizePositiveInteger(
+  value: string | number | undefined,
+  fallback: number,
+) {
   const parsed = typeof value === "number" ? value : Number(value);
   if (!Number.isInteger(parsed) || parsed < 1) return fallback;
   return parsed;
@@ -103,7 +106,10 @@ export function applyCatalogFilters(
   });
 
   const sortedProducts = sortProducts(selected, options.sort);
-  const perPage = normalizePositiveInteger(options.perPage, sortedProducts.length || 1);
+  const perPage = normalizePositiveInteger(
+    options.perPage,
+    sortedProducts.length || 1,
+  );
   const totalPages = Math.max(1, Math.ceil(sortedProducts.length / perPage));
   const requestedPage = normalizePositiveInteger(options.page, 1);
   const page = Math.min(requestedPage, totalPages);

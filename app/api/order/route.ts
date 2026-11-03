@@ -26,7 +26,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       training: true,
       order: {
-        id: parsed.data.mode === "b2b" ? "training-b2b-order" : "training-order",
+        id:
+          parsed.data.mode === "b2b" ? "training-b2b-order" : "training-order",
         orderNumber:
           parsed.data.mode === "b2b"
             ? parsed.data.purchaseOrderNumber || "PO-2026-104"

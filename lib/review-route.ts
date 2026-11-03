@@ -6,7 +6,11 @@ import {
   reviewErrorResponse,
   type ReviewCatalog,
 } from "@/lib/ct/reviews";
-import { assertValidReviewMedia, ReviewMediaError, storeReviewMedia } from "@/lib/ct/review-media";
+import {
+  assertValidReviewMedia,
+  ReviewMediaError,
+  storeReviewMedia,
+} from "@/lib/ct/review-media";
 import type { ProductReviewQuery } from "@/lib/types";
 
 type Context = { params: Promise<{ productId: string }> };
@@ -21,14 +25,20 @@ const querySchema = z.object({
   offset: z.coerce.number().int().min(0).max(10000).default(0),
   q: z.string().trim().max(120).default(""),
   /** Whole stars to keep, e.g. "5,4". */
-  rating: z.string().regex(/^[1-5](,[1-5])*$/).optional(),
+  rating: z
+    .string()
+    .regex(/^[1-5](,[1-5])*$/)
+    .optional(),
   media: z.enum(["all", "with"]).default("all"),
   sort: z.enum(["newest", "oldest", "highest", "lowest"]).default("newest"),
 });
 
 function failure(error: unknown) {
   if (error instanceof ReviewMediaError) {
-    return NextResponse.json({ error: error.message }, { status: error.status });
+    return NextResponse.json(
+      { error: error.message },
+      { status: error.status },
+    );
   }
   const result = reviewErrorResponse(error);
   return NextResponse.json({ error: result.error }, { status: result.status });
@@ -36,8 +46,13 @@ function failure(error: unknown) {
 
 /** Accepts the plain JSON draft, or multipart when the shopper attached media. */
 async function readSubmission(request: Request) {
-  if (!(request.headers.get("content-type") ?? "").includes("multipart/form-data")) {
-    return { values: await request.json().catch(() => null), files: [] as File[] };
+  if (
+    !(request.headers.get("content-type") ?? "").includes("multipart/form-data")
+  ) {
+    return {
+      values: await request.json().catch(() => null),
+      files: [] as File[],
+    };
   }
 
   const form = await request.formData().catch(() => null);
@@ -55,7 +70,11 @@ async function readSubmission(request: Request) {
       text: text("text"),
       rating: Number(text("rating")),
     },
-    files: form.getAll("media").filter((entry): entry is File => entry instanceof File && entry.size > 0),
+    files: form
+      .getAll("media")
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      ),
   };
 }
 
@@ -65,12 +84,20 @@ export type ReviewRouteOptions = {
 };
 
 /** GET/POST handlers for `…/products/[productId]/reviews` against one catalog's project. */
-export function reviewRouteHandlers(catalog: ReviewCatalog, { authorizeWrite }: ReviewRouteOptions = {}) {
+export function reviewRouteHandlers(
+  catalog: ReviewCatalog,
+  { authorizeWrite }: ReviewRouteOptions = {},
+) {
   async function GET(request: Request, context: Context) {
     const { productId } = await context.params;
-    const parsed = querySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+    const parsed = querySchema.safeParse(
+      Object.fromEntries(new URL(request.url).searchParams),
+    );
     if (!productIdSchema.safeParse(productId).success || !parsed.success) {
-      return NextResponse.json({ error: "Invalid product or review filters." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid product or review filters." },
+        { status: 400 },
+      );
     }
 
     const { offset, q, rating, media, sort } = parsed.data;
@@ -83,7 +110,9 @@ export function reviewRouteHandlers(catalog: ReviewCatalog, { authorizeWrite }: 
     };
 
     try {
-      return NextResponse.json(await readProductReviews(productId, query, catalog));
+      return NextResponse.json(
+        await readProductReviews(productId, query, catalog),
+      );
     } catch (error) {
       return failure(error);
     }
@@ -97,16 +126,24 @@ export function reviewRouteHandlers(catalog: ReviewCatalog, { authorizeWrite }: 
     const { values, files } = await readSubmission(request);
     const parsed = reviewSchema.safeParse(values);
     if (!productIdSchema.safeParse(productId).success || !parsed.success) {
-      return NextResponse.json({
-        error: "Enter your name (up to 80 characters), a title (up to 120), a review (up to 2,000), and a whole-number rating from 1 to 5.",
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            "Enter your name (up to 80 characters), a title (up to 120), a review (up to 2,000), and a whole-number rating from 1 to 5.",
+        },
+        { status: 400 },
+      );
     }
 
     try {
       // Reject an invalid attachment set before anything is written or created.
       assertValidReviewMedia(files);
       const media = await storeReviewMedia(files);
-      const review = await createProductReview(productId, { ...parsed.data, media }, catalog);
+      const review = await createProductReview(
+        productId,
+        { ...parsed.data, media },
+        catalog,
+      );
       return NextResponse.json({ review }, { status: 201 });
     } catch (error) {
       return failure(error);

@@ -1,7 +1,7 @@
 @tailwind base;
 
 @layer base {
-  [data-theme='default'] {
+  [data-theme="default"] {
     --color-primary: 33 33 33;
     --color-secondary: 73 73 73;
     --color-accent: 73 73 73;
@@ -58,7 +58,11 @@
   border-width: 0;
   border-color: rgb(var(--color-gray-300));
 }
-#launchpad-storefront button.ct-ui { cursor: pointer; }
-#launchpad-storefront button.ct-ui:disabled { cursor: not-allowed; }
+#launchpad-storefront button.ct-ui {
+  cursor: pointer;
+}
+#launchpad-storefront button.ct-ui:disabled {
+  cursor: not-allowed;
+}
 
 @tailwind utilities;

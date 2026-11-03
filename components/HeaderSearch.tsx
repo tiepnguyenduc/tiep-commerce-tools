@@ -7,7 +7,11 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faMagnifyingGlass,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import type { HeaderCategory, Product, SearchResult } from "@/lib/types";
 
 const suggestionLimit = 5;
@@ -26,7 +30,9 @@ export function HeaderSearch({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestedProducts, setSuggestedProducts] = useState(products);
-  const [searchState, setSearchState] = useState<"ready" | "loading" | "error">("ready");
+  const [searchState, setSearchState] = useState<"ready" | "loading" | "error">(
+    "ready",
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const trimmedQuery = query.trim();
@@ -122,9 +128,14 @@ export function HeaderSearch({
   }
 
   return (
-    <div className={`header-search ${styles.headerSearch} ${open ? "open" : ""}`} ref={rootRef}>
+    <div
+      className={`header-search ${styles.headerSearch} ${open ? "open" : ""}`}
+      ref={rootRef}
+    >
       {!open && !inline ? (
-        <UIButton variant="ghost" size="fit"
+        <UIButton
+          variant="ghost"
+          size="fit"
           aria-label="Open search"
           className="header-search-trigger"
           onClick={() => setOpen(true)}
@@ -144,7 +155,9 @@ export function HeaderSearch({
             <label className="sr-only" htmlFor="header-search-input">
               Search products and categories
             </label>
-            <CTInput containerClassName={styles.headerInput} className={styles.headerInputControl}
+            <CTInput
+              containerClassName={styles.headerInput}
+              className={styles.headerInputControl}
               autoComplete="off"
               id="header-search-input"
               name="q"
@@ -159,7 +172,9 @@ export function HeaderSearch({
               value={query}
             />
             {query ? (
-              <UIButton variant="ghost" size="fit"
+              <UIButton
+                variant="ghost"
+                size="fit"
                 aria-label="Clear search"
                 className={`header-search-clear ${styles.headerClear}`}
                 onClick={clearSearch}
@@ -168,7 +183,9 @@ export function HeaderSearch({
                 <FontAwesomeIcon aria-hidden="true" icon={faXmark} />
               </UIButton>
             ) : null}
-            <UIButton variant="ghost" size="fit"
+            <UIButton
+              variant="ghost"
+              size="fit"
               aria-label="Search"
               className={`header-search-submit ${styles.headerSubmit}`}
               type="submit"
@@ -177,58 +194,64 @@ export function HeaderSearch({
             </UIButton>
           </form>
 
-          {open && <div className="header-search-dropdown">
-            <div className="header-search-group">
-              <h3>Categories</h3>
-              {categoryMatches.length ? (
-                categoryMatches.map((category) => (
-                  <Link
-                    className="header-search-row category-result"
-                    href={`/search?categoryId=${encodeURIComponent(category.id)}&category=${encodeURIComponent(category.name)}${trimmedQuery ? `&q=${encodeURIComponent(trimmedQuery)}` : ""}`}
-                    key={category.id}
-                    onClick={() => setOpen(false)}
-                  >
-                    <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
-                    <span>{category.name}</span>
-                  </Link>
-                ))
-              ) : (
-                <p className="search-empty">No matching categories</p>
-              )}
-            </div>
+          {open && (
+            <div className="header-search-dropdown">
+              <div className="header-search-group">
+                <h3>Categories</h3>
+                {categoryMatches.length ? (
+                  categoryMatches.map((category) => (
+                    <Link
+                      className="header-search-row category-result"
+                      href={`/search?categoryId=${encodeURIComponent(category.id)}&category=${encodeURIComponent(category.name)}${trimmedQuery ? `&q=${encodeURIComponent(trimmedQuery)}` : ""}`}
+                      key={category.id}
+                      onClick={() => setOpen(false)}
+                    >
+                      <FontAwesomeIcon aria-hidden="true" icon={faArrowRight} />
+                      <span>{category.name}</span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="search-empty">No matching categories</p>
+                )}
+              </div>
 
-            <div className="header-search-group">
-              <h3>Products</h3>
-              {searchState !== "ready" ? (
-                <p className="search-empty" role="status">{searchState === "loading" ? "Finding products…" : "Suggestions are unavailable. Try viewing all results."}</p>
-              ) : productsToShow.length ? (
-                productsToShow.map((product) => (
-                  <Link
-                    className="header-search-row product-result"
-                    href={`/products/${product.slug}`}
-                    key={product.id}
-                    onClick={() => setOpen(false)}
-                  >
-                    <img src={product.image} alt="" />
-                    <span>
-                      <strong>{product.name}</strong>
-                      <small>{product.price.formatted}</small>
-                    </span>
-                  </Link>
-                ))
-              ) : (
-                <p className="search-empty">No matching products</p>
-              )}
-            </div>
+              <div className="header-search-group">
+                <h3>Products</h3>
+                {searchState !== "ready" ? (
+                  <p className="search-empty" role="status">
+                    {searchState === "loading"
+                      ? "Finding products…"
+                      : "Suggestions are unavailable. Try viewing all results."}
+                  </p>
+                ) : productsToShow.length ? (
+                  productsToShow.map((product) => (
+                    <Link
+                      className="header-search-row product-result"
+                      href={`/products/${product.slug}`}
+                      key={product.id}
+                      onClick={() => setOpen(false)}
+                    >
+                      <img src={product.image} alt="" />
+                      <span>
+                        <strong>{product.name}</strong>
+                        <small>{product.price.formatted}</small>
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="search-empty">No matching products</p>
+                )}
+              </div>
 
-            <Link
-              className="header-search-view-all"
-              href={`/search${trimmedQuery ? `?q=${encodeURIComponent(trimmedQuery)}` : ""}`}
-              onClick={() => setOpen(false)}
-            >
-              View all results{trimmedQuery ? ` for "${trimmedQuery}"` : ""}
-            </Link>
-          </div>}
+              <Link
+                className="header-search-view-all"
+                href={`/search${trimmedQuery ? `?q=${encodeURIComponent(trimmedQuery)}` : ""}`}
+                onClick={() => setOpen(false)}
+              >
+                View all results{trimmedQuery ? ` for "${trimmedQuery}"` : ""}
+              </Link>
+            </div>
+          )}
         </>
       )}
     </div>

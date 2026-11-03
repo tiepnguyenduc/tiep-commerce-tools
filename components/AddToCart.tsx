@@ -22,7 +22,14 @@ export function AddToCart({
   const [busy, setBusy] = useState(false);
   const { cart, loadCart, openCart, syncCart } = useMiniCart();
   const showToast = useToast();
-  const inCart = cart?.mode === mode ? cart.lines.filter(line => sku ? line.sku === sku : line.productId === productId).reduce((count, line) => count + line.quantity, 0) : 0;
+  const inCart =
+    cart?.mode === mode
+      ? cart.lines
+          .filter((line) =>
+            sku ? line.sku === sku : line.productId === productId,
+          )
+          .reduce((count, line) => count + line.quantity, 0)
+      : 0;
   async function addToCart() {
     if (busy) return;
     setBusy(true);
@@ -46,14 +53,20 @@ export function AddToCart({
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        showToast(data.error || "Could not add the product to your cart.", "error");
+        showToast(
+          data.error || "Could not add the product to your cart.",
+          "error",
+        );
         return;
       }
       syncCart(data);
       openCart();
       showToast("Product added to your cart.", "success");
     } catch {
-      showToast("Network error — could not add the product to your cart.", "error");
+      showToast(
+        "Network error — could not add the product to your cart.",
+        "error",
+      );
     } finally {
       setBusy(false);
     }

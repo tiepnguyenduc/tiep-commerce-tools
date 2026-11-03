@@ -5,5 +5,7 @@ export default async function Page({
   searchParams: Promise<{ businessUnitKey?: string; status?: string }>;
 }) {
   const { businessUnitKey, status } = await searchParams;
-  return <B2BApprovalFlowsPage businessUnitKey={businessUnitKey} status={status} />;
+  return (
+    <B2BApprovalFlowsPage businessUnitKey={businessUnitKey} status={status} />
+  );
 }

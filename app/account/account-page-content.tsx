@@ -1,10 +1,7 @@
 import { AccountAuth } from "@/components/AccountAuth";
 import { readCustomerProfile } from "@/lib/ct/account";
 import type { AccountPage } from "@/lib/account-pages";
-import type {
-  CustomerOrderDetail,
-  CustomerProfile,
-} from "@/lib/types";
+import type { CustomerOrderDetail, CustomerProfile } from "@/lib/types";
 
 async function readInitialCustomer(): Promise<CustomerProfile | null> {
   try {

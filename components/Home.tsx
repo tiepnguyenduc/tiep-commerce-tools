@@ -16,17 +16,33 @@ export async function Home({ mode }: { mode: StoreMode }) {
   ]);
   const b2b = mode === "b2b";
   const firstCampaignProduct = products.find((product) => product.image);
-  const secondCampaignProduct = products.find((product) => product.image && product.image !== firstCampaignProduct?.image);
+  const secondCampaignProduct = products.find(
+    (product) => product.image && product.image !== firstCampaignProduct?.image,
+  );
   return (
     <>
       <ModeBar mode={mode} />
       <main className="shell">
         <div className={styles.campaigns}>
           <Banner
-            image={{ src: "/launchpad/category-banner.png", alt: "A considered interior from the Launchpad collection", position: "center" }}
-            title={b2b ? "Procure with confidence." : "Make room for good work."}
-            eyebrow={b2b ? "Spaces that bring teams together" : "The workday, beautifully considered"}
-            description={b2b ? "Bring your next workspace together, one considered piece at a time." : "Thoughtful furniture. Everyday comfort. A space that feels like you."}
+            image={{
+              src: "/launchpad/category-banner.png",
+              alt: "A considered interior from the Launchpad collection",
+              position: "center",
+            }}
+            title={
+              b2b ? "Procure with confidence." : "Make room for good work."
+            }
+            eyebrow={
+              b2b
+                ? "Spaces that bring teams together"
+                : "The workday, beautifully considered"
+            }
+            description={
+              b2b
+                ? "Bring your next workspace together, one considered piece at a time."
+                : "Thoughtful furniture. Everyday comfort. A space that feels like you."
+            }
             buttonText="Explore the collection"
             buttonLink="/products"
             headingLevel="h1"
@@ -39,7 +55,14 @@ export async function Home({ mode }: { mode: StoreMode }) {
               eyebrow="Find your favorite"
               title="Small details. Better days."
               description="Discover the pieces that make a space your own."
-              image={firstCampaignProduct ? { src: firstCampaignProduct.image, alt: firstCampaignProduct.name } : undefined}
+              image={
+                firstCampaignProduct
+                  ? {
+                      src: firstCampaignProduct.image,
+                      alt: firstCampaignProduct.name,
+                    }
+                  : undefined
+              }
               buttonText="Shop the collection"
               buttonLink="/products"
             />
@@ -47,7 +70,14 @@ export async function Home({ mode }: { mode: StoreMode }) {
               eyebrow="Design worth knowing"
               title="Good design starts here."
               description="Explore our brands and find a new point of view."
-              image={secondCampaignProduct ? { src: secondCampaignProduct.image, alt: secondCampaignProduct.name } : undefined}
+              image={
+                secondCampaignProduct
+                  ? {
+                      src: secondCampaignProduct.image,
+                      alt: secondCampaignProduct.name,
+                    }
+                  : undefined
+              }
               buttonText="Discover brands"
               buttonLink="/shop-by-brand"
             />

@@ -127,7 +127,8 @@ async function readOwnedLiveWishlist(id: string, customerId: string) {
         .get({ queryArgs: { expand: expandVariant } })
         .execute()
     ).body;
-    if (list.customer?.id !== customerId) throw new Error("Wishlist not found.");
+    if (list.customer?.id !== customerId)
+      throw new Error("Wishlist not found.");
     return list;
   } catch (error) {
     if (error instanceof Error && error.message === "Wishlist not found.") {

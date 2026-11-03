@@ -14,10 +14,7 @@ type WishlistRouteContext = {
   params: Promise<{ wishlistId: string }>;
 };
 
-export async function PUT(
-  request: Request,
-  { params }: WishlistRouteContext,
-) {
+export async function PUT(request: Request, { params }: WishlistRouteContext) {
   const parsed = renameInput.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
@@ -33,7 +30,10 @@ export async function PUT(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist rename failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist rename failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }
@@ -49,7 +49,10 @@ export async function DELETE(
     return NextResponse.json({ deletedId: wishlistId });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Wishlist delete failed" },
+      {
+        error:
+          error instanceof Error ? error.message : "Wishlist delete failed",
+      },
       { status: wishlistErrorStatus(error) },
     );
   }

@@ -23,14 +23,28 @@ export default function LaunchpadUIProvider({
   resetStyles?: boolean;
 }) {
   const pathname = usePathname();
-  const storefront = pathname === "/b2b" || pathname?.startsWith("/b2b/") ? "b2b" : "b2c";
+  const storefront =
+    pathname === "/b2b" || pathname?.startsWith("/b2b/") ? "b2b" : "b2c";
   const language = useStorefrontLanguages(storefront);
   const activeLocale = locale ?? language.locale ?? "en";
-  const activeMessages = messages ?? (activeLocale.split("-")[0] === "de" ? germanMessages : englishMessages);
-  useEffect(() => { document.documentElement.lang = activeLocale; }, [activeLocale]);
+  const activeMessages =
+    messages ??
+    (activeLocale.split("-")[0] === "de" ? germanMessages : englishMessages);
+  useEffect(() => {
+    document.documentElement.lang = activeLocale;
+  }, [activeLocale]);
   return (
-    <NextIntlClientProvider locale={activeLocale} messages={activeMessages} timeZone={timeZone}>
-      <div className={resetStyles ? "launchpad-ui" : undefined} data-theme="default">{children}</div>
+    <NextIntlClientProvider
+      locale={activeLocale}
+      messages={activeMessages}
+      timeZone={timeZone}
+    >
+      <div
+        className={resetStyles ? "launchpad-ui" : undefined}
+        data-theme="default"
+      >
+        {children}
+      </div>
     </NextIntlClientProvider>
   );
 }

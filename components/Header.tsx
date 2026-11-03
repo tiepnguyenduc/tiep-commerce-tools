@@ -8,7 +8,11 @@ import { Suspense, cache } from "react";
 import { connection } from "next/server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { listCatalogCategories, listHeaderCategories, searchProducts } from "@/lib/ct/catalog";
+import {
+  listCatalogCategories,
+  listHeaderCategories,
+  searchProducts,
+} from "@/lib/ct/catalog";
 import { readCustomerProfile } from "@/lib/ct/account";
 import { HeaderAccountLink } from "@/components/HeaderAccountLink";
 import { HeaderCartButton } from "@/components/MiniCart";
@@ -57,7 +61,9 @@ async function HeaderSearchSlot() {
     searchProducts("", "", { perPage: 5 }),
   ]);
 
-  return <HeaderSearch categories={categories} products={result.products} inline />;
+  return (
+    <HeaderSearch categories={categories} products={result.products} inline />
+  );
 }
 
 // Adapted from Launchpad organisms/header: logo, search, utilities and navigation.
@@ -67,14 +73,38 @@ export function Header() {
       <StorefrontAnnouncement />
       <div className={`shell header-inner ${styles.mainRow}`}>
         <HeaderMobileMenu>
-          <Suspense fallback={<p className={styles.menuLabel}>Loading categories…</p>}><HeaderMobileCategoryLinks /></Suspense>
+          <Suspense
+            fallback={<p className={styles.menuLabel}>Loading categories…</p>}
+          >
+            <HeaderMobileCategoryLinks />
+          </Suspense>
         </HeaderMobileMenu>
-        <Link className={`brand ${styles.logo}`} href="/" aria-label="WORK/SHOP home">WORK<i>/</i>SHOP</Link>
+        <Link
+          className={`brand ${styles.logo}`}
+          href="/"
+          aria-label="WORK/SHOP home"
+        >
+          WORK<i>/</i>SHOP
+        </Link>
         <div className={styles.search}>
-          <Suspense fallback={<div className={styles.searchFallback}><FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} /><span>Search products, categories...</span></div>}><HeaderSearchSlot /></Suspense>
+          <Suspense
+            fallback={
+              <div className={styles.searchFallback}>
+                <FontAwesomeIcon aria-hidden="true" icon={faMagnifyingGlass} />
+                <span>Search products, categories...</span>
+              </div>
+            }
+          >
+            <HeaderSearchSlot />
+          </Suspense>
         </div>
-        <nav className={`nav ${styles.actions}`} aria-label="Account and shopping tools">
-          <Suspense fallback={<HeaderAccountLink initialCustomer={null} />}><HeaderAccountSlot /></Suspense>
+        <nav
+          className={`nav ${styles.actions}`}
+          aria-label="Account and shopping tools"
+        >
+          <Suspense fallback={<HeaderAccountLink initialCustomer={null} />}>
+            <HeaderAccountSlot />
+          </Suspense>
           <HeaderWishlistLink />
           <HeaderCompareLink />
           <HeaderCartButton />
@@ -85,9 +115,15 @@ export function Header() {
           <nav className={styles.primaryLinks} aria-label="Main navigation">
             <Link href="/products">Shop all</Link>
             <Link href="/shop-by-brand">Brands</Link>
-            <Link className={styles.sale} href="/products?sale=true">Sale</Link>
+            <Link className={styles.sale} href="/products?sale=true">
+              Sale
+            </Link>
           </nav>
-          <div className={styles.categoryLinks}><Suspense fallback={null}><HeaderCategoryLinks /></Suspense></div>
+          <div className={styles.categoryLinks}>
+            <Suspense fallback={null}>
+              <HeaderCategoryLinks />
+            </Suspense>
+          </div>
         </div>
       </div>
     </header>

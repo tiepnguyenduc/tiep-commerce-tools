@@ -11,8 +11,17 @@ import { LinkedAddressFields } from "@/components/LinkedAddressFields";
 import { OrderDetails } from "@/components/OrderDetails";
 import { WishlistsPage } from "@/components/WishlistsPage";
 import { publishCustomerAuthChange } from "@/components/HeaderAccountLink";
-import { accountHref, accountPages, type AccountPage } from "@/lib/account-pages";
-import type { CustomerAddress, CustomerOrderDetail, CustomerOrderSummary, CustomerProfile } from "@/lib/types";
+import {
+  accountHref,
+  accountPages,
+  type AccountPage,
+} from "@/lib/account-pages";
+import type {
+  CustomerAddress,
+  CustomerOrderDetail,
+  CustomerOrderSummary,
+  CustomerProfile,
+} from "@/lib/types";
 import { fetchCustomerOrders } from "@/lib/account-orders-api";
 
 type Action = "login" | "register";
@@ -40,11 +49,7 @@ async function readJson<T>(response: Response): Promise<T> {
   return data;
 }
 
-function DashboardPage({
-  customer,
-}: {
-  customer: CustomerProfile;
-}) {
+function DashboardPage({ customer }: { customer: CustomerProfile }) {
   return (
     <div className="account-content-grid">
       <section className="account-box">
@@ -249,11 +254,15 @@ function AddressBookPage({
   customer: CustomerProfile;
   onCustomerChange: (customer: CustomerProfile) => void;
 }) {
-  const [addresses, setAddresses] = useState<CustomerAddress[]>(customer.addresses);
+  const [addresses, setAddresses] = useState<CustomerAddress[]>(
+    customer.addresses,
+  );
   const [editing, setEditing] = useState<CustomerAddress>(emptyAddress);
   const [status, setStatus] = useState("");
   const [savingAddress, setSavingAddress] = useState(false);
-  const [removingAddressId, setRemovingAddressId] = useState<string | null>(null);
+  const [removingAddressId, setRemovingAddressId] = useState<string | null>(
+    null,
+  );
   const showToast = useToast();
   const busy = savingAddress || removingAddressId !== null;
 
@@ -318,9 +327,12 @@ function AddressBookPage({
     setStatus("Removing address...");
     try {
       const data = await readJson<{ customer: CustomerProfile }>(
-        await fetch(`/api/customer/addresses?id=${encodeURIComponent(addressId)}`, {
-          method: "DELETE",
-        }),
+        await fetch(
+          `/api/customer/addresses?id=${encodeURIComponent(addressId)}`,
+          {
+            method: "DELETE",
+          },
+        ),
       );
       onCustomerChange(data.customer);
       setStatus("Address removed.");
@@ -343,8 +355,9 @@ function AddressBookPage({
             {addresses.map((address) => (
               <article className="address-card" key={address.id}>
                 <strong>
-                  {[address.firstName, address.lastName].filter(Boolean).join(" ") ||
-                    "Saved address"}
+                  {[address.firstName, address.lastName]
+                    .filter(Boolean)
+                    .join(" ") || "Saved address"}
                 </strong>
                 <p className="muted">
                   {[address.streetNumber, address.streetName]
@@ -358,15 +371,26 @@ function AddressBookPage({
                   {address.country}
                 </p>
                 <div className="inline-actions">
-                  <Button variant="secondary" size="s" type="button" disabled={busy} onClick={() => setEditing(address)}>
+                  <Button
+                    variant="secondary"
+                    size="s"
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setEditing(address)}
+                  >
                     Edit
                   </Button>
                   {address.id && (
-                    <Button variant="secondary" size="s" type="button"
+                    <Button
+                      variant="secondary"
+                      size="s"
+                      type="button"
                       disabled={busy}
                       onClick={() => removeAddress(address.id!)}
                     >
-                      {removingAddressId === address.id ? "Deleting…" : "Delete"}
+                      {removingAddressId === address.id
+                        ? "Deleting…"
+                        : "Delete"}
                     </Button>
                   )}
                 </div>
@@ -459,7 +483,13 @@ function AddressBookPage({
               {savingAddress ? "Saving…" : "Save address"}
             </Button>
             {editing.id && (
-              <Button variant="secondary" size="s" disabled={busy} type="button" onClick={() => setEditing(emptyAddress)}>
+              <Button
+                variant="secondary"
+                size="s"
+                disabled={busy}
+                type="button"
+                onClick={() => setEditing(emptyAddress)}
+              >
                 Cancel
               </Button>
             )}
@@ -471,11 +501,7 @@ function AddressBookPage({
   );
 }
 
-function OrdersPage({
-  initialOrder,
-}: {
-  initialOrder?: CustomerOrderDetail;
-}) {
+function OrdersPage({ initialOrder }: { initialOrder?: CustomerOrderDetail }) {
   const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
   const [status, setStatus] = useState("Loading orders...");
   const router = useRouter();
@@ -495,40 +521,46 @@ function OrdersPage({
 
   return (
     <div className="account-stack">
-      {orders.length > 0 && <div className="account-table-wrap">
-        <table className="account-table">
-        <thead>
-          <tr>
-            <th>Order #</th>
-            <th>Date</th>
-            <th>Items</th>
-            <th>Status</th>
-            <th>Total</th>
-            <th><span className="sr-only">Actions</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id}>
-              <td>{order.orderNumber}</td>
-              <td>{new Date(order.createdAt).toLocaleDateString("en-US")}</td>
-              <td>{order.lineCount}</td>
-              <td>{order.orderState}</td>
-              <td>{order.total.formatted}</td>
-              <td>
-                <Link
-                  aria-label={`View order ${order.orderNumber} details`}
-                  className="text-button order-detail-trigger"
-                  href={`/account/orders/${encodeURIComponent(order.id)}`}
-                >
-                  View details
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-        </table>
-      </div>}
+      {orders.length > 0 && (
+        <div className="account-table-wrap">
+          <table className="account-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.orderNumber}</td>
+                  <td>
+                    {new Date(order.createdAt).toLocaleDateString("en-US")}
+                  </td>
+                  <td>{order.lineCount}</td>
+                  <td>{order.orderState}</td>
+                  <td>{order.total.formatted}</td>
+                  <td>
+                    <Link
+                      aria-label={`View order ${order.orderNumber} details`}
+                      className="text-button order-detail-trigger"
+                      href={`/account/orders/${encodeURIComponent(order.id)}`}
+                    >
+                      View details
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       {initialOrder && (
         <OrderDetails
           order={initialOrder}
@@ -556,7 +588,8 @@ export function AccountDashboard({
   initialPage?: AccountPage;
 }) {
   const [activePage, setActivePage] = useState<AccountPage>(initialPage);
-  const [currentCustomer, setCurrentCustomer] = useState<CustomerProfile>(customer);
+  const [currentCustomer, setCurrentCustomer] =
+    useState<CustomerProfile>(customer);
 
   useEffect(() => {
     setCurrentCustomer(customer);
@@ -588,7 +621,8 @@ export function AccountDashboard({
         />
       );
     }
-    if (activePage === "orders") return <OrdersPage initialOrder={initialOrder} />;
+    if (activePage === "orders")
+      return <OrdersPage initialOrder={initialOrder} />;
     if (activePage === "wishlist") return <WishlistsPage />;
     return <DashboardPage customer={currentCustomer} />;
   }
@@ -706,7 +740,8 @@ export function AccountAuth({
         "success",
       );
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Customer request failed";
+      const message =
+        e instanceof Error ? e.message : "Customer request failed";
       setState(message);
       showToast(message, "error");
     } finally {
@@ -752,8 +787,14 @@ export function AccountAuth({
     <section className="panel account-auth-panel">
       <span className="eyebrow">Customer API</span>
       <h2>Login / register</h2>
-      <div className="ct-ui mb-24 grid grid-cols-2 gap-8" role="group" aria-label="Login or register">
-        <Button variant={action === "login" ? "primary" : "secondary"} size="full"
+      <div
+        className="ct-ui mb-24 grid grid-cols-2 gap-8"
+        role="group"
+        aria-label="Login or register"
+      >
+        <Button
+          variant={action === "login" ? "primary" : "secondary"}
+          size="full"
           aria-pressed={action === "login"}
           disabled={submitting}
           onClick={() => setAction("login")}
@@ -761,7 +802,9 @@ export function AccountAuth({
         >
           Login
         </Button>
-        <Button variant={action === "register" ? "primary" : "secondary"} size="full"
+        <Button
+          variant={action === "register" ? "primary" : "secondary"}
+          size="full"
           aria-pressed={action === "register"}
           disabled={submitting}
           onClick={() => setAction("register")}
@@ -821,7 +864,12 @@ export function AccountAuth({
             </>
           )}
         </div>
-        <Button variant="primary" className="gap-10" disabled={submitting} type="submit">
+        <Button
+          variant="primary"
+          className="gap-10"
+          disabled={submitting}
+          type="submit"
+        >
           {submitting ? (
             action === "login" ? (
               "Logging in…"

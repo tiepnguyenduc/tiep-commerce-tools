@@ -6,18 +6,23 @@ import { reviewMediaError, reviewMediaKind } from "../review-media";
 import type { ReviewMedia, ReviewMediaType } from "../types";
 
 /** Ids are generated here, so anything else must never reach the filesystem. */
-const MEDIA_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const MEDIA_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 export class ReviewMediaError extends Error {
   readonly status = 400;
 }
 
 function storageDirectory() {
-  return process.env.REVIEW_MEDIA_DIR || path.join(process.cwd(), ".data", "review-media");
+  return (
+    process.env.REVIEW_MEDIA_DIR ||
+    path.join(process.cwd(), ".data", "review-media")
+  );
 }
 
 const payloadPath = (id: string) => path.join(storageDirectory(), `${id}.bin`);
-const metadataPath = (id: string) => path.join(storageDirectory(), `${id}.json`);
+const metadataPath = (id: string) =>
+  path.join(storageDirectory(), `${id}.json`);
 
 export function reviewMediaUrl(id: string) {
   return `/api/review-media/${id}`;
@@ -64,7 +69,12 @@ export async function readStoredReviewMedia(id: string) {
       readFile(metadataPath(id), "utf8"),
     ]);
     const { contentType } = JSON.parse(metadata) as ReviewMedia;
-    return { body, contentType: reviewMediaKind(contentType) ? contentType : "application/octet-stream" };
+    return {
+      body,
+      contentType: reviewMediaKind(contentType)
+        ? contentType
+        : "application/octet-stream",
+    };
   } catch {
     return null;
   }
@@ -76,16 +86,22 @@ export function sanitizeStoredMedia(value: unknown): ReviewMedia[] {
 
   return value.flatMap((entry) => {
     const media = entry as Partial<ReviewMedia>;
-    const contentType = typeof media?.contentType === "string" ? media.contentType : "";
+    const contentType =
+      typeof media?.contentType === "string" ? media.contentType : "";
     const kind = reviewMediaKind(contentType);
-    if (!kind || typeof media.id !== "string" || !MEDIA_ID.test(media.id)) return [];
+    if (!kind || typeof media.id !== "string" || !MEDIA_ID.test(media.id))
+      return [];
 
-    return [{
-      id: media.id,
-      type: kind,
-      url: reviewMediaUrl(media.id),
-      contentType,
-      ...(typeof media.name === "string" && media.name ? { name: media.name.slice(0, 120) } : {}),
-    }];
+    return [
+      {
+        id: media.id,
+        type: kind,
+        url: reviewMediaUrl(media.id),
+        contentType,
+        ...(typeof media.name === "string" && media.name
+          ? { name: media.name.slice(0, 120) }
+          : {}),
+      },
+    ];
   });
 }
