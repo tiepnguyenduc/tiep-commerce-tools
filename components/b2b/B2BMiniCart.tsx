@@ -359,7 +359,7 @@ function B2BMiniCartDrawer({
               </ButtonLink>
               <ButtonLink
                 variant="primary"
-                href="/checkout/b2b"
+                href="/b2b/checkout"
                 onClick={onClose}
                 style={{ textAlign: "center", justifyContent: "center" }}
               >

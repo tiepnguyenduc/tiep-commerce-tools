@@ -139,7 +139,7 @@ export function resolveContext(unit: BusinessUnit, store: Store): B2BContext {
     distributionChannelId: store.distributionChannels[0].id,
   };
 }
-async function verifiedContext(session: B2BSession) {
+export async function verifiedContext(session: B2BSession) {
   if (!session.context)
     throw new B2BError("Choose a business unit and Store first.");
   const unit = await unitFor(session, session.context.businessUnitKey);
@@ -352,7 +352,7 @@ async function productsFor(
       p !== null && p.name.toLowerCase().includes(q.toLowerCase()),
   );
 }
-function cartRoot(session: B2BSession) {
+export function cartRoot(session: B2BSession) {
   return api()
     .asAssociate()
     .withAssociateIdValue({ associateId: requireCustomer(session).id })
@@ -376,7 +376,7 @@ export function cartMatchesContext(cart: CtCart, session: B2BSession) {
     ),
   );
 }
-async function cartFor(session: B2BSession) {
+export async function cartFor(session: B2BSession) {
   if (!session.context) return null;
   await verifiedContext(session);
   if (!session.cartId) {

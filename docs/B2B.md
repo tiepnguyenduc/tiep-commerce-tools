@@ -27,7 +27,8 @@ The API client requires the relevant project-scoped customer, Business Unit, ass
 3. An account without a company can create a Company with itself as administrator. Merchant-configured onboarding Stores are attached server-side; the browser cannot choose arbitrary Stores in the creation request.
 4. Company administrators can add an already registered customer's email to their Business Unit with the configured buyer role. No open join-by-company-key operation exists.
 5. Choose an assigned Business Unit and Store. Product visibility and negotiated prices use that Store; changing context restores only an Active bag belonging to the same customer, BU, Store, country and currency.
-6. Add variants to the business bag and update quantities. Checkout/payment/order placement is not part of this implementation; the B2C checkout must not receive a B2B session.
+6. Add variants to the business bag and update quantities.
+7. Check out at `/b2b/checkout`: choose one of the company's delivery addresses, enter the purchase order number and place the order. The order is created as the associate in the selected Business Unit and Store. Orders that match an active Approval Rule wait for approval; the confirmation page links to the Approval Flow. Online payment is not part of the business checkout, and the B2C checkout must not receive a B2B session.
 
 ## Isolation and authorization
 

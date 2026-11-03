@@ -71,7 +71,11 @@ See [B2B setup and verification](docs/B2B.md) for required merchant configuratio
 node --env-file=.env.local scripts/setup-b2b.mjs
 ```
 
-Only after reviewing the target project and resource plan, add `--apply` to create the named roles, Stores, and distribution channels. This does not create prices, customers, or Business Units. Channel prices and Store assignments must be configured before business purchasing is available. The new portal does not yet submit orders or use the legacy `/checkout/b2b` flow.
+Only after reviewing the target project and resource plan, add `--apply` to create the named roles, Stores, and distribution channels. This does not create prices, customers, or Business Units. Channel prices and Store assignments must be configured before business purchasing is available. The portal places orders through its own checkout at `/b2b/checkout` (not the legacy `/checkout/b2b` flow).
+
+### Business checkout and orders
+
+`/b2b/checkout` shows the business bag, the company's delivery addresses and a required purchase order number. `POST /api/b2b/orders` sets the chosen address as shipping and billing address, applies the default shipping method that matches the cart (when the API client may read shipping methods), and creates the Order with `asAssociate().inBusinessUnitKeyWithBusinessUnitKeyValue(...).orders().post(...)`, including `purchaseOrderNumber` and a generated `B2B-YYYYMMDD-XXXXXX` order number. The request carries the cart version the buyer reviewed; a changed bag is rejected with 409. When the order matches an active Approval Rule, commercetools opens an Approval Flow, and the confirmation page `/b2b/orders/[id]` shows the pending state with a link to it. The associate role needs `CreateMyOrdersFromMyCarts` to place orders and `ViewMyOrders` to read the confirmation.
 
 ### Legacy training checkout
 

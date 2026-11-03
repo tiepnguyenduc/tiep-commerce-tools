@@ -110,7 +110,7 @@ describe("B2B Cart & MiniCart", () => {
     expect(html).toContain("DP-100");
     expect(html).toContain("$150.00");
     expect(html).toContain("$300.00");
-    expect(html).toContain('href="/checkout/b2b"');
+    expect(html).toContain('href="/b2b/checkout"');
     expect(html).toContain("Proceed to checkout");
     expect(html).toContain("Clear bag");
   });

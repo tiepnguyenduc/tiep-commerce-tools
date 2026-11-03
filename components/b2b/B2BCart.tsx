@@ -366,7 +366,7 @@ export function B2BCart() {
               </p>
 
               {state.context ? (
-                <Link href="/checkout/b2b" className={s.bagCheckoutBtn}>
+                <Link href="/b2b/checkout" className={s.bagCheckoutBtn}>
                   <span>{t("Proceed to checkout")}</span>
                   <FontAwesomeIcon icon={faArrowRight} aria-hidden="true" />
                 </Link>
