@@ -1,0 +1,15 @@
+{
+  "extends": "@commercetools-frontend/application-config/tsconfig-mc-app.json",
+  "compilerOptions": {
+    "typeRoots": ["@types-extensions", "node_modules/@types"],
+    // Only the ambient types the app uses. Some build tools pull in empty
+    // `@types/*` stubs that would otherwise fail the typecheck.
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+    // Third-party declarations (e.g. `@commercetools/nimbus`) do not all typecheck
+    // against React 19; only check the application code.
+    "skipLibCheck": true,
+    // Allow tsc to resolve dependencies of `@types` packages in the way pnpm sets up the `node_modules`.
+    "preserveSymlinks": false
+  },
+  "include": ["src"]
+}

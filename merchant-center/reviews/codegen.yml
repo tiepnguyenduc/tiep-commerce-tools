@@ -1,0 +1,36 @@
+# Regenerates `src/types/generated/ctp.ts` and the `*.ctp.graphql` module
+# declarations from `schemas/ctp.json`. Run `npm run generate-types` after
+# changing a `.ctp.graphql` document.
+overwrite: true
+schema: schemas/ctp.json
+documents: 'src/**/*.ctp.graphql'
+generates:
+  src/types/generated/ctp.ts:
+    plugins:
+      # Emits the operation types plus only the enums and inputs they use.
+      - typescript-operations
+    config:
+      typesPrefix: T
+      addUnderscoreToArgsType: true
+      avoidOptionals:
+        field: false
+      scalars:
+        BigDecimal: string
+        Country: string
+        Currency: string
+        Date: string
+        DateTime: string
+        Json: '{ [key: string]: unknown }'
+        KeyReferenceInput: string
+        Locale: string
+        Long: number
+        SearchFilter: string
+        SearchSort: string
+        Time: string
+        Set: 'unknown[]'
+        YearMonth: string
+  '@types-extensions/graphql-ctp/index.d.ts':
+    plugins:
+      - add:
+          content: '/* THIS IS A GENERATED FILE */'
+      - typescript-graphql-files-modules

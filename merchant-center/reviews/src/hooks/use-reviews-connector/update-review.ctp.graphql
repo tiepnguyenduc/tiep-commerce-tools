@@ -1,0 +1,11 @@
+#import "./review-details.ctp.graphql"
+
+mutation UpdateReview(
+  $reviewId: String!
+  $version: Long!
+  $actions: [ReviewUpdateAction!]!
+) {
+  updateReview(id: $reviewId, version: $version, actions: $actions) {
+    ...ReviewDetails
+  }
+}

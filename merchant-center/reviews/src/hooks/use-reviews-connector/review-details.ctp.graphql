@@ -1,0 +1,34 @@
+fragment ReviewDetails on Review {
+  id
+  version
+  key
+  authorName
+  title
+  text
+  rating
+  locale
+  includedInStatistics
+  createdAt
+  lastModifiedAt
+  customerRef {
+    id
+  }
+  state {
+    id
+    key
+  }
+  target {
+    id
+    ... on Product {
+      key
+      masterData {
+        current {
+          nameAllLocales {
+            locale
+            value
+          }
+        }
+      }
+    }
+  }
+}

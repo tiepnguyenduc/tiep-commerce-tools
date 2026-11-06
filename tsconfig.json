@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
+    "merchant-center",
     "components/commercetools-ui/**/*.stories.tsx",
     "components/commercetools-ui/**/*.stories.ts",
     "components/commercetools-ui/**/*.spec.tsx",

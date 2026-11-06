@@ -1,0 +1,9 @@
+query FetchModerationStates($where: String!) {
+  states(where: $where, limit: 20) {
+    results {
+      id
+      key
+      roles
+    }
+  }
+}

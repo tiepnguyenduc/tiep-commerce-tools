@@ -1,0 +1,7 @@
+#import "./review-details.ctp.graphql"
+
+query FetchReviewDetails($reviewId: String!) {
+  review(id: $reviewId) {
+    ...ReviewDetails
+  }
+}

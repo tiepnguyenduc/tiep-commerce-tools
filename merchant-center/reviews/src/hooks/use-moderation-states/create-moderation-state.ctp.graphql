@@ -1,0 +1,7 @@
+mutation CreateModerationState($draft: StateDraft!) {
+  createState(draft: $draft) {
+    id
+    key
+    roles
+  }
+}
